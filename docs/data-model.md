@@ -29,7 +29,7 @@ Comments apply to a trait in general, not to its specific state or the mappings.
 
 ## Trait statuses and their transitions
 
-| Action                                                                                                                                                                       | Ontology term status | Mapping review status <br>(computed based<br> on reviews table) | Trait stats - master<br>(computed based on <br>the previous two) |
+| Action                                                                                                                                                                       | Ontology term status | Mapping review status <br>(computed based<br> on reviews table) | Trait status - master<br>(computed based on <br>the previous two) |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | --------------------------------------------------------------- | ---------------------------------------------------------------- |
 | **Case 1. Curator chooses an existing term from EFO**                                                                                                                        | current              | not_reviewed                                                    | awaiting review                                                  |
 | A necessary number of reviews is accumulated                                                                                                                                 | current              | reviewed                                                        | current                                                          |
@@ -47,9 +47,9 @@ Comments apply to a trait in general, not to its specific state or the mappings.
 
 ### Diagram:
 
-[![](https://i.imgur.com/tUBBipu.png)
+![](https://i.imgur.com/tUBBipu.png)
 
-Mermaid iagram source code :
+Mermaid diagram source code :
 
 `stateDiagram-v2`
 
