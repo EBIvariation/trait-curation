@@ -1,7 +1,5 @@
-
-Step by step guide on how to deploy the app in Heroku and enable automatic pull request deployment as well.
+# Setting up deployment in Heroku and automated pull request deployment
 The instructions assume that a Heroku account has been set up.
-
 
 1. Create a new Heroku app via the dashboard
 2. Once created, navigate to the "Deploy" tab and in the "Deployment Method" menu, select "GitHub".
