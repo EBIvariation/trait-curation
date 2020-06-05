@@ -17,11 +17,13 @@
 <body>
     <nav class="uk-navbar-container header" uk-navbar>
         <div class="uk-navbar-left">
+            {% with request.resolver_match.url_name as url_name %}
             <ul class="uk-navbar-nav">
-                <li class="header__item header__item--active">
+                <li class="header__item {% if url_name == 'browse' %}header__item--active{% endif %}">
                     <a class="header__link" href="#">BROWSE MAPPINGS</a>
                 </li>
             </ul>
+            {% endwith %}
         </div>
         <div class="uk-navbar-right">
             <ul class="uk-navbar-nav">
