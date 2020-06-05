@@ -1,8 +1,11 @@
 from django.shortcuts import render
+from .models import Trait
 
 
 def browse(request):
-    return render(request, 'traits/browse.html')
+    traits = Trait.objects.all()
+    context = {"traits": traits}
+    return render(request, 'traits/browse.html', context)
 
 
 def trait_detail(request, pk):
