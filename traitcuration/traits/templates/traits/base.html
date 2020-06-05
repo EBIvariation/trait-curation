@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<head>
+    {% load compress %}
+    {% load static %}
+    {% compress css %}
+    <link type="text/x-scss" href="{% static 'styles/main.scss' %}" rel="stylesheet"> {% endcompress %}
+    <script src="{% static 'js/uikit/uikit.js' %}"></script>
+    <script src="{% static 'js/uikit/uikit-icons.min.js' %}"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="description" content="An application for manually curating traits">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <nav class="uk-navbar-container header" uk-navbar>
+        <div class="uk-navbar-left">
+            <ul class="uk-navbar-nav">
+                <li class="header__item header__item--active">
+                    <a class="header__link" href="#">BROWSE MAPPINGS</a>
+                </li>
+            </ul>
+        </div>
+        <div class="uk-navbar-right">
+            <ul class="uk-navbar-nav">
+                <li class="header__item">
+                    <a class="header__link" href="#" uk-icon="icon: user"></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+
+</body>
+
+</html>

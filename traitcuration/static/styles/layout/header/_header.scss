@@ -1,0 +1,19 @@
+@import "../../utilities/variables";
+
+.header {
+  background-color: $color-primary !important;
+  padding: 0 15px;
+
+  &__item {
+    border-top: 6px solid transparent;
+
+    &--active {
+      border-top: 6px solid $color-secondary;
+    }
+  }
+
+  &__link {
+    font-family: $lato !important;
+    color: white !important;
+  }
+}
