@@ -20,7 +20,7 @@
             {% with request.resolver_match.url_name as url_name %}
             <ul class="uk-navbar-nav">
                 <li class="header__item {% if url_name == 'browse' %}header__item--active{% endif %}">
-                    <a class="header__link" href="#">BROWSE MAPPINGS</a>
+                    <a class="header__link" href="{% url 'browse' %}">BROWSE TRAITS</a>
                 </li>
             </ul>
             {% endwith %}
