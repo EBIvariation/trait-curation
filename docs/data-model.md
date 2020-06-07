@@ -37,4 +37,3 @@ Important consideration to note is that mappings are not unique in regard to (tr
 ### Diagram:
 
 ![Mermaid Diagram](statuses_diagram.png "Statuses Diagram")
-
