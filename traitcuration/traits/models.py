@@ -25,8 +25,8 @@ class User(models.Model):
 
 class OntologyTerm(models.Model):
     curie = models.CharField(max_length=50, blank=True, null=True)
-    uri = models.URLField(null=True)
-    label = models.CharField(max_length=200, blank=True, null=True)
+    uri = models.URLField(null=True, blank=True)
+    label = models.CharField(max_length=200)
     status = models.CharField(max_length=50)
     description = models.TextField(blank=True, null=True)
     cross_refs = models.TextField(blank=True, null=True)
