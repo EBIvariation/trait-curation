@@ -1,0 +1,25 @@
+stateDiagram-v2
+
+unmapped --> in_review:Mapped to newly suggested term
+
+unmapped --> in_review:Mapped to a term in EFO
+
+unmapped --> in_review: Mapped to a term in another ontology
+
+in_review --> needs_creation:Successfully reviewed new term
+
+in_review --> current: Successfully reviewed term in EFO
+
+in_review --> needs_import:Successfully reviewed term from <br/>another ontology
+
+needs_creation --> awaiting_creation: Submitted in PR
+
+note right of awaiting_creation : Newly created terms <br/> cannot be automatically <br/> picked up. To map them, <br/> one has to manually <br/> choose them` `once they <br/>are in EFO
+
+needs_import --> awaiting_import: Submitted in PR
+
+awaiting_import --> current: Picked up in periodic OLS query
+
+current --> obsolete: Found obsolete in periodic OLS query
+
+current --> deleted: Not found in periodic OLS query
