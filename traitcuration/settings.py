@@ -148,5 +148,5 @@ COMPRESS_PRECOMPILERS = (
 )
 
 # Activate Django-Heroku, only on Heroku environments.
-if '/app' in os.environ['HOME']:
-    django_heroku.settings(locals())
+# if '/app' in os.environ['HOME']:
+django_heroku.settings(locals())
