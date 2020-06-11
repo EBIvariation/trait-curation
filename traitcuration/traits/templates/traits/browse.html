@@ -16,6 +16,15 @@
     </form>
   </div>
 
+  <div class="tags">
+    <button id="all" onclick="filterClicked(this)" class="tag filter uk-button button-outlined--primary" data-filter="all"> All </button>
+    <button id="awaiting_review" onclick="filterClicked(this)" class="tag filter uk-button button-outlined--warning" data-filter="awaiting_review"> Awaiting Review </button>
+    <button id="deleted" onclick="filterClicked(this)" class="tag filter uk-button button-outlined--danger" data-filter="deleted"> Deleted </button>
+    <button id="obsolete" onclick="filterClicked(this)" class="tag filter uk-button button-outlined--danger" data-filter="obsolete"> Obsolete </button>
+    <button id="unmapped" onclick="filterClicked(this)" class="tag filter uk-button button-outlined--danger" data-filter="unmapped"> Unmapped </button>
+    <button id="current" onclick="filterClicked(this)" class="tag filter uk-button button-outlined--success" data-filter="current"> Current </button>
+  </div>
+
   <table class="uk-table uk-table-small uk-table-divider uk-table-justify">
     <thead>
       <tr>
@@ -28,7 +37,7 @@
     </thead>
     <tbody class="list">
       {% for trait in traits %}
-      <tr>
+      <tr status="{{trait.status}}">
         <td class="name">
           <a href="{% url 'trait_detail' trait.id %}">{{trait.name}}</a>
         </td>

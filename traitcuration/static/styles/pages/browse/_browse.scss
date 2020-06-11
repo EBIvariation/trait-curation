@@ -2,3 +2,12 @@
   width: 30vw !important;
   min-width: 350px !important;
 }
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tag {
+  margin-right: 20px !important;
+}
