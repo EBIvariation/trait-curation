@@ -1,12 +1,12 @@
 {% extends "traits/base.html" %} 
-{% load static %}
-{% block title %} Browse Traits {% endblock %}
+{% load static %} 
+{% block title %} Browse Traits {% endblock %} 
 {% block content %}
 <script src="{% static 'js/listjs/list.js' %}"></script>
 <div id="traits-table" class="uk-container uk-container-xlarge">
   <div class="uk-margin">
     <form class="uk-search uk-search-default search">
-      <span class="uk-search-icon-flip " uk-search-icon></span>
+      <span class="uk-search-icon-flip" uk-search-icon></span>
       <input
         class="uk-search-input search"
         onkeyup="search(this.value)"
@@ -19,11 +19,11 @@
   <table class="uk-table uk-table-small uk-table-divider uk-table-justify">
     <thead>
       <tr>
-        <th>TRAIT NAME</th>
-        <th>SOURCE RECORDS</th>
-        <th>MAPPED TERM</th>
-        <th>MAPPED TERM LABEL</th>
-        <th>TRAIT STATUS</th>
+        <th class="uk-width-large">TRAIT NAME</th>
+        <th class="uk-width-1-6">SOURCE RECORDS</th>
+        <th class="uk-width-1-6">MAPPED TERM</th>
+        <th class="uk-width-large">MAPPED TERM LABEL</th>
+        <th class="uk-width-1-6">TRAIT STATUS</th>
       </tr>
     </thead>
     <tbody class="list">
