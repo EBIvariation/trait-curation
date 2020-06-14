@@ -17,7 +17,7 @@ def trait_detail(request, pk):
 
 def get_status_list(traits):
     status_list = [
-        {"status": "all", "count": 0, "class": "button-outlined--primary",
+        {"status": "all", "count": len(traits), "class": "button-outlined--primary",
             "activeClass": "button-outlined--primary--active"},
         {"status": "awaiting_review", "count": 0, "class": "button-outlined--warning",
             "activeClass": "button-outlined--warning--active"},
