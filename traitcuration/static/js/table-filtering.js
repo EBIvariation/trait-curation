@@ -8,7 +8,7 @@ function search(searchstring) {
   table.search(searchstring, ["name", "curie", "label"]);
 }
 
-function filterClicked(status) {
+function filterClicked(status, activeClass) {
   var s = status.getAttribute("data-filter");
   var filterButtons = document.getElementsByClassName("filter");
   for (var button of filterButtons) {
@@ -20,33 +20,11 @@ function filterClicked(status) {
   document.getElementById(s).classList.add("active");
   if (s === "all") {
     table.filter();
-    document.getElementById(s).classList.add("button-outlined--primary--active");
+    document.getElementById(s).classList.add(activeClass);
     return;
   }
   table.filter(function (item) {
-    switch (s) {
-      case "current":
-        document
-          .getElementById(s)
-          .classList.add("button-outlined--success--active");
-        break;
-      case "awaiting_review":
-      case "awaiting_import":
-      case "awaiting_creation":
-      case "needs_import":
-      case "needs_creation":
-        document
-          .getElementById(s)
-          .classList.add("button-outlined--warning--active");
-        break;
-      case "unmapped":
-      case "obsolete":
-      case "deleted":
-        document
-          .getElementById(s)
-          .classList.add("button-outlined--danger--active");
-        break;
-    }
+    document.getElementById(s).classList.add(activeClass);
     status = item.elm.getAttribute("status");
     if (status == s) {
       return true;
