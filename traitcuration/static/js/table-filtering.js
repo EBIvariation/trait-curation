@@ -31,6 +31,10 @@ function filterClicked(status) {
           .classList.add("button-outlined--success--active");
         break;
       case "awaiting_review":
+      case "awaiting_import":
+      case "awaiting_creation":
+      case "needs_import":
+      case "needs_creation":
         document
           .getElementById(s)
           .classList.add("button-outlined--warning--active");

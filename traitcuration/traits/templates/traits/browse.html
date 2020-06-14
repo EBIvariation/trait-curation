@@ -1,6 +1,6 @@
-{% extends "traits/base.html" %} 
-{% load static %} 
-{% block title %} Browse Traits {% endblock %} 
+{% extends "traits/base.html" %}
+{% load static %}
+{% block title %} Browse Traits {% endblock %}
 {% block content %}
 <script src="{% static 'js/listjs/list.js' %}"></script>
 <div id="traits-table" class="uk-container uk-container-xlarge">
@@ -17,12 +17,86 @@
   </div>
 
   <div class="tags">
-    <button id="all" onclick="filterClicked(this)" class="tag filter uk-button button-outlined--primary" data-filter="all"> All </button>
-    <button id="awaiting_review" onclick="filterClicked(this)" class="tag filter uk-button button-outlined--warning" data-filter="awaiting_review"> Awaiting Review </button>
-    <button id="deleted" onclick="filterClicked(this)" class="tag filter uk-button button-outlined--danger" data-filter="deleted"> Deleted </button>
-    <button id="obsolete" onclick="filterClicked(this)" class="tag filter uk-button button-outlined--danger" data-filter="obsolete"> Obsolete </button>
-    <button id="unmapped" onclick="filterClicked(this)" class="tag filter uk-button button-outlined--danger" data-filter="unmapped"> Unmapped </button>
-    <button id="current" onclick="filterClicked(this)" class="tag filter uk-button button-outlined--success" data-filter="current"> Current </button>
+    <button
+      id="all"
+      onclick="filterClicked(this)"
+      class="tag filter uk-button button-outlined--primary"
+      data-filter="all"
+    >
+      All
+    </button>
+    <button
+      id="awaiting_review"
+      onclick="filterClicked(this)"
+      class="tag filter uk-button button-outlined--warning"
+      data-filter="awaiting_review"
+    >
+      Awaiting Review
+    </button>
+    <button
+      id="needs_import"
+      onclick="filterClicked(this)"
+      class="tag filter uk-button button-outlined--warning"
+      data-filter="needs_import"
+    >
+      Needs Import
+    </button>
+    <button
+      id="awaiting_import"
+      onclick="filterClicked(this)"
+      class="tag filter uk-button button-outlined--warning"
+      data-filter="awaiting_import"
+    >
+      Awaiting Import
+    </button>
+    <button
+      id="needs_creation"
+      onclick="filterClicked(this)"
+      class="tag filter uk-button button-outlined--warning"
+      data-filter="needs_creation"
+    >
+      Needs Creation
+    </button>
+    <button
+      id="awaiting_creation"
+      onclick="filterClicked(this)"
+      class="tag filter uk-button button-outlined--warning"
+      data-filter="awaiting_creation"
+    >
+      Awaiting Creation
+    </button>
+    <button
+      id="deleted"
+      onclick="filterClicked(this)"
+      class="tag filter uk-button button-outlined--danger"
+      data-filter="deleted"
+    >
+      Deleted
+    </button>
+    <button
+      id="obsolete"
+      onclick="filterClicked(this)"
+      class="tag filter uk-button button-outlined--danger"
+      data-filter="obsolete"
+    >
+      Obsolete
+    </button>
+    <button
+      id="unmapped"
+      onclick="filterClicked(this)"
+      class="tag filter uk-button button-outlined--danger"
+      data-filter="unmapped"
+    >
+      Unmapped
+    </button>
+    <button
+      id="current"
+      onclick="filterClicked(this)"
+      class="tag filter uk-button button-outlined--success"
+      data-filter="current"
+    >
+      Current 
+    </button>
   </div>
 
   <table class="uk-table uk-table-small uk-table-divider uk-table-justify">
@@ -43,7 +117,9 @@
         </td>
         <td>{% firstof trait.number_of_source_records '0' %}</td>
         <td>{% firstof trait.current_mapping.term_id.curie 'None' %}</td>
-        <td class="label">{% firstof trait.current_mapping.term_id.label 'None' %}</td>
+        <td class="label">
+          {% firstof trait.current_mapping.term_id.label 'None' %}
+        </td>
         <td>{{trait.status}}</td>
       </tr>
       {% endfor %}
