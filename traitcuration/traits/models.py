@@ -15,8 +15,8 @@ class Trait(models.Model):
 
 
 class User(models.Model):
-    username = models.CharField(max_length=100)
-    email = models.EmailField()
+    username = models.CharField(max_length=100, unique=True)
+    email = models.EmailField(unique=True)
     role = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
@@ -24,8 +24,8 @@ class User(models.Model):
 
 
 class OntologyTerm(models.Model):
-    curie = models.CharField(max_length=50, blank=True, null=True)
-    uri = models.URLField(null=True, blank=True)
+    curie = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    uri = models.URLField(null=True, blank=True, unique=True)
     label = models.CharField(max_length=200)
     status = models.CharField(max_length=50)
     description = models.TextField(blank=True, null=True)
