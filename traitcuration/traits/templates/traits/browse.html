@@ -116,7 +116,7 @@
           <a href="{% url 'trait_detail' trait.id %}">{{trait.name}}</a>
         </td>
         <td>{% firstof trait.number_of_source_records '0' %}</td>
-        <td>{% firstof trait.current_mapping.term_id.curie 'None' %}</td>
+        <td class="curie">{% firstof trait.current_mapping.term_id.curie 'None' %}</td>
         <td class="label">
           {% firstof trait.current_mapping.term_id.label 'None' %}
         </td>

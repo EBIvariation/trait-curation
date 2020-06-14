@@ -1,11 +1,11 @@
 var options = {
-  valueNames: ["name", "label", "status"],
+  valueNames: ["name", "curie", "label", "status"],
 };
 
 var table = new List("traits-table", options);
 
 function search(searchstring) {
-  table.search(searchstring, ["name", "label"]);
+  table.search(searchstring, ["name", "curie", "label"]);
 }
 
 function filterClicked(status) {
