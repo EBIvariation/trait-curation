@@ -17,14 +17,12 @@ function filterClicked(status, activeClass) {
     button.classList.remove("button-outlined--danger--active");
     button.classList.remove("button-outlined--warning--active");
   }
-  document.getElementById(s).classList.add("active");
+  document.getElementById(s).classList.add(`button-outlined--${activeClass}--active`);
   if (s === "all") {
     table.filter();
-    document.getElementById(s).classList.add(activeClass);
     return;
   }
   table.filter(function (item) {
-    document.getElementById(s).classList.add(activeClass);
     status = item.elm.getAttribute("status");
     if (status == s) {
       return true;

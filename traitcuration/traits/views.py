@@ -17,26 +17,16 @@ def trait_detail(request, pk):
 
 def get_status_list(traits):
     status_list = [
-        {"status": "all", "count": len(traits), "class": "button-outlined--primary",
-            "activeClass": "button-outlined--primary--active"},
-        {"status": "awaiting_review", "count": 0, "class": "button-outlined--warning",
-            "activeClass": "button-outlined--warning--active"},
-        {"status": "awaiting_creation", "count": 0, "class": "button-outlined--warning",
-            "activeClass": "button-outlined--warning--active"},
-        {"status": "needs_creation", "count": 0, "class": "button-outlined--warning",
-            "activeClass": "button-outlined--warning--active"},
-        {"status": "awaiting_import", "count": 0, "class": "button-outlined--warning",
-            "activeClass": "button-outlined--warning--active"},
-        {"status": "needs_import", "count": 0, "class": "button-outlined--warning",
-            "activeClass": "button-outlined--warning--active"},
-        {"status": "unmapped", "count": 0, "class": "button-outlined--danger",
-            "activeClass": "button-outlined--danger--active"},
-        {"status": "obsolete", "count": 0, "class": "button-outlined--danger",
-            "activeClass": "button-outlined--danger--active"},
-        {"status": "deleted", "count": 0, "class": "button-outlined--danger",
-            "activeClass": "button-outlined--danger--active"},
-        {"status": "current", "count": 0, "class": "button-outlined--success",
-            "activeClass": "button-outlined--success--active"},
+        {"status": "all", "count": len(traits), "class": "primary"},
+        {"status": "awaiting_review", "count": 0, "class": "warning"},
+        {"status": "awaiting_creation", "count": 0, "class": "warning"},
+        {"status": "needs_creation", "count": 0, "class": "warning"},
+        {"status": "awaiting_import", "count": 0, "class": "warning"},
+        {"status": "needs_import", "count": 0, "class": "warning"},
+        {"status": "unmapped", "count": 0, "class": "danger"},
+        {"status": "obsolete", "count": 0, "class": "danger"},
+        {"status": "deleted", "count": 0, "class": "danger"},
+        {"status": "current", "count": 0, "class": "success"}
     ]
     for trait in traits:
         for status in status_list:

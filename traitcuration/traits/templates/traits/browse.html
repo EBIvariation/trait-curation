@@ -21,8 +21,8 @@
     {% for status in status_list %}
     <button
       id="{{status.status}}"
-      onclick="filterClicked(this, '{{status.activeClass}}')"
-      class="tag filter uk-button {{status.class}}"
+      onclick="filterClicked(this, '{{status.class}}')"
+      class="tag filter uk-button button-outlined--{{status.class}}"
       data-filter="{{status.status}}"
     >
       {{status.status | status_readable_name:status.count}}
