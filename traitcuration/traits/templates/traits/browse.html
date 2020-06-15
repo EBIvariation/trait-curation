@@ -18,14 +18,14 @@
   </div>
 
   <div class="tags">
-    {% for status in status_list %}
+    {% for status_name, status_attributes in status_dict.items %}
     <button
-      id="{{status.status}}"
-      onclick="filterClicked(this, '{{status.class}}')"
-      class="tag filter uk-button button-outlined--{{status.class}}"
-      data-filter="{{status.status}}"
+      id="{{status_name}}"
+      onclick="filterClicked(this, '{{status_attributes.class}}')"
+      class="tag filter uk-button button-outlined--{{status_attributes.class}}"
+      data-filter="{{status_name}}"
     >
-      {{status.status | status_readable_name:status.count}}
+    {{status_name | status_readable_name:status_attributes.count}}
     </button>
     {% endfor %}
   </div>
