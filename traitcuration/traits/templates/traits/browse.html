@@ -25,7 +25,7 @@
       class="tag filter uk-button button-outlined--{{status_attributes.class}}"
       data-filter="{{status_name}}"
     >
-    {{status_name | status_readable_name:status_attributes.count}}
+    {{status_name | status_readable_name_with_count:status_attributes.count}}
     </button>
     {% endfor %}
   </div>
@@ -48,12 +48,19 @@
         </td>
         <td>{% firstof trait.number_of_source_records '0' %}</td>
         <td class="curie">
-          {% firstof trait.current_mapping.term_id.curie 'None' %}
+          {% if trait.current_mapping.term_id.uri %}
+          <a href="{{ trait.current_mapping.term_id.uri }}">{{trait.current_mapping.term_id.curie}}</a> 
+          {% else %} 
+          None
+          {% endif %}
         </td>
         <td class="label">
           {% firstof trait.current_mapping.term_id.label 'None' %}
         </td>
-        <td>{{trait.status}}</td>
+        <td>
+          <span class="uk-label label--{{status_dict | get_dict_item:trait.status}}">
+            {{trait.status | status_readable_name}}</span>
+        </td>
       </tr>
       {% endfor %}
     </tbody>
