@@ -5,16 +5,19 @@ This script contains all the filtering logic of the main traits table using list
 //Add all the possible values to filter by and enable asynchronous indexing
 const options = {
   valueNames: ["name", "curie", "label", "status"],
-  indexAsync: true
+  indexAsync: true,
 };
 
 //Initialize the table with the previously created values
 const table = new List("traits-table", options);
 
-//Function to do text filtering. Fires whenever a user types something in the main search box
-function search(searchstring) {
-  table.search(searchstring, ["name", "curie", "label"]);
-}
+//Function to prevent the enter key from reloading the page
+var input = document.getElementById("test");
+input.addEventListener("keydown", (event) => {
+  if (event.keyCode === 13) {
+    event.preventDefault();
+  }
+});
 
 //Function to do filtering by status. Fires whenever a user clicks a status button
 function filterClicked(status, activeClass) {
