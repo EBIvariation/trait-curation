@@ -1,5 +1,7 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
 from .models import Trait
+from .datasources import clinvar
 
 
 def browse(request):
@@ -13,6 +15,16 @@ def trait_detail(request, pk):
     trait = get_object_or_404(Trait, pk=pk)
     context = {"trait": trait}
     return render(request, 'traits/trait_detail.html', context)
+
+
+def fetch_data(request):
+    # clinvar.extract_clinvar_data()
+    messages.info(request, 'Parsing data...')
+    traits_dict = clinvar.parse_trait_names_and_source_records()
+    print(traits_dict)
+    messages.info(request, 'Storing data...')
+    clinvar.store_data(traits_dict)
+    return redirect('browse')
 
 
 def get_status_list(traits):

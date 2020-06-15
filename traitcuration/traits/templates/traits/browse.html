@@ -5,6 +5,8 @@
 {% block content %}
 <script src="{% static 'js/listjs/list.js' %}"></script>
 <div id="traits-table" class="uk-container uk-container-xlarge">
+
+  <a href="{% url 'fetch_data' %}"><button class="uk-button uk-button-primary"> FETCH DATA</button> </a>
   <div class="uk-margin">
     <form class="uk-search uk-search-default search">
       <span class="uk-search-icon-flip" uk-search-icon></span>
