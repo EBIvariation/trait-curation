@@ -2,9 +2,10 @@
 This script contains all the filtering logic of the main traits table using list.js
 */
 
-//All the possible values to filter by
+//Add all the possible values to filter by and enable asynchronous indexing
 const options = {
   valueNames: ["name", "curie", "label", "status"],
+  indexAsync: true
 };
 
 //Initialize the table with the previously created values
