@@ -8,6 +8,10 @@ from ..models import Trait
 
 
 def extract_clinvar_data():
+    """
+    This function downloads the latest ClinVar TSV release data and extracts it into a 
+    'variant_summary.txt' file
+    """
     print("Downloading ClinVar data...")
     url = 'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz'
     urllib.request.urlretrieve(url, './variant_summary.txt.gz')
@@ -18,21 +22,22 @@ def extract_clinvar_data():
 
 
 def parse_trait_names_and_source_records():
+    """
+    This function parses a downloaded 'variant_summary.txt' file, and returns a unique set of traint names
+    along with their calculated source record number, in a form of a dictionary where the key is the trait name
+    and the value is the source record number
+    """
     print("Parsing ClinVar data...")
     with open('variant_summary.txt') as tsvfile:
         reader = csv.DictReader(tsvfile, dialect='excel-tab')
         # A dictionary with trait names as keys and sets of source records as values
         traits_dict = dict()
+        # The int value here defines how many records should be parsed
         for row in itertools.islice(reader, 10):
             # For every row, get its allele_id and all its rcv_accessions and phenotypes
             row_alleleid = [(row['#AlleleID'])]
             row_rcv_list = set(row['RCVaccession'].split(';'))
             row_phenotype_list = set(row['PhenotypeList'].split(';'))
-            try:
-                row_phenotype_list.remove("not provided")
-                row_phenotype_list.remove("not specified")
-            except Exception:
-                pass
             # Get every possible combination tuple of allele_id rcv_accessions and phenotypes for the current row
             tuple_list = list(itertools.product(
                 row_alleleid, row_rcv_list, row_phenotype_list))
@@ -46,17 +51,25 @@ def parse_trait_names_and_source_records():
         # Count the number of source records for each trait name
         for key in traits_dict.keys():
             traits_dict[key] = len(traits_dict[key])
-        # os.remove("variant_summary.txt")
-        # os.remove("variant_summary.txt.gz")
+        os.remove("variant_summary.txt")
+        os.remove("variant_summary.txt.gz")
         return traits_dict
 
 
 def store_data(traits_dict):
+    """
+    This function accepts a dictionary in the form of keys=trait names and values=source record numbers
+    and stores them in the database using the Django ORM
+    """
     print("Storing ClinVar data...")
     try:
         for trait_name in traits_dict.keys():
             print(trait_name)
-            if not Trait.objects.filter(name=trait_name).exists():
+            if Trait.objects.filter(name=trait_name).exists():
+                trait = Trait.objects.filter(name=trait_name).first()
+                trait.number_of_source_records = traits_dict[trait_name]
+                trait.save()
+            else:
                 trait = Trait(name=trait_name, status="unmapped",
                               number_of_source_records=traits_dict[trait_name])
                 trait.save()
