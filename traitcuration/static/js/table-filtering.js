@@ -12,7 +12,7 @@ const options = {
 const table = new List("traits-table", options);
 
 //Function to prevent the enter key from reloading the page
-var input = document.getElementById("test");
+var input = document.getElementById("searchField");
 input.addEventListener("keydown", (event) => {
   if (event.keyCode === 13) {
     event.preventDefault();
