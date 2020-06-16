@@ -1,5 +1,4 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
 from .models import Trait
 from .datasources import clinvar
 
@@ -17,12 +16,14 @@ def trait_detail(request, pk):
     return render(request, 'traits/trait_detail.html', context)
 
 
+def datasources(request):
+    return render(request, 'traits/datasources.html')
+
+
 def fetch_data(request):
-    # clinvar.extract_clinvar_data()
-    messages.info(request, 'Parsing data...')
+    clinvar.extract_clinvar_data()
     traits_dict = clinvar.parse_trait_names_and_source_records()
     print(traits_dict)
-    messages.info(request, 'Storing data...')
     clinvar.store_data(traits_dict)
     return redirect('browse')
 

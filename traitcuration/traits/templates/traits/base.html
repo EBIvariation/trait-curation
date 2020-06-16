@@ -22,6 +22,9 @@
                 <li class="header__item {% if url_name == 'browse' %}header__item--active{% endif %}">
                     <a class="header__link" href="{% url 'browse' %}">BROWSE TRAITS</a>
                 </li>
+                <li class="header__item {% if url_name == 'datasources' %}header__item--active{% endif %}">
+                    <a class="header__link" href="{% url 'datasources' %}">EXTERNAL DATASOURCES</a>
+                </li>
             </ul>
             {% endwith %}
         </div>
