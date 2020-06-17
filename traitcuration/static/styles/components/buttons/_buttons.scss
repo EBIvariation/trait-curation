@@ -1,5 +1,16 @@
 @import "../../utilities/variables";
 
+.button {
+  box-shadow: 2px 2px rgba(0, 0, 0, 0.1) !important;
+
+  &--success {
+    background-color: $color-success !important;
+
+    &:active {
+      background-color: darken($color-success, 5%) !important;
+    }
+  }
+}
 .button-outlined {
   background-color: white !important;
   color: $color-gray;
