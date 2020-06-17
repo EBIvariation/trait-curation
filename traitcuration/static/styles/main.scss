@@ -1,8 +1,8 @@
 /* Main file to import into the app */
 
+@import "./libraries/libraries";
 @import "./base/base";
 @import "./pages/pages";
 @import "./layout/layout.scss";
-@import "./libraries/libraries";
 @import "./utilities/utilities";
-@import "./components/components"
+@import "./components/components";

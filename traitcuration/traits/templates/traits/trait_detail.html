@@ -5,6 +5,37 @@ Trait Detail
 {% endblock %}
 
 {% block content %}
+<aside class="sidebar">
+    <div class="sidebar__wrapper">
+        <div class="sidebar__section">
+            <p class="sidebar__section-title">LAST UPDATED</p>
+            <span class="sidebar__section-text"> {{trait.timestamp_updated}} </span>
+            <hr/>
+        </div>
+        <div class="sidebar__section">
+            {% if trait.current_mapping %}
+            <p class="sidebar__section-title">CURATOR</p>
+            <span uk-icon="user" class="uk-margin-small-right"></span>
+            <span class="sidebar__section-text"> {{trait.current_mapping.curator}} </span>
+            <hr/>
+            {% endif %}
+        </div>
+        <div class="sidebar__section">
+            {% if trait.current_mapping %}
+            <p class="sidebar__section-title">REVIEW STATUS</p>
+            {% if trait.current_mapping.is_reviewed %}
+            <span class="uk-label label--success"> REVIEWED</span>
+            {% else %}
+            <span class="uk-label label--warning"> IN REVIEW </span>
+            {% endif %}
+            <button class="uk-button button--success sidebar__section-review-button"> 
+                <span uk-icon="check"> REVIEW </span> 
+            </button>
+            {% endif %}
+        </div>
+    </div>
+</aside>
+
 <div class="uk-container uk-container-xlarge">
     <h1>Trait details</h1>
     <ul class="uk-list">
