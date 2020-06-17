@@ -1,0 +1,25 @@
+@import "../../utilities/variables";
+
+.header {
+  background-color: $color-primary !important;
+  padding: 0 15px;
+
+  &__item {
+    border-top: 6px solid transparent;
+    margin-right: 12px;
+
+    &--active {
+      border-top: 6px solid $color-secondary;
+    }
+
+    &:hover {
+      border-top: 6px solid $color-secondary;
+      transition: border-top 0.5s;
+    }
+  }
+
+  &__link {
+    font-family: $lato !important;
+    color: white !important;
+  }
+}

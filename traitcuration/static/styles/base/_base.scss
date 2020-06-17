@@ -1,0 +1,8 @@
+@import "./typography";
+@import "./reset";
+@import "../utilities/variables";
+
+body {
+    font-family: $lato !important;
+}
+

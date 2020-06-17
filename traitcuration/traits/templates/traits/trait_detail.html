@@ -1,0 +1,26 @@
+{% extends "traits/base.html" %}
+
+{% block title %}
+Trait Detail
+{% endblock %}
+
+{% block content %}
+<div class="uk-container uk-container-xlarge">
+    <h1>Trait details</h1>
+    <ul class="uk-list">
+        <li>Trait name: {{trait.name}}</li>
+        <li>Source records: {% firstof trait.number_of_source_records '0' %}</li>
+        <li>Trait status: {{trait.status}}</li>
+    </ul>
+    <h1>Mapped term details</h1>
+    {% with trait.current_mapping.term_id as term %}
+    <ul class="uk-list">
+        <li>Term: {% firstof term.curie 'None' %}</li>
+        <li>Term label: {% firstof term.label 'None' %}</li>
+        <li>Term status: {% firstof term.status 'None' %}</li>
+    </ul>
+    {% endwith %}
+    
+    
+</div>
+{% endblock %}

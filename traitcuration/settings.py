@@ -16,6 +16,10 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+STATIC_URL = os.path.join(BASE_DIR, 'traitcuration/static/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'traitcuration/static')
+COMPRESS_ROOT = os.path.join(BASE_DIR, 'traitcuration/static/')
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -26,18 +30,21 @@ SECRET_KEY = 'cox$_8ag9@-n3pfuvnvjk==j0()u5apcf!_jx4f&xyp5x%#-+o'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+
 ALLOWED_HOSTS = []
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'traitcuration.traits.apps.TraitsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'compressor'
 ]
 
 MIDDLEWARE = [
@@ -117,8 +124,25 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
+COMPRESS_ENABLED = True
 
-STATIC_URL = '/static/'
+STATICFILES_DIRS = []
 
-# Activate Django-Heroku.
-django_heroku.settings(locals())
+STATIC_URL = os.path.join(BASE_DIR, 'traitcuration/static/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'traitcuration/static')
+COMPRESS_ROOT = os.path.join(BASE_DIR, 'traitcuration/static/')
+
+STATICFILES_FINDERS = (
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    'compressor.finders.CompressorFinder'
+)
+
+COMPRESS_PRECOMPILERS = (
+    ('text/x-sass', 'django_libsass.SassCompiler'),
+    ('text/x-scss', 'django_libsass.SassCompiler'),
+)
+
+# Activate Django-Heroku, only on Heroku environments.
+if '/app' in os.environ['HOME']:
+    django_heroku.settings(locals())

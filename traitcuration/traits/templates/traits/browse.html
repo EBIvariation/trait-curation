@@ -1,0 +1,32 @@
+{% extends "traits/base.html" %}
+
+{% block title %}
+Browse Traits
+{% endblock %}
+
+{% block content %}
+<div class="uk-container uk-container-xlarge">
+    <table class="uk-table uk-table-small uk-table-divider uk-table-justify ">
+        <thead>
+            <tr>
+                <th>TRAIT NAME</th>
+                <th>SOURCE RECORDS</th>
+                <th>MAPPED TERM</th>
+                <th>MAPPED TERM LABEL</th>
+                <th>TRAIT STATUS</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for trait in traits %}
+            <tr>
+                <td> <a href="{% url 'trait_detail' trait.id %}">{{trait.name}}</a></td>
+                <td>{% firstof trait.number_of_source_records '0' %}</td>
+                <td>{% firstof trait.current_mapping.term_id.curie 'None' %}</td>
+                <td>{% firstof trait.current_mapping.term_id.label 'None' %}</td>
+                <td>{{trait.status}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
