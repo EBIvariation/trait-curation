@@ -21,7 +21,7 @@ def datasources(request):
 
 
 def fetch_data(request):
-    clinvar.extract_clinvar_data()
+    clinvar.download_clinvar_data()
     traits_dict = clinvar.parse_trait_names_and_source_records()
     print(traits_dict)
     clinvar.store_data(traits_dict)

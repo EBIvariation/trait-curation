@@ -13,7 +13,7 @@ from ..models import Trait
 URL = 'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz'
 
 
-def extract_clinvar_data():
+def download_clinvar_data():
     """
     This function downloads the latest ClinVar TSV release data and extracts it into a
     'variant_summary.txt' file
