@@ -19,6 +19,10 @@
   }
 
   &__section {
+<<<<<<< HEAD
+=======
+    margin-bottom: 0.3rem;
+>>>>>>> 6f49d3d7d78961812843b07ad40473cebd162841
     
       &-title{
         margin-bottom: 0.6rem !important;
@@ -32,6 +36,7 @@
         display: flex !important;
         padding: 0.5rem 1.2rem !important;
         align-items: center !important;
+<<<<<<< HEAD
         margin-top: 1.5rem !important;
       }
   }
@@ -40,4 +45,10 @@
     margin-bottom: 0.8rem;
   }
 
+=======
+        margin-top: 1rem !important;
+      }
+  }
+
+>>>>>>> 6f49d3d7d78961812843b07ad40473cebd162841
 }
