@@ -34,16 +34,17 @@ def parse_trait_names_and_source_records():
         # A dictionary with trait names as keys and sets of source records as values
         traits_dict = dict()
         # The int value here defines how many records should be parsed
-        for row in itertools.islice(reader, 200):
+        for row in itertools.islice(reader, 10):
             # For every row, get its allele_id and all its rcv_accessions and phenotypes
-            row_alleleid = [(row['#AlleleID'])]
-            row_rcv_list = set(row['RCVaccession'].split(';'))
-            row_phenotype_list = set(row['PhenotypeList'].split(';'))
-            # Get every possible combination tuple of allele_id rcv_accessions and phenotypes for the current row
-            tuple_list = list(itertools.product(
-                row_alleleid, row_rcv_list, row_phenotype_list))
+            row_alleleid = (row['#AlleleID'])
+            row_rcv_list = row['RCVaccession'].split(';')
+            row_phenotype_list = row['PhenotypeList'].split(';')
+            # Get every possible pair tuple of allele_id rcv_accessions and phenotypes for the current row
+            tuple_set = set()
+            for index in range(len(row_rcv_list)):
+                tuple_set.add((row_alleleid, row_rcv_list[index], row_phenotype_list[index]))
             # Insert the tuple in the dictionary
-            for tuple in tuple_list:
+            for tuple in tuple_set:
                 trait_name = tuple[2]
                 if trait_name in traits_dict:
                     traits_dict[trait_name].update([tuple])
