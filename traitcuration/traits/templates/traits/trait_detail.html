@@ -4,7 +4,6 @@
 
 {% block content %}
 <aside class="sidebar">
-<<<<<<< HEAD
   <div class="sidebar__wrapper">
     <div class="sidebar__section">
       <p class="sidebar__section-title">LAST UPDATED</p>
@@ -24,8 +23,8 @@
     <div class="sidebar__section">
       {% if trait.current_mapping %}
       <p class="sidebar__section-title">REVIEWED BY</p>
-      {% with trait.current_mapping.review_set.all as reviews %} {% for review
-      in reviews %}
+      {% with trait.current_mapping.review_set.all as reviews %} 
+      {% for review in reviews %}
       <div class="sidebar__review-section">
         <span uk-icon="user" class="uk-margin-small-right"></span>
         <span class="sidebar__section-text"> {{review.reviewer}} </span>
@@ -79,54 +78,5 @@
     <li>Term status: {% firstof term.status 'None' %}</li>
   </ul>
   {% endwith %}
-=======
-    <div class="sidebar__wrapper">
-        <div class="sidebar__section">
-            <p class="sidebar__section-title">LAST UPDATED</p>
-            <span class="sidebar__section-text"> {{trait.timestamp_updated}} </span>
-            <hr/>
-        </div>
-        <div class="sidebar__section">
-            {% if trait.current_mapping %}
-            <p class="sidebar__section-title">CURATOR</p>
-            <span uk-icon="user" class="uk-margin-small-right"></span>
-            <span class="sidebar__section-text"> {{trait.current_mapping.curator}} </span>
-            <hr/>
-            {% endif %}
-        </div>
-        <div class="sidebar__section">
-            {% if trait.current_mapping %}
-            <p class="sidebar__section-title">REVIEW STATUS</p>
-            {% if trait.current_mapping.is_reviewed %}
-            <span class="uk-label label--success"> REVIEWED</span>
-            {% else %}
-            <span class="uk-label label--warning"> IN REVIEW </span>
-            {% endif %}
-            <button class="uk-button button--success sidebar__section-review-button"> 
-                <span uk-icon="check"> REVIEW </span> 
-            </button>
-            {% endif %}
-        </div>
-    </div>
-</aside>
-
-<div class="uk-container uk-container-xlarge">
-    <h1>Trait details</h1>
-    <ul class="uk-list">
-        <li>Trait name: {{trait.name}}</li>
-        <li>Source records: {% firstof trait.number_of_source_records '0' %}</li>
-        <li>Trait status: {{trait.status}}</li>
-    </ul>
-    <h1>Mapped term details</h1>
-    {% with trait.current_mapping.term_id as term %}
-    <ul class="uk-list">
-        <li>Term: {% firstof term.curie 'None' %}</li>
-        <li>Term label: {% firstof term.label 'None' %}</li>
-        <li>Term status: {% firstof term.status 'None' %}</li>
-    </ul>
-    {% endwith %}
-    
-    
->>>>>>> 6f49d3d7d78961812843b07ad40473cebd162841
 </div>
 {% endblock %}
