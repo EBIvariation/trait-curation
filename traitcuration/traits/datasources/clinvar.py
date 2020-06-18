@@ -10,7 +10,10 @@ import os
 
 from ..models import Trait
 
+# Constants to use. URL defines the clinvar data location and NUMBER_OF_RECORDS defines how many traits to parse
+# during development
 URL = 'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz'
+NUMBER_OF_RECORDS = 200
 
 
 def download_clinvar_data():
@@ -33,7 +36,7 @@ def parse_trait_names_and_source_records():
         # A dictionary with trait names as keys and sets of source records as values
         traits_dict = dict()
         # The int value here defines how many records should be parsed
-        for row in itertools.islice(reader, 10):
+        for row in itertools.islice(reader, NUMBER_OF_RECORDS):
             # For every row, get its allele_id and all its rcv_accessions and phenotypes
             row_alleleid = (row['#AlleleID'])
             row_rcv_list = row['RCVaccession'].split(';')
