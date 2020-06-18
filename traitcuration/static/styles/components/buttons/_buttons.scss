@@ -1,0 +1,42 @@
+@import "../../utilities/variables";
+
+.button-outlined {
+  background-color: white !important;
+  color: $color-gray;
+
+  &--primary {
+    border: 1px solid $color-primary;
+
+    &--active {
+      background-color: $color-primary !important;
+      color: white !important;
+    }
+  }
+
+  &--success {
+    border: 1px solid $color-success;
+
+    &--active {
+      background-color: $color-success !important;
+      color: white !important;
+    }
+  }
+
+  &--danger {
+    border: 1px solid $color-danger;
+
+    &--active {
+      background-color: $color-danger !important;
+      color: white !important;
+    }
+  }
+
+  &--warning {
+    border: 1px solid $color-warning;
+
+    &--active {
+      background-color: $color-warning !important;
+      color: white !important;
+    }
+  }
+}
