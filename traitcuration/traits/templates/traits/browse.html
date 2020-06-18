@@ -3,15 +3,15 @@
 {% load trait_filters %}
 {% block title %} Browse Traits {% endblock %} 
 {% block content %}
-<script src="{% static 'js/listjs/list.js' %}"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
 <div id="traits-table" class="uk-container uk-container-xlarge">
 
   <div class="uk-margin">
     <form class="uk-search uk-search-default search">
       <span class="uk-search-icon-flip" uk-search-icon></span>
       <input
+        id="searchField"
         class="uk-search-input search"
-        onkeyup="search(this.value)"
         type="search"
         placeholder="Filter by trait or term name..."
       />
@@ -19,14 +19,14 @@
   </div>
 
   <div class="tags">
-    {% for status in status_list %}
+    {% for status_name, status_attributes in status_dict.items %}
     <button
-      id="{{status.status}}"
-      onclick="filterClicked(this, '{{status.class}}')"
-      class="tag filter uk-button button-outlined--{{status.class}}"
-      data-filter="{{status.status}}"
+      id="{{status_name}}"
+      onclick="filterClicked(this, '{{status_attributes.class}}')"
+      class="tag filter uk-button button-outlined--{{status_attributes.class}}"
+      data-filter="{{status_name}}"
     >
-      {{status.status | status_readable_name:status.count}}
+    {{status_name | status_readable_name_with_count:status_attributes.count}}
     </button>
     {% endfor %}
   </div>
@@ -49,12 +49,19 @@
         </td>
         <td>{% firstof trait.number_of_source_records '0' %}</td>
         <td class="curie">
-          {% firstof trait.current_mapping.term_id.curie 'None' %}
+          {% if trait.current_mapping.term_id.uri %}
+          <a target="_blank" href="{{ trait.current_mapping.term_id.uri }}">{{trait.current_mapping.term_id.curie}}</a> 
+          {% else %} 
+          None
+          {% endif %}
         </td>
         <td class="label">
           {% firstof trait.current_mapping.term_id.label 'None' %}
         </td>
-        <td>{{trait.status}}</td>
+        <td>
+          <span class="uk-label label--{{status_dict | get_dict_item:trait.status}}">
+            {{trait.status | status_readable_name}}</span>
+        </td>
       </tr>
       {% endfor %}
     </tbody>

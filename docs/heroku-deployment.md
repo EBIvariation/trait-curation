@@ -14,4 +14,8 @@ The app should now be successfully deployed. Follow-up instructions are included
 4. We now have to connect the whole pipeline to GitHub as well. Navigate to Settings > Connect to GitHub and select the repository
 5. Once the pipeline is created and connected to the GitHub repo, the left most column should have a "Enable Review Apps" button
 5. Click it, select "Create new review apps for new pull requests automatically " and make sure to select the "Create new review apps for new pull requests automatically" option
-6. Optionally, friendlier URL patterns for review apps can be chosen by navigating to Settings > Review Apps
+6. Configure more predictable URL patterns for review apps:
+    + Click the Configure button next to the review apps column in the pipeline page
+    + Click on "more settings"
+    + Scroll down to the review apps section and click "Update URL pattern"
+    + Select the "predictable" option and enter something like "trait-curation" as the URL prefix

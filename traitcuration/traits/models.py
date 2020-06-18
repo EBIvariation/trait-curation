@@ -5,7 +5,16 @@ class Trait(models.Model):
     name = models.CharField(max_length=200)
     current_mapping = models.ForeignKey(
         'Mapping', on_delete=models.SET_NULL, null=True, blank=True)
-    status = models.CharField(max_length=50)
+    status = models.CharField(max_length=50, choices=[
+        ('current', 'Current'),
+        ('unmapped', 'Unmapped'),
+        ('obsolete', 'Obsolete'),
+        ('deleted', 'Deleted'),
+        ('awaiting_review', 'Awaiting Review'),
+        ('needs_import', 'Needs Import'),
+        ('awaiting_import', 'Awaiting Import'),
+        ('needs_creation', 'Needs Creation'),
+        ('awaiting_creation', 'Awaiting Creation')])
     number_of_source_records = models.IntegerField(blank=True, null=True)
     timestamp_added = models.DateTimeField(auto_now=True)
     timestamp_updated = models.DateTimeField(auto_now_add=True)
@@ -15,8 +24,8 @@ class Trait(models.Model):
 
 
 class User(models.Model):
-    username = models.CharField(max_length=100)
-    email = models.EmailField()
+    username = models.CharField(max_length=100, unique=True)
+    email = models.EmailField(unique=True)
     role = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
@@ -24,10 +33,18 @@ class User(models.Model):
 
 
 class OntologyTerm(models.Model):
-    curie = models.CharField(max_length=50, blank=True, null=True)
-    uri = models.URLField(null=True, blank=True)
+    curie = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    uri = models.URLField(null=True, blank=True, unique=True)
     label = models.CharField(max_length=200)
-    status = models.CharField(max_length=50)
+    status = models.CharField(max_length=50, choices=[
+        ('current', 'Current'),
+        ('obsolete', 'Obsolete'),
+        ('deleted', 'Deleted'),
+        ('unmapped', 'Unmapped'),
+        ('needs_import', 'Needs Import'),
+        ('awaiting_import', 'Awaiting Import'),
+        ('needs_creation', 'Needs Creation'),
+        ('awaiting_creation', 'Awaiting Creation')])
     description = models.TextField(blank=True, null=True)
     cross_refs = models.TextField(blank=True, null=True)
 
@@ -54,6 +71,14 @@ class MappingSuggestion(models.Model):
 
     def __str__(self):
         return f"{self.trait_id} | {self.term_id}"
+
+
+class Review(models.Model):
+    mapping_id = models.ForeignKey(Mapping, on_delete=models.PROTECT)
+    reviewer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return f"{self.mapping_id} by {self.reviewer}"
 
 
 class Comment(models.Model):
