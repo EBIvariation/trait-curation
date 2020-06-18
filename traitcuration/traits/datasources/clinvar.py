@@ -1,24 +1,25 @@
+"""
+This module contains utility functions for downloading, parsing and storing trait data fron ClinVar
+"""
+
 import urllib.request
 import csv
 import gzip
-import shutil
 import itertools
 import os
+
 from ..models import Trait
+
+URL = 'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz'
 
 
 def extract_clinvar_data():
     """
-    This function downloads the latest ClinVar TSV release data and extracts it into a 
+    This function downloads the latest ClinVar TSV release data and extracts it into a
     'variant_summary.txt' file
     """
     print("Downloading ClinVar data...")
-    url = 'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz'
-    urllib.request.urlretrieve(url, './variant_summary.txt.gz')
-    print("Extracting ClinVar data...")
-    with gzip.open('variant_summary.txt.gz', 'rb') as f_in:
-        with open('variant_summary.txt', 'wb') as f_out:
-            shutil.copyfileobj(f_in, f_out)
+    urllib.request.urlretrieve(URL, './variant_summary.txt.gz')
 
 
 def parse_trait_names_and_source_records():
@@ -28,12 +29,12 @@ def parse_trait_names_and_source_records():
     and the value is the source record number
     """
     print("Parsing ClinVar data...")
-    with open('variant_summary.txt') as tsvfile:
+    with gzip.open('variant_summary.txt.gz', 'rt') as tsvfile:
         reader = csv.DictReader(tsvfile, dialect='excel-tab')
         # A dictionary with trait names as keys and sets of source records as values
         traits_dict = dict()
         # The int value here defines how many records should be parsed
-        for row in itertools.islice(reader, 10):
+        for row in itertools.islice(reader, 200):
             # For every row, get its allele_id and all its rcv_accessions and phenotypes
             row_alleleid = [(row['#AlleleID'])]
             row_rcv_list = set(row['RCVaccession'].split(';'))
@@ -51,7 +52,6 @@ def parse_trait_names_and_source_records():
         # Count the number of source records for each trait name
         for key in traits_dict.keys():
             traits_dict[key] = len(traits_dict[key])
-        os.remove("variant_summary.txt")
         os.remove("variant_summary.txt.gz")
         return traits_dict
 
