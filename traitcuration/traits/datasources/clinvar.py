@@ -15,8 +15,7 @@ URL = 'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.tx
 
 def download_clinvar_data():
     """
-    This function downloads the latest ClinVar TSV release data and extracts it into a
-    'variant_summary.txt' file
+    This function downloads the latest ClinVar TSV release data and extracts it into a 'variant_summary.txt' file
     """
     print("Downloading ClinVar data...")
     urllib.request.urlretrieve(URL, './variant_summary.txt.gz')
@@ -26,7 +25,7 @@ def parse_trait_names_and_source_records():
     """
     This function parses a downloaded 'variant_summary.txt' file, and returns a unique set of traint names
     along with their calculated source record number, in a form of a dictionary where the key is the trait name
-    and the value is the source record number
+    and the value is the source record number.
     """
     print("Parsing ClinVar data...")
     with gzip.open('variant_summary.txt.gz', 'rt') as tsvfile:
@@ -42,7 +41,8 @@ def parse_trait_names_and_source_records():
             # Get every possible pair tuple of allele_id rcv_accessions and phenotypes for the current row
             tuple_set = set()
             for index in range(len(row_rcv_list)):
-                tuple_set.add((row_alleleid, row_rcv_list[index], row_phenotype_list[index]))
+                tuple_set.add(
+                    (row_alleleid, row_rcv_list[index], row_phenotype_list[index]))
             # Insert the tuple in the dictionary
             for tuple in tuple_set:
                 trait_name = tuple[2]
@@ -60,19 +60,15 @@ def parse_trait_names_and_source_records():
 def store_data(traits_dict):
     """
     This function accepts a dictionary in the form of keys=trait names and values=source record numbers
-    and stores them in the database using the Django ORM
+    and stores them in the database using the Django ORM.
     """
     print("Storing ClinVar data...")
-    try:
-        for trait_name in traits_dict.keys():
-            print(trait_name)
-            if Trait.objects.filter(name=trait_name).exists():
-                trait = Trait.objects.filter(name=trait_name).first()
-                trait.number_of_source_records = traits_dict[trait_name]
-                trait.save()
-            else:
-                trait = Trait(name=trait_name, status="unmapped",
-                              number_of_source_records=traits_dict[trait_name])
-                trait.save()
-    except Exception as e:
-        print(f"Error: {e}")
+    for trait_name in traits_dict.keys():
+        if Trait.objects.filter(name=trait_name).exists():
+            trait = Trait.objects.filter(name=trait_name).first()
+            trait.number_of_source_records = traits_dict[trait_name]
+            trait.save()
+        else:
+            trait = Trait(name=trait_name, status="unmapped",
+                          number_of_source_records=traits_dict[trait_name])
+            trait.save()

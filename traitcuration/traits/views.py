@@ -21,11 +21,13 @@ def datasources(request):
 
 
 def fetch_data(request):
-    clinvar.download_clinvar_data()
-    traits_dict = clinvar.parse_trait_names_and_source_records()
-    print(traits_dict)
-    clinvar.store_data(traits_dict)
-    return redirect('browse')
+    try:
+        clinvar.download_clinvar_data()
+        traits_dict = clinvar.parse_trait_names_and_source_records()
+        clinvar.store_data(traits_dict)
+        return redirect('browse')
+    except Exception as e:
+        print(f"Error: {e}")
 
 
 def get_status_list(traits):
