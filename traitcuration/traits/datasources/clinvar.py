@@ -11,7 +11,7 @@ import os
 from ..models import Trait
 
 # Constants to use. URL defines the clinvar data location and NUMBER_OF_RECORDS defines how many traits to parse
-# during development
+# during development.
 URL = 'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz'
 NUMBER_OF_RECORDS = 200
 
@@ -26,7 +26,7 @@ def download_clinvar_data():
 
 def parse_trait_names_and_source_records():
     """
-    This function parses a downloaded 'variant_summary.txt' file, and returns a unique set of traint names
+    This function parses a downloaded 'variant_summary.txt' file, and returns a unique set of trait names
     along with their calculated source record number, in a form of a dictionary where the key is the trait name
     and the value is the source record number.
     """
