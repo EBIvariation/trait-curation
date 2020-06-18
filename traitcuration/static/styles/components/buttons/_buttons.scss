@@ -5,7 +5,7 @@
   color: $color-gray;
 
   &--primary {
-    border: 1px solid $color-primary;
+    border: 1px solid $color-primary !important;
 
     &--active {
       background-color: $color-primary !important;
@@ -14,7 +14,7 @@
   }
 
   &--success {
-    border: 1px solid $color-success;
+    border: 1px solid $color-success !important;
 
     &--active {
       background-color: $color-success !important;
@@ -23,7 +23,7 @@
   }
 
   &--danger {
-    border: 1px solid $color-danger;
+    border: 1px solid $color-danger !important;
 
     &--active {
       background-color: $color-danger !important;
@@ -32,7 +32,7 @@
   }
 
   &--warning {
-    border: 1px solid $color-warning;
+    border: 1px solid $color-warning !important;
 
     &--active {
       background-color: $color-warning !important;
