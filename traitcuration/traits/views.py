@@ -18,7 +18,7 @@ def trait_detail(request, pk):
     context = {"trait": trait}
     return render(request, 'traits/trait_detail.html', context)
 
-  
+
 def datasources(request):
     return render(request, 'traits/datasources.html')
 
