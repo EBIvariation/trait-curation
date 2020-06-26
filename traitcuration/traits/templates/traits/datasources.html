@@ -1,0 +1,9 @@
+{% extends "traits/base.html" %} 
+{% block title %} External Datasources {%endblock %} 
+{% block content %}
+<div class="uk-container uk-container-xlarge">
+  <a href="{% url 'fetch_data' %}"
+    ><button class="uk-button uk-button-primary">FETCH DATA</button>
+  </a>
+</div>
+{% endblock %}

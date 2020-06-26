@@ -1,6 +1,9 @@
-from django.shortcuts import render, get_object_or_404
+
+from django.shortcuts import render, get_object_or_404, redirect
+
 from .utils import get_status_dict
 from .models import Trait
+from .datasources import clinvar
 
 
 def browse(request):
@@ -14,3 +17,17 @@ def trait_detail(request, pk):
     trait = get_object_or_404(Trait, pk=pk)
     context = {"trait": trait}
     return render(request, 'traits/trait_detail.html', context)
+
+
+def datasources(request):
+    return render(request, 'traits/datasources.html')
+
+
+def fetch_data(request):
+    try:
+        clinvar.download_clinvar_data()
+        traits_dict = clinvar.parse_trait_names_and_source_records()
+        clinvar.store_data(traits_dict)
+        return redirect('browse')
+    except Exception as e:
+        print(f"Error: {e}")
