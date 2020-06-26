@@ -2,11 +2,11 @@
 This module contains utility functions for downloading, parsing and storing trait data fron ClinVar
 """
 
-import urllib.request
 import csv
 import gzip
 import itertools
 import os
+import urllib.request
 
 from ..models import Trait
 
@@ -42,17 +42,12 @@ def parse_trait_names_and_source_records():
             row_rcv_list = row['RCVaccession'].split(';')
             row_phenotype_list = row['PhenotypeList'].split(';')
             # Get every possible pair tuple of allele_id rcv_accessions and phenotypes for the current row
-            tuple_set = set()
-            for index in range(len(row_rcv_list)):
-                tuple_set.add(
-                    (row_alleleid, row_rcv_list[index], row_phenotype_list[index]))
+            tuple_set = {(row_alleleid, rcv, phenotype) for rcv, phenotype in zip(row_rcv_list, row_phenotype_list)}
             # Insert the tuple in the dictionary
             for tuple in tuple_set:
                 trait_name = tuple[2]
-                if trait_name in traits_dict:
-                    traits_dict[trait_name].update([tuple])
-                else:
-                    traits_dict[trait_name] = {tuple}
+                traits_dict.setdefault(trait_name, set())
+                traits_dict[trait_name].update([tuple])
         # Count the number of source records for each trait name
         for key in traits_dict.keys():
             traits_dict[key] = len(traits_dict[key])
@@ -70,8 +65,7 @@ def store_data(traits_dict):
         if Trait.objects.filter(name=trait_name).exists():
             trait = Trait.objects.filter(name=trait_name).first()
             trait.number_of_source_records = traits_dict[trait_name]
-            trait.save()
         else:
             trait = Trait(name=trait_name, status="unmapped",
                           number_of_source_records=traits_dict[trait_name])
-            trait.save()
+        trait.save()
