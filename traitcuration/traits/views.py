@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 
 from .utils import get_status_dict
 from .models import Trait
-from .datasources import clinvar
+from .datasources import clinvar, zooma
 
 
 def browse(request):
@@ -23,7 +23,7 @@ def datasources(request):
     return render(request, 'traits/datasources.html')
 
 
-def fetch_data(request):
+def clinvar_data(request):
     try:
         clinvar.download_clinvar_data()
         traits_dict = clinvar.parse_trait_names_and_source_records()
@@ -31,3 +31,8 @@ def fetch_data(request):
         return redirect('browse')
     except Exception as e:
         print(f"Error: {e}")
+
+
+def zooma_suggestions(request):
+    zooma.get_zooma_suggestions()
+    return redirect('datasources')
