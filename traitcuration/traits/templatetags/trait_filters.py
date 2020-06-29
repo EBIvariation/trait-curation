@@ -5,7 +5,6 @@ register = template.Library()
 
 @register.filter
 def get_dict_item(dictionary, key):
-    print(key)
     attribute_dict = dictionary.get(key)
     return attribute_dict['class']
 
