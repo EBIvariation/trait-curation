@@ -20,6 +20,11 @@ Trait Detail
         <li>Term status: {% firstof term.status 'None' %}</li>
     </ul>
     {% endwith %}
+    <h1>Mapping Suggestions</h1>
+    {% with trait.mappingsuggestion_set.all as suggestions %}
+    {% for suggestion in suggestions %}
+       <p>{{suggestion}} | status: {{suggestion.term_id.status}}</p> 
+    {% endfor %} {% endwith %}
     
     
 </div>
