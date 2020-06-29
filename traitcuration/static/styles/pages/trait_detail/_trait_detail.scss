@@ -1,5 +1,5 @@
 .trait-container {
-    margin-right: 14.5rem;
+    width: 86vw;
 }
 
 .info-section {
@@ -12,6 +12,10 @@
     display: flex;
     flex-direction: column;
     max-width: 40vw;
+
+    @media (max-width: 900px) {
+      max-width: 30vh;
+    }
   }
 
   &__title {
