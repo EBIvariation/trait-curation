@@ -20,8 +20,7 @@ def make_ols_query(term_uri, ontology):
     term_status = 'current' if ontology == 'efo' else 'needs_import'
     if term_info["is_obsolete"]:
         term_status = "obsolete"
-    info_dict = {"curie": term_curie,
-                 "label": term_label, "status": term_status}
+    info_dict = {"curie": term_curie, "label": term_label, "status": term_status}
     print(info_dict)
     print()
     return info_dict
