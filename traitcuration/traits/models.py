@@ -49,7 +49,7 @@ class OntologyTerm(models.Model):
     cross_refs = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.curie} | {self.label}"
+        return f"{self.curie} - {self.label}"
 
 
 class Mapping(models.Model):
@@ -70,7 +70,7 @@ class MappingSuggestion(models.Model):
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.trait_id} | {self.term_id}"
+        return f"Trait: {self.trait_id} | Term: {self.term_id}"
 
 
 class Review(models.Model):
