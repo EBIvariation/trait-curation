@@ -1,6 +1,6 @@
 """
-This module contains functions to retrieve info about terms from OLS, as well as helper functions such as status
-calculation and ontology_id extraction
+This module contains functions to retrieve info about terms from OLS, as well as helper functions such as
+ontology_id extraction
 """
 import requests
 
@@ -11,7 +11,7 @@ BASE_URL = "https://www.ebi.ac.uk/ols/api/"
 def make_ols_query(term_iri, ontology_id):
     """
     Takes in a term iri (or IRI as referenced in OLS documentation) and the ontology id to search against. Returns a
-    dictionary for that term with the fields 'label', 'obo_id' which is the CURIE and 'status'.
+    dictionary for that term with the fields 'label', 'obo_id' which is the CURIE and 'is_obsolete' as True or False.
     """
     results = requests.get(f"{BASE_URL}ontologies/{ontology_id}/terms?iri={term_iri}").json()
     print(results)
@@ -22,8 +22,7 @@ def make_ols_query(term_iri, ontology_id):
     term_curie = term_info["obo_id"]  # E.g. EFO:0000400
     term_label = term_info["label"]  # E.g. Diabetes mellitus
     term_is_obsolete = term_info["is_obsolete"]  # True or False value on whether the term is obsolete or not
-    term_status = get_term_status(ontology_id, term_is_obsolete)
-    info_dict = {"curie": term_curie, "label": term_label, "status": term_status}
+    info_dict = {"curie": term_curie, "label": term_label, "is_obsolete": term_is_obsolete}
     print(info_dict)
     print()
     return info_dict
@@ -40,15 +39,3 @@ def get_ontology_id(term_iri):
     if ontology_id == 'Orphanet':
         ontology_id = 'ordo'
     return ontology_id
-
-
-def get_term_status(ontology_id, is_obsolete):
-    """
-    Takes the ontology_id of a term and a whether it is obsolete or not, and returns its calculated status.
-    'Obsolete' if the is_obsolete flag is true, 'Current' if its ontology is EFO, and 'Needs Import' otherwise
-    """
-    if is_obsolete:
-        return 'obsolete'
-    if ontology_id == 'efo':
-        return 'current'
-    return 'needs_import'
