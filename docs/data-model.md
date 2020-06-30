@@ -7,8 +7,8 @@
 - `mappings` (id, trait_id [foreign_key], ontology_term[foreign_key], curator [foreign_key], is_reviewed[computed_boolean], timestamp_mapped)
   + The `is_reviewed` field status is computed based on the reviews table.
 Important consideration to note is that mappings are not unique in regard to (trait_id, ontology_term) pair. It is possible that a mapping from a certain trait to a certain ontology term is proposed multiple times in the history of the trait. These are stored in the database as separate entities for historical purposes, and displayed in the trait history.
-- `ontology_terms`:(id, curie, uri, label, status, description, cross_refs)
-  + The `uri` field represents the complete URI, e. g. http://www.ebi.ac.uk/efo/EFO_0000249, while `term` stores the corresponding CURIE (compact URI), in this case EFO:0000249. Note that while URL uses an underscore, CURIE uses a colon to separate namespace and an identifier. Both the URI and the CURIE can be obtained through the OLS query.
+- `ontology_terms`:(id, curie, iri , label, status, description, cross_refs)
+  + The `iri ` field represents the complete IRI, e. g. http://www.ebi.ac.uk/efo/EFO_0000249, while `term` stores the corresponding CURIE (compact IRI), in this case EFO:0000249. Note that while URL uses an underscore, CURIE uses a colon to separate namespace and an identifier. Both the IRI and the CURIE can be obtained through the OLS query.
   + A note to make, is that the `description` and `cross_refs` fields only apply to new term suggestions created via our web app. Other terms will have those fields empty.
   + The ontology term status can be either `current`, `obsolete`, `deleted`, `needs_import`, `needs_creation`, `awaiting_import`, `awaiting_creation`. This status is automatically computed, except for moving out of the “awaiting_creation” status, which requires a manual check.
 - `mapping_suggestions` (id, trait_id [foreign_key], ontology_id [foreign_key], made_by[foreign_key], timestamp)

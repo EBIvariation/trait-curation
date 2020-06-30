@@ -34,7 +34,7 @@ class User(models.Model):
 
 class OntologyTerm(models.Model):
     curie = models.CharField(max_length=50, blank=True, null=True, unique=True)
-    uri = models.URLField(null=True, blank=True, unique=True)
+    iri = models.URLField(null=True, blank=True, unique=True)
     label = models.CharField(max_length=200)
     status = models.CharField(max_length=50, choices=[
         ('current', 'Current'),

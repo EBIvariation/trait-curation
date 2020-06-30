@@ -49,8 +49,8 @@
         </td>
         <td>{% firstof trait.number_of_source_records '0' %}</td>
         <td class="curie">
-          {% if trait.current_mapping.term_id.uri %}
-          <a target="_blank" href="{{ trait.current_mapping.term_id.uri }}">{{trait.current_mapping.term_id.curie}}</a> 
+          {% if trait.current_mapping.term_id.iri %}
+          <a target="_blank" href="{{ trait.current_mapping.term_id.iri }}">{{trait.current_mapping.term_id.curie}}</a> 
           {% else %} 
           None
           {% endif %}
