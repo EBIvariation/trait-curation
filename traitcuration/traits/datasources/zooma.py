@@ -21,6 +21,7 @@ def get_zooma_suggestions():
         results_list = get_suggestions_for_trait(trait)
         for result in results_list:
             term = create_local_term(result)
+            # If local term creation returns None, it means that this term already exists in the database
             if term is not None:
                 create_mapping_suggestion(trait, term)
 
@@ -47,10 +48,11 @@ def create_local_term(result):
     # Search for the term in EFO and return its information. If it is not in EFO, search for it in original ontology.
     term_info = make_ols_query(term_iri, 'efo')
     term_ontology_id = 'efo'
+    # None here means that the term wasn't found in the EFO ontology
     if term_info is None:
         term_ontology_id = get_ontology_id(term_iri)
         term_info = make_ols_query(term_iri, term_ontology_id)
-        # If the term is not found in the original ontology either
+        # If the term is not found in the original ontology either, return
         if term_info is None:
             print(f'No info found on {term_iri}')
             return
