@@ -36,21 +36,20 @@ def create_local_term(result):
     """
     Takes in a single zooma suggestion result and creates an ontology term for it in the app's database.
     """
-    term_uri = result["semanticTags"][0]
-    print(term_uri)
-    if OntologyTerm.objects.filter(uri=term_uri).exists():
+    term_iri = result["semanticTags"][0]
+    print(term_iri)
+    if OntologyTerm.objects.filter(iri=term_iri).exists():
         return
     # Search for the term in EFO and return its information. If it is not in EFO, search for it in original ontology.
-    term_info = make_ols_query(term_uri, 'efo')
+    term_info = make_ols_query(term_iri, 'efo')
     if term_info is None:
-        term_info = make_ols_query(term_uri, get_ontology_id(term_uri))
+        term_info = make_ols_query(term_iri, get_ontology_id(term_iri))
         # If the term is not found in the original ontology either
         if term_info is None:
-            print(f'No info found on {term_uri}')
+            print(f'No info found on {term_iri}')
             return
     # Create an ontology term in the database
-    term = OntologyTerm(
-        curie=term_info['curie'], uri=term_uri, label=term_info['label'], status=term_info['status'])
+    term = OntologyTerm(curie=term_info['curie'], iri=term_iri, label=term_info['label'], status=term_info['status'])
     term.save()
     return term
 

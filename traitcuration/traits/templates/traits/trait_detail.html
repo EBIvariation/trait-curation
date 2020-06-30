@@ -25,7 +25,7 @@ Trait Detail
     {% for suggestion in suggestions %}
     <ul class="uk-list">
         <li> <b>Suggested term:</b> {{suggestion.term_id}} </li>
-        <li> <b>Term Link:</b> <a href="{{suggestion.term_id.uri}}">{{suggestion.term_id.uri}}</a></li>
+        <li> <b>Term Link:</b> <a href="{{suggestion.term_id.iri}}">{{suggestion.term_id.iri}}</a></li>
         <li> <b>Term Status:</b> {{suggestion.term_id.status}}</li>
         <hr>
     </ul>
