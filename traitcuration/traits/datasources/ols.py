@@ -1,3 +1,7 @@
+"""
+This module contains functions to retrieve info about terms from OLS, as well as helper functions such as status
+calculation and ontology_id extraction
+"""
 import requests
 
 
@@ -27,7 +31,7 @@ def make_ols_query(term_iri, ontology_id):
 
 def get_ontology_id(term_iri):
     """
-    Extracts the ontology id from the term iri, to be used for OLS queries by reading the last part of an iri and 
+    Extracts the ontology id from the term iri, to be used for OLS queries by reading the last part of an iri and
     reading the ontology id using the term prefix
     E.g. extracts 'mondo' from http://purl.obolibrary.org/obo/MONDO_0019482
     """

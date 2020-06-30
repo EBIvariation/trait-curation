@@ -1,3 +1,7 @@
+"""
+This module contains all the functionality that uses ZOOMA to retrieve mapping suggestions and create the suggested
+terms in the app's database
+"""
 import requests
 
 from ..models import Trait, MappingSuggestion, OntologyTerm, User
