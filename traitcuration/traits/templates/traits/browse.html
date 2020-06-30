@@ -23,7 +23,7 @@
     <button
       id="{{status_name}}"
       onclick="filterClicked(this, '{{status_attributes.class}}')"
-      class="tag filter uk-button button-outlined--{{status_attributes.class}}"
+      class="tag filter uk-button button-outlined button-outlined--{{status_attributes.class}}"
       data-filter="{{status_name}}"
     >
     {{status_name | status_readable_name_with_count:status_attributes.count}}

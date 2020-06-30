@@ -1,20 +1,21 @@
 from django.db import models
 
-
-class Trait(models.Model):
-    name = models.CharField(max_length=200)
-    current_mapping = models.ForeignKey(
-        'Mapping', on_delete=models.SET_NULL, null=True, blank=True)
-    status = models.CharField(max_length=50, choices=[
+STATUS_FIELDS = [
         ('current', 'Current'),
         ('unmapped', 'Unmapped'),
         ('obsolete', 'Obsolete'),
         ('deleted', 'Deleted'),
-        ('awaiting_review', 'Awaiting Review'),
         ('needs_import', 'Needs Import'),
         ('awaiting_import', 'Awaiting Import'),
         ('needs_creation', 'Needs Creation'),
-        ('awaiting_creation', 'Awaiting Creation')])
+        ('awaiting_creation', 'Awaiting Creation'),
+]
+
+
+class Trait(models.Model):
+    name = models.CharField(max_length=200)
+    current_mapping = models.ForeignKey('Mapping', on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(max_length=50, choices=STATUS_FIELDS + [('awaiting_review', 'Awaiting Review')])
     number_of_source_records = models.IntegerField(blank=True, null=True)
     timestamp_added = models.DateTimeField(auto_now=True)
     timestamp_updated = models.DateTimeField(auto_now_add=True)
@@ -36,15 +37,7 @@ class OntologyTerm(models.Model):
     curie = models.CharField(max_length=50, blank=True, null=True, unique=True)
     iri = models.URLField(null=True, blank=True, unique=True)
     label = models.CharField(max_length=200)
-    status = models.CharField(max_length=50, choices=[
-        ('current', 'Current'),
-        ('obsolete', 'Obsolete'),
-        ('deleted', 'Deleted'),
-        ('unmapped', 'Unmapped'),
-        ('needs_import', 'Needs Import'),
-        ('awaiting_import', 'Awaiting Import'),
-        ('needs_creation', 'Needs Creation'),
-        ('awaiting_creation', 'Awaiting Creation')])
+    status = models.CharField(max_length=50, choices=STATUS_FIELDS)
     description = models.TextField(blank=True, null=True)
     cross_refs = models.TextField(blank=True, null=True)
 

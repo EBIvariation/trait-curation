@@ -1,0 +1,28 @@
+.trait-container {
+    width: 86vw;
+}
+
+.info-section {
+  &__wrapper {
+    display: flex;
+  }
+
+  &__column {
+    margin-right: 4.2rem;
+    display: flex;
+    flex-direction: column;
+    max-width: 40vw;
+
+    @media (max-width: 900px) {
+      max-width: 30vh;
+    }
+  }
+
+  &__title {
+      color: $color-gray !important;
+  }
+
+  &__value {
+      color: black !important;
+  }
+}
