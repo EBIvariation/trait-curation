@@ -46,16 +46,31 @@ def create_local_term(result):
         return
     # Search for the term in EFO and return its information. If it is not in EFO, search for it in original ontology.
     term_info = make_ols_query(term_iri, 'efo')
+    term_ontology_id = 'efo'
     if term_info is None:
-        term_info = make_ols_query(term_iri, get_ontology_id(term_iri))
+        term_ontology_id = get_ontology_id(term_iri)
+        term_info = make_ols_query(term_iri, term_ontology_id)
         # If the term is not found in the original ontology either
         if term_info is None:
             print(f'No info found on {term_iri}')
             return
+    term_status = get_term_status(term_ontology_id, term_info['is_obsolete'])
     # Create an ontology term in the database
-    term = OntologyTerm(curie=term_info['curie'], iri=term_iri, label=term_info['label'], status=term_info['status'])
+    term = OntologyTerm(curie=term_info['curie'], iri=term_iri, label=term_info['label'], status=term_status)
     term.save()
     return term
+
+
+def get_term_status(ontology_id, is_obsolete):
+    """
+    Takes the ontology_id of a term and a whether it is obsolete or not, and returns its calculated status.
+    'Obsolete' if the is_obsolete flag is true, 'Current' if its ontology is EFO, and 'Needs Import' otherwise
+    """
+    if is_obsolete:
+        return 'obsolete'
+    if ontology_id == 'efo':
+        return 'current'
+    return 'needs_import'
 
 
 def create_mapping_suggestion(trait, term):
