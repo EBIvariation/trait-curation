@@ -1,4 +1,4 @@
-def get_status_dict(traits):
+def get_status_dict(traits=[]):
     status_dict = {
         "all": {"count": len(traits), "class": "primary"},
         "awaiting_review": {"count": 0, "class": "warning"},
