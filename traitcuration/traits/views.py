@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 
 from .utils import get_status_dict
 from .models import Trait
-from .datasources import clinvar, zooma
+from .datasources import clinvar, zooma, dummy
 
 
 def browse(request):
@@ -37,3 +37,8 @@ def clinvar_data(request):
 def zooma_suggestions(request):
     zooma.get_zooma_suggestions()
     return redirect('datasources')
+
+
+def dummy_data(request):
+    dummy.import_dummy_data()
+    return redirect('browse')
