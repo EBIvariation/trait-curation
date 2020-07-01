@@ -1,14 +1,14 @@
 from django.db import models
 
 STATUS_FIELDS = [
-        ('current', 'Current'),
-        ('unmapped', 'Unmapped'),
-        ('obsolete', 'Obsolete'),
-        ('deleted', 'Deleted'),
-        ('needs_import', 'Needs Import'),
-        ('awaiting_import', 'Awaiting Import'),
-        ('needs_creation', 'Needs Creation'),
-        ('awaiting_creation', 'Awaiting Creation'),
+    ('current', 'Current'),
+    ('unmapped', 'Unmapped'),
+    ('obsolete', 'Obsolete'),
+    ('deleted', 'Deleted'),
+    ('needs_import', 'Needs Import'),
+    ('awaiting_import', 'Awaiting Import'),
+    ('needs_creation', 'Needs Creation'),
+    ('awaiting_creation', 'Awaiting Creation'),
 ]
 
 
@@ -64,6 +64,9 @@ class MappingSuggestion(models.Model):
 
     def __str__(self):
         return f"Trait: {self.trait_id} | Term: {self.term_id}"
+
+    class Meta:
+        unique_together = ('trait_id', 'term_id',)
 
 
 class Review(models.Model):
