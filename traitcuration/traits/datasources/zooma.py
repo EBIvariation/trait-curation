@@ -18,15 +18,14 @@ def get_zooma_suggestions():
     """
     traits = Trait.objects.all()
     for trait in traits:
-        results_list = get_suggestions_for_trait(trait)
-        for result in results_list:
-            term = create_local_term(result)
-            # If local term creation returns None, it means that this term already exists in the database
-            if term is not None:
-                create_mapping_suggestion(trait, term)
+        suggestion_list = get_zooma_suggestions_for_trait(trait)
+        for suggestion in suggestion_list:
+            suggested_term_iri = suggestion["semanticTags"][0]  # E.g. http://purl.obolibrary.org/obo/HP_0004839
+            suggested_term = create_local_term(suggested_term_iri)
+            create_mapping_suggestion(trait, suggested_term)
 
 
-def get_suggestions_for_trait(trait):
+def get_zooma_suggestions_for_trait(trait):
     """
     Takes in a trait object as its argument and returns the zooma response of a suggestion list as a dictionary.
     """
@@ -37,28 +36,28 @@ def get_suggestions_for_trait(trait):
     return response.json()
 
 
-def create_local_term(result):
+def create_local_term(suggested_term_iri):
     """
-    Takes in a single zooma suggestion result and creates an ontology term for it in the app's database.
+    Takes in a single zooma suggestion result and creates an ontology term for it in the app's database. If that term
+    already exists, returns the existing term
     """
-    term_iri = result["semanticTags"][0]
-    print(term_iri)
-    if OntologyTerm.objects.filter(iri=term_iri).exists():
-        return
+    print(suggested_term_iri)
+    if OntologyTerm.objects.filter(iri=suggested_term_iri).exists():
+        return OntologyTerm.objects.filter(iri=suggested_term_iri).first()
     # Search for the term in EFO and return its information. If it is not in EFO, search for it in original ontology.
-    term_info = make_ols_query(term_iri, 'efo')
+    term_info = make_ols_query(suggested_term_iri, 'efo')
     term_ontology_id = 'efo'
     # None here means that the term wasn't found in the EFO ontology
     if term_info is None:
-        term_ontology_id = get_ontology_id(term_iri)
-        term_info = make_ols_query(term_iri, term_ontology_id)
+        term_ontology_id = get_ontology_id(suggested_term_iri)
+        term_info = make_ols_query(suggested_term_iri, term_ontology_id)
         # If the term is not found in the original ontology either, return
         if term_info is None:
-            print(f'No info found on {term_iri}')
+            print(f'No info found on {suggested_term_iri}')
             return
     term_status = get_term_status(term_ontology_id, term_info['is_obsolete'])
     # Create an ontology term in the database
-    term = OntologyTerm(curie=term_info['curie'], iri=term_iri, label=term_info['label'], status=term_status)
+    term = OntologyTerm(curie=term_info['curie'], iri=suggested_term_iri, label=term_info['label'], status=term_status)
     term.save()
     return term
 
@@ -77,8 +76,10 @@ def get_term_status(ontology_id, is_obsolete):
 
 def create_mapping_suggestion(trait, term):
     """
-    Creates a mapping suggestion in the app's database.
+    Creates a mapping suggestion in the app's database, if it doesn't exist already.
     """
     zooma = User.objects.filter(username="Zooma").first()
+    if MappingSuggestion.objects.filter(trait_id=trait, term_id=term).exists():
+        return
     suggestion = MappingSuggestion(trait_id=trait, term_id=term, made_by=zooma)
     suggestion.save()
