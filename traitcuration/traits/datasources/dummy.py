@@ -12,69 +12,69 @@ def import_dummy_data():
     OntologyTerm.objects.all().delete()
     User.objects.all().delete()
     # ONTOLOGY TERMS
-    term_current1 = OntologyTerm(label='Diabetes mellitus', curie='EFO:0000400',
+    term_current1 = OntologyTerm(label='/ Diabetes mellitus /', curie='EFO:0000400',
                                  iri='http://www.ebi.ac.uk/efo/EFO_0000400', status='current')
     term_current1.save()
-    term_current2 = OntologyTerm(label='digestive system disease', curie='EFO:0000405',
+    term_current2 = OntologyTerm(label='/ digestive system disease /', curie='EFO:0000405',
                                  iri='http://www.ebi.ac.uk/efo/EFO_0000405', status='current')
     term_current2.save()
-    term_ni1 = OntologyTerm(label='Insulin-resistant diabetes mellitus', curie='HP:0000831',
+    term_ni1 = OntologyTerm(label='/ Insulin-resistant diabetes mellitus /', curie='HP:0000831',
                             iri='http://purl.obolibrary.org/obo/HP_0000831', status='needs_import')
     term_ni1.save()
-    term_ni2 = OntologyTerm(label='breast-ovarian cancer, familial, susceptibility to, 3', curie='MONDO:0013253',
+    term_ni2 = OntologyTerm(label='/ breast-ovarian cancer, familial, susceptibility to, 3 /', curie='MONDO:0013253',
                             iri='http://purl.obolibrary.org/obo/MONDO_0013253', status='needs_import')
     term_ni2.save()
-    term_ai2 = OntologyTerm(label='pancreatic cancer, susceptibility to, 4', curie='MONDO:0013685',
+    term_ai2 = OntologyTerm(label='/ pancreatic cancer, susceptibility to, 4 /', curie='MONDO:0013685',
                             iri='http://purl.obolibrary.org/obo/MONDO_0013685', status='awaiting_import')
     term_ai2.save()
-    term_nc1 = OntologyTerm(label='Hypogonadism, diabetes mellitus, alopecia, mental retardation and \
+    term_nc1 = OntologyTerm(label='/ Hypogonadism, diabetes mellitus, alopecia, mental retardation and \
           electrocardiographic abnormalities', description='The description for Hypogonadism, diabetes \
           mellitus, alopecia, mental retardation and electrocardiographic abnormalities ',
                             cross_refs='MONDO:0013685,HP:0000400', status='awaiting_creation')
     term_nc1.save()
-    term_nc2 = OntologyTerm(label='Familial cancer of breast, 2',
+    term_nc2 = OntologyTerm(label='/ Familial cancer of breast, 2 /',
                             description='Description for familial cancer of breast, 2',
                             cross_refs="Orphanet:0000405", status='awaiting_creation')
     term_nc2.save()
-    term_ac1 = OntologyTerm(label='Diastrophic dysplasia',
+    term_ac1 = OntologyTerm(label='/ Diastrophic dysplasia /',
                             description='Description for Diastrophic dysplasia',
                             cross_refs="", status='awaiting_creation')
     term_ac1.save()
-    term_obsolete = OntologyTerm(label='Diastrophic dysplasia', curie='Orphanet:628',
+    term_obsolete = OntologyTerm(label='/ Diastrophic dysplasia /', curie='Orphanet:628',
                                  iri='http://www.orpha.net/ORDO/Orphanet_628', status='obsolete')
     term_obsolete.save()
-    term_deleted = OntologyTerm(label='Spastic paraplegia', curie='HP:0001258',
+    term_deleted = OntologyTerm(label='/ Spastic paraplegia /', curie='HP:0001258',
                                 iri=' http://purl.obolibrary.org/obo/HP_0001258', status='deleted')
     term_deleted.save()
     # TRAITS
-    trait_current = Trait(name='Diabetes mellitus', status='current', number_of_source_records=9)
+    trait_current = Trait(name='/ Diabetes mellitus /', status='current', number_of_source_records=9)
     trait_current.save()
-    trait_ar1 = Trait(name='digestive system disease', status='awaiting_review', number_of_source_records=4)
+    trait_ar1 = Trait(name='/ digestive system disease /', status='awaiting_review', number_of_source_records=4)
     trait_ar1.save()
-    trait_needs_import = Trait(name='Familial cancer of breast', status='needs_import', number_of_source_records=5)
+    trait_needs_import = Trait(name='/ Familial cancer of breast /', status='needs_import', number_of_source_records=5)
     trait_needs_import.save()
-    trait_ar2 = Trait(name='Insulin-resistant diabetes mellitus', status='awaiting_review', number_of_source_records=1)
+    trait_ar2 = Trait(name='/ Insulin-resistant diabetes mellitus /', status='awaiting_review', number_of_source_records=1)
     trait_ar2.save()
-    trait_ai = Trait(name='pancreatic cancer, susceptibility to, 4',
+    trait_ai = Trait(name='/ pancreatic cancer, susceptibility to, 4 /',
                      status='awaiting_import', number_of_source_records=5)
     trait_ai.save()
-    trait_nc = Trait(name='Hypogonadism, diabetes mellitus, alopecia, mental retardation and \
-          electrocardiographic abnormalities', status='needs_creation', number_of_source_records=12)
+    trait_nc = Trait(name='/ Hypogonadism, diabetes mellitus, alopecia, mental retardation and \
+          electrocardiographic abnormalities /', status='needs_creation', number_of_source_records=12)
     trait_nc.save()
-    trait_ar3 = Trait(name='Pancreatic cancer 4', status='awaiting_review', number_of_source_records=1)
+    trait_ar3 = Trait(name='/ Pancreatic cancer 4 /', status='awaiting_review', number_of_source_records=1)
     trait_ar3.save()
-    trait_ac = Trait(name='Familial cancer of breast', status='awaiting_creation', number_of_source_records=4)
+    trait_ac = Trait(name='/ Familial cancer of breast /', status='awaiting_creation', number_of_source_records=4)
     trait_ac.save()
-    trait_obsolete = Trait(name='Diastrophic dysplasia', status='obsolete', number_of_source_records=7)
+    trait_obsolete = Trait(name='/ Diastrophic dysplasia /', status='obsolete', number_of_source_records=7)
     trait_obsolete.save()
-    trait_deleted = Trait(name='Spastic paraplegia', status='deleted', number_of_source_records=7)
+    trait_deleted = Trait(name='/ Spastic paraplegia /', status='deleted', number_of_source_records=7)
     trait_deleted.save()
     # USERS
-    user1 = User(username='user1', email='user1@user.com')
+    user1 = User(username='/ user1', email='user1@user.com')
     user1.save()
-    user2 = User(username='user2', email='user2@user.com')
+    user2 = User(username='/ user2', email='user2@user.com')
     user2.save()
-    user3 = User(username='user3', email='user3@user.com')
+    user3 = User(username='/ user3', email='user3@user.com')
     user3.save()
     # MAPPINGS
     m1 = Mapping(trait_id=trait_current, term_id=term_current1, curator=user1, is_reviewed=True)
