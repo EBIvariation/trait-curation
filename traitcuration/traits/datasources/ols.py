@@ -3,14 +3,18 @@ This module contains functions to retrieve info about terms from OLS, as well as
 ontology_id extraction
 """
 import requests
+import logging
 
 from retry import retry
 
+logging.basicConfig()
+logger = logging.getLogger('ZOOMA')
+logger.setLevel(logging.INFO)
 
 BASE_URL = "https://www.ebi.ac.uk/ols/api/"
 
 
-@retry(tries=10, delay=5, backoff=1.2, jitter=(1, 3))
+@retry(tries=10, delay=5, backoff=1.2, jitter=(1, 3), logger=logger)
 def make_ols_query(term_iri, ontology_id):
     """
     Takes in a term iri (or IRI as referenced in OLS documentation) and the ontology id to search against. Returns a
@@ -27,8 +31,6 @@ def make_ols_query(term_iri, ontology_id):
     term_label = term_info["label"]  # E.g. Diabetes mellitus
     term_is_obsolete = term_info["is_obsolete"]  # True or False value on whether the term is obsolete or not
     info_dict = {"curie": term_curie, "label": term_label, "is_obsolete": term_is_obsolete}
-    print(info_dict)
-    print()
     return info_dict
 
 

@@ -3,10 +3,14 @@ This module contains all the functionality that uses ZOOMA to retrieve mapping s
 terms in the app's database
 """
 import requests
+import logging
 
 from ..models import Trait, MappingSuggestion, OntologyTerm, User
 from .ols import make_ols_query, get_ontology_id
 
+logging.basicConfig()
+logger = logging.getLogger('ZOOMA')
+logger.setLevel(logging.INFO)
 
 BASE_URL = "http://www.ebi.ac.uk/spot/zooma/v2/api"
 
@@ -18,6 +22,7 @@ def get_zooma_suggestions():
     """
     traits = Trait.objects.all()
     for trait in traits:
+        logger.info(f"Retrieving ZOOMA suggestions for trait: {trait.name}")
         suggestion_list = get_zooma_suggestions_for_trait(trait)
         for suggestion in suggestion_list:
             suggested_term_iri = suggestion["semanticTags"][0]  # E.g. http://purl.obolibrary.org/obo/HP_0004839
@@ -41,8 +46,9 @@ def create_local_term(suggested_term_iri):
     Takes in a single zooma suggestion result and creates an ontology term for it in the app's database. If that term
     already exists, returns the existing term
     """
-    print(suggested_term_iri)
+    logger.info(f"Retrieving info for suggested term: {suggested_term_iri}")
     if OntologyTerm.objects.filter(iri=suggested_term_iri).exists():
+        logger.info(f"Term {suggested_term_iri} already exists in the database")
         return OntologyTerm.objects.filter(iri=suggested_term_iri).first()
     # Search for the term in EFO and return its information. If it is not in EFO, search for it in original ontology.
     term_info = make_ols_query(suggested_term_iri, 'efo')
@@ -53,8 +59,9 @@ def create_local_term(suggested_term_iri):
         term_info = make_ols_query(suggested_term_iri, term_ontology_id)
         # If the term is not found in the original ontology either, return
         if term_info is None:
-            print(f'No info found on {suggested_term_iri}')
+            logger.info(f'No info found on {suggested_term_iri}')
             return
+    logger.info(f"Term {suggested_term_iri} found in {term_ontology_id} ontology")
     term_status = get_term_status(term_ontology_id, term_info['is_obsolete'])
     # Create an ontology term in the database
     term = OntologyTerm(curie=term_info['curie'], iri=suggested_term_iri, label=term_info['label'], status=term_status)
@@ -80,6 +87,8 @@ def create_mapping_suggestion(trait, term):
     """
     zooma = User.objects.filter(username="Zooma").first()
     if MappingSuggestion.objects.filter(trait_id=trait, term_id=term).exists():
+        logger.info(f"Mapping suggestion {trait} - {term} already exists in the database")
         return
     suggestion = MappingSuggestion(trait_id=trait, term_id=term, made_by=zooma)
     suggestion.save()
+    logger.info(f"Created mapping suggestion {suggestion}")
