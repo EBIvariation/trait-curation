@@ -1,8 +1,10 @@
 {% extends "traits/base.html" %} 
 {% block title %} Trait Detail {% endblock %}
 {% load trait_filters %} 
+{% load static %} 
 
 {% block content %}
+<script src="{% static 'js/mapping.js' %}"></script>
 <aside class="sidebar">
   <div class="sidebar__wrapper">
     <div class="sidebar__section">
@@ -49,44 +51,84 @@
   </div>
 </aside>
 
-<div class="uk-container uk-container-xlarge trait-container">
-  <div class="info-section__wrapper">
-    <div class="info-section__column">
-      <span class="info-section__title">TRAIT NAME</span>
-      <span class="info-section__value">{{trait.name}}</span>
+<div class="trait-container">
+  <div class="uk-container uk-container-xlarge">
+    <div class="info-section__wrapper">
+      <div class="info-section__column">
+        <span class="info-section__title">TRAIT NAME</span>
+        <span class="info-section__value">{{trait.name}}</span>
+      </div>
+      <div class="info-section__column">
+        <span class="info-section__title">SOURCE RECORDS</span>
+        <span class="info-section__value"
+          >{% firstof trait.number_of_source_records '0' %}</span
+        >
+      </div>
+      <div class="info-section__column">
+        <span class="info-section__title">TRAIT STATUS</span>
+        <span
+          class="uk-label label--{{status_dict | get_dict_item:trait.status}}"
+        >
+          {{trait.status | status_readable_name}}
+        </span>
+      </div>
     </div>
-    <div class="info-section__column">
-      <span class="info-section__title">SOURCE RECORDS</span>
-      <span class="info-section__value"
-        >{% firstof trait.number_of_source_records '0' %}</span
-      >
-    </div>
-    <div class="info-section__column">
-      <span class="info-section__title">TRAIT STATUS</span>
-      <span
-        class="uk-label label--{{status_dict | get_dict_item:trait.status}}"
-      >
-        {{trait.status | status_readable_name}}
-      </span>
-    </div>
-  </div>
-  <h1>Mapped term details</h1>
-  {% with trait.current_mapping.term_id as term %}
-  <ul class="uk-list">
-    <li>Term: {% firstof term.curie 'None' %}</li>
-    <li>Term label: {% firstof term.label 'None' %}</li>
-    <li>Term status: {% firstof term.status 'None' %}</li>
-  </ul>
-  {% endwith %}
-  <h1>Mapping Suggestions</h1>
-    {% with trait.mappingsuggestion_set.all as suggestions %}
-    {% for suggestion in suggestions %}
+    <h4>SUGGESTED TERMS</h4>
+    <table id="suggestionTable" class="uk-table uk-table-small uk-table-divider uk-table-hover">
+      <thead>
+        <tr>
+          <th class="uk-width-1-6">TERM</th>
+          <th class="uk-width-large">TERM LABEL</th>
+          <th class="uk-width-1-6">SUGGESTED BY</th>
+          <th class="uk-width-1-6">TERM STATUS</th>
+        </tr>
+      </thead>
+      <tbody class="list">
+      {% with trait.mappingsuggestion_set.all as suggestions %}
+      {% with trait.current_mapping.term_id as current_term %}
+      {% for suggestion in suggestions %}
+        <tr 
+        onclick="selectRow(this, 'suggestionTable', '{{trait.id}}', '{{suggestion.term_id.id}}')"
+        class="suggestion-table__row 
+        {% if suggestion.term_id == current_term %} suggestion-table__row--current {% endif %}">
+          <td>
+            <a target="_blank" href="{{suggestion.term_id.iri}}">
+              {{suggestion.term_id.curie}} 
+              {% if suggestion.term_id == current_term %} 
+              <span class="uk-label label--primary">MAPPED TERM</span>
+              {% endif %}</a>
+          </td>
+          <td>{{suggestion.term_id.label}}</td>
+          <td> {{suggestion.made_by}}</td>
+          <td>
+            <span class="uk-label label--{{status_dict | get_dict_item:suggestion.term_id.status}}">
+              {{suggestion.term_id.status | status_readable_name}}</span>
+          </td>
+        </tr>
+      {% endfor %} {% endwith %} {% endwith %}
+      </tbody>
+    </table>
+
+    <button onclick="mapButtonClicked()" class="uk-button button button--primary">MAP TO SELECTION</button>
+  
+    <h1>Mapped term details</h1>
+    {% with trait.current_mapping.term_id as term %}
     <ul class="uk-list">
-        <li> <b>Suggested term:</b> {{suggestion.term_id}} </li>
-        <li> <b>Term Link:</b> <a href="{{suggestion.term_id.iri}}">{{suggestion.term_id.iri}}</a></li>
-        <li> <b>Term Status:</b> {{suggestion.term_id.status}}</li>
-        <hr>
+      <li>Term: {% firstof term.curie 'None' %}</li>
+      <li>Term label: {% firstof term.label 'None' %}</li>
+      <li>Term status: {% firstof term.status 'None' %}</li>
     </ul>
-    {% endfor %} {% endwith %}
+    {% endwith %}
+    <h1>Mapping Suggestions</h1>
+      {% with trait.mappingsuggestion_set.all as suggestions %}
+      {% for suggestion in suggestions %}
+      <ul class="uk-list">
+          <li> <b>Suggested term:</b> {{suggestion.term_id}} </li>
+          <li> <b>Term Link:</b> <a href="{{suggestion.term_id.iri}}">{{suggestion.term_id.iri}}</a></li>
+          <li> <b>Term Status:</b> {{suggestion.term_id.status}}</li>
+          <hr>
+      </ul>
+      {% endfor %} {% endwith %}
+  </div>
 </div>
 {% endblock %}

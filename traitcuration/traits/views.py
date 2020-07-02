@@ -1,8 +1,12 @@
 
+import json
+
 from django.shortcuts import render, get_object_or_404, redirect
+from django.forms.models import model_to_dict
+from django.http import HttpResponse
 
 from .utils import get_status_dict
-from .models import Trait
+from .models import Trait, Mapping, OntologyTerm, User
 from .datasources import clinvar, zooma, dummy
 
 
@@ -18,6 +22,27 @@ def trait_detail(request, pk):
     status_dict = get_status_dict()
     context = {"trait": trait, "status_dict": status_dict}
     return render(request, 'traits/trait_detail.html', context)
+
+
+def update_mapping(request, pk):
+    # Parse request body parameters, expected a trait id
+    request_body = json.loads(request.body.decode('utf-8'))
+    term_id = request_body['term']
+    term = get_object_or_404(OntologyTerm, pk=term_id)
+    trait = get_object_or_404(Trait, pk=pk)
+    user = get_object_or_404(User, username='user1')
+    # If a mapping instance with the given trait and term already exists, then map the trait to that, and reset reviews
+    if Mapping.objects.filter(trait_id=trait, term_id=term).exists():
+        mapping = Mapping.objects.filter(trait_id=trait, term_id=term).first()
+        mapping.curator = user
+        mapping.is_reviewed = False
+    else:
+        mapping = Mapping(trait_id=trait, term_id=term, curator=user, is_reviewed=False)
+    mapping.save()
+    trait.current_mapping = mapping
+    trait.status = trait.Status.AWAITING_REVIEW
+    trait.save()
+    return HttpResponse(json.dumps(model_to_dict(mapping)), content_type="application/json")
 
 
 def datasources(request):

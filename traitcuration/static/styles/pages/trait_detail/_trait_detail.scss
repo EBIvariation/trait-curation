@@ -1,5 +1,5 @@
 .trait-container {
-    width: 86vw;
+  width: 85vw;
 }
 
 .info-section {
@@ -19,10 +19,29 @@
   }
 
   &__title {
-      color: $color-gray !important;
+    color: $color-gray !important;
   }
 
   &__value {
-      color: black !important;
+    color: black !important;
+  }
+}
+
+.suggestion-table {
+  &__row {
+    cursor: pointer;
+    padding: 0 2rem !important;
+
+    &--current {
+      background-color: lighten($color-secondary, 30%);
+
+      &:hover {
+        background-color: lighten($color-secondary, 30%) !important;
+      }
+    }
+
+    &--selected {
+      background-color: #ffffdd !important;
+    }
   }
 }
