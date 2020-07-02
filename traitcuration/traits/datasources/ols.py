@@ -4,20 +4,24 @@ ontology_id extraction
 """
 import requests
 
+from retry import retry
+
 
 BASE_URL = "https://www.ebi.ac.uk/ols/api/"
 
 
+@retry(tries=10, delay=5, backoff=1.2, jitter=(1, 3))
 def make_ols_query(term_iri, ontology_id):
     """
     Takes in a term iri (or IRI as referenced in OLS documentation) and the ontology id to search against. Returns a
     dictionary for that term with the fields 'label', 'obo_id' which is the CURIE and 'is_obsolete' as True or False.
     """
-    results = requests.get(f"{BASE_URL}ontologies/{ontology_id}/terms?iri={term_iri}").json()
-    print(results)
-    if 'error' in results:
-        print
+    response = requests.get(f"{BASE_URL}ontologies/{ontology_id}/terms?iri={term_iri}")
+    # 404 errors are expected. In any other case, raise an exception and retry the query
+    if response.status_code == 404:
         return None
+    response.raise_for_status()
+    results = response.json()
     term_info = results["_embedded"]["terms"][0]
     term_curie = term_info["obo_id"]  # E.g. EFO:0000400
     term_label = term_info["label"]  # E.g. Diabetes mellitus
