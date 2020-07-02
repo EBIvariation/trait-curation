@@ -80,10 +80,10 @@ def get_term_status(ontology_id, is_obsolete):
     'Obsolete' if the is_obsolete flag is true, 'Current' if its ontology is EFO, and 'Needs Import' otherwise
     """
     if is_obsolete:
-        return 'obsolete'
+        return OntologyTerm.Status.OBSOLETE
     if ontology_id == 'efo':
-        return 'current'
-    return 'needs_import'
+        return OntologyTerm.Status.CURRENT
+    return OntologyTerm.Status.NEEDS_IMPORT
 
 
 def create_mapping_suggestion(trait, term):

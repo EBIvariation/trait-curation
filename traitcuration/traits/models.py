@@ -1,21 +1,21 @@
 from django.db import models
 
-STATUS_FIELDS = [
-    ('current', 'Current'),
-    ('unmapped', 'Unmapped'),
-    ('obsolete', 'Obsolete'),
-    ('deleted', 'Deleted'),
-    ('needs_import', 'Needs Import'),
-    ('awaiting_import', 'Awaiting Import'),
-    ('needs_creation', 'Needs Creation'),
-    ('awaiting_creation', 'Awaiting Creation'),
-]
-
 
 class Trait(models.Model):
+    class Status(models.TextChoices):
+        CURRENT = 'current'
+        UNMAPPED = 'unmapped'
+        OBSOLETE = 'obsolete'
+        DELETED = 'deleted'
+        NEEDS_IMPORT = 'needs_import'
+        AWAITING_IMPORT = 'awaiting_import'
+        NEEDS_CREATION = 'needs_creation'
+        AWAITING_CREATION = 'awaiting_creation'
+        AWAITING_REVIEW = 'awaiting_review'
+
     name = models.CharField(max_length=200)
     current_mapping = models.ForeignKey('Mapping', on_delete=models.SET_NULL, null=True, blank=True)
-    status = models.CharField(max_length=50, choices=STATUS_FIELDS + [('awaiting_review', 'Awaiting Review')])
+    status = models.CharField(max_length=50, choices=Status.choices)
     number_of_source_records = models.IntegerField(blank=True, null=True)
     timestamp_added = models.DateTimeField(auto_now=True)
     timestamp_updated = models.DateTimeField(auto_now_add=True)
@@ -34,10 +34,19 @@ class User(models.Model):
 
 
 class OntologyTerm(models.Model):
+    class Status(models.TextChoices):
+        CURRENT = 'current'
+        OBSOLETE = 'obsolete'
+        DELETED = 'deleted'
+        NEEDS_IMPORT = 'needs_import'
+        AWAITING_IMPORT = 'awaiting_import'
+        NEEDS_CREATION = 'needs_creation'
+        AWAITING_CREATION = 'awaiting_creation'
+
     curie = models.CharField(max_length=50, blank=True, null=True, unique=True)
     iri = models.URLField(null=True, blank=True, unique=True)
     label = models.CharField(max_length=200)
-    status = models.CharField(max_length=50, choices=STATUS_FIELDS)
+    status = models.CharField(max_length=50, choices=Status.choices)
     description = models.TextField(blank=True, null=True)
     cross_refs = models.TextField(blank=True, null=True)
 
