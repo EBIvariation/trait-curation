@@ -110,25 +110,7 @@
     </table>
 
     <button onclick="mapButtonClicked()" class="uk-button button button--primary">MAP TO SELECTION</button>
-  
-    <h1>Mapped term details</h1>
-    {% with trait.current_mapping.term_id as term %}
-    <ul class="uk-list">
-      <li>Term: {% firstof term.curie 'None' %}</li>
-      <li>Term label: {% firstof term.label 'None' %}</li>
-      <li>Term status: {% firstof term.status 'None' %}</li>
-    </ul>
-    {% endwith %}
-    <h1>Mapping Suggestions</h1>
-      {% with trait.mappingsuggestion_set.all as suggestions %}
-      {% for suggestion in suggestions %}
-      <ul class="uk-list">
-          <li> <b>Suggested term:</b> {{suggestion.term_id}} </li>
-          <li> <b>Term Link:</b> <a href="{{suggestion.term_id.iri}}">{{suggestion.term_id.iri}}</a></li>
-          <li> <b>Term Status:</b> {{suggestion.term_id.status}}</li>
-          <hr>
-      </ul>
-      {% endfor %} {% endwith %}
+
   </div>
 </div>
 {% endblock %}
