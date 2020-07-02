@@ -24,10 +24,15 @@ def get_zooma_suggestions():
     for trait in traits:
         logger.info(f"Retrieving ZOOMA suggestions for trait: {trait.name}")
         suggestion_list = get_zooma_suggestions_for_trait(trait)
+        # A set of suggested terms found in the query, used to exclude those terms from being deleted from the database 
+        # when the delete_unused_mappings function is called
+        suggested_terms = set()
         for suggestion in suggestion_list:
             suggested_term_iri = suggestion["semanticTags"][0]  # E.g. http://purl.obolibrary.org/obo/HP_0004839
             suggested_term = create_local_term(suggested_term_iri)
             create_mapping_suggestion(trait, suggested_term)
+            suggested_terms.add(suggested_term)
+        delete_unused_suggestions(trait, suggested_terms)
 
 
 def get_zooma_suggestions_for_trait(trait):
@@ -92,3 +97,18 @@ def create_mapping_suggestion(trait, term):
     suggestion = MappingSuggestion(trait_id=trait, term_id=term, made_by=zooma)
     suggestion.save()
     logger.info(f"Created mapping suggestion {suggestion}")
+
+
+def delete_unused_suggestions(trait, suggested_terms):
+    """
+    Takes in a trait and a set of suggested_terms, found in the previously executed ZOOMA query. This function gets all
+    the mapping suggestions for that trait that are NOT found in the suggested_terms list or in any previous mappings
+    for that trait, and deletes them
+    """
+    trait_mappings = trait.mapping_set.all()
+    for mapping in trait_mappings:
+        suggested_terms.add(mapping.term_id)
+    deleted_suggestions = trait.mappingsuggestion_set.exclude(term_id__in=list(suggested_terms))
+    # .exclude(term_id__in=suggested_terms)
+    deleted_suggestions.delete()
+    logger.info(f"Deleted mapping suggestions {deleted_suggestions}")
