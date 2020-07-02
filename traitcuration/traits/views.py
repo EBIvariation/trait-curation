@@ -24,6 +24,18 @@ def datasources(request):
     return render(request, 'traits/datasources.html')
 
 
+def all_data(request):
+    try:
+        dummy.import_dummy_data()
+        clinvar.download_clinvar_data()
+        traits_dict = clinvar.parse_trait_names_and_source_records()
+        clinvar.store_data(traits_dict)
+        zooma.get_zooma_suggestions()
+        return redirect('browse')
+    except Exception as e:
+        print(f"Error: {e}")
+
+
 def clinvar_data(request):
     try:
         clinvar.download_clinvar_data()
