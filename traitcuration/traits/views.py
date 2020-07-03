@@ -1,5 +1,6 @@
 
 import json
+from datetime import datetime
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.forms.models import model_to_dict
@@ -41,6 +42,7 @@ def update_mapping(request, pk):
     mapping.save()
     trait.current_mapping = mapping
     trait.status = trait.Status.AWAITING_REVIEW
+    trait.timestamp_updated = datetime.now()
     trait.save()
     return HttpResponse(json.dumps(model_to_dict(mapping)), content_type="application/json")
 
