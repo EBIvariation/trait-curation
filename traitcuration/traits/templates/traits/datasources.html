@@ -2,6 +2,12 @@
 {% block title %} External Datasources {%endblock %} 
 {% block content %}
 <div class="uk-container uk-container-xlarge">
+  <a href="{% url 'all_data' %}"
+    ><button class="uk-button uk-button-primary">IMPORT ALL DATA</button>
+  </a>
+  <a href="{% url 'dummy_data' %}"
+    ><button class="uk-button uk-button-primary">IMPORT DUMMY DATA</button>
+  </a>
   <a href="{% url 'clinvar_data' %}"
     ><button class="uk-button uk-button-primary">CLINVAR DATA</button>
   </a>

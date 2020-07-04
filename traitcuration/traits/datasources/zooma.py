@@ -72,7 +72,6 @@ def create_local_term(suggested_term_iri):
     # Create an ontology term in the database
     term = OntologyTerm(curie=term_info['curie'], iri=suggested_term_iri, label=term_info['label'], status=term_status)
     term.save()
-    print(term.status)
     return term
 
 
@@ -95,7 +94,10 @@ def create_mapping_suggestion(trait, term):
     """
     Creates a mapping suggestion in the app's database, if it doesn't exist already.
     """
-    zooma = User.objects.filter(username="Zooma").first()
+    zooma = User.objects.filter(username="ZOOMA").first()
+    if zooma is None:
+        zooma = User(username="ZOOMA", email="eva-dev@ebi.ac.uk")
+        zooma.save()
     if MappingSuggestion.objects.filter(trait_id=trait, term_id=term).exists():
         logger.info(f"Mapping suggestion {trait} - {term} already exists in the database")
         return
