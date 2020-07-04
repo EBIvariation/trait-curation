@@ -1,7 +1,7 @@
 """
 This module holds dummy data to import during development
 """
-from ..models import OntologyTerm, MappingSuggestion, Trait, Mapping, User, Review
+from ..models import OntologyTerm, MappingSuggestion, Trait, Mapping, User, Review, Status
 
 
 def import_dummy_data():
@@ -13,42 +13,42 @@ def import_dummy_data():
     User.objects.all().delete()
     # ONTOLOGY TERMS
     term1 = OntologyTerm(label='/ Diabetes mellitus /', curie='EFO:0000400',
-                         iri='http://www.ebi.ac.uk/efo/EFO_0000400', status='current')
+                         iri='http://www.ebi.ac.uk/efo/EFO_0000400', status=Status.CURRENT)
     term2 = OntologyTerm(label='/ digestive system disease /', curie='EFO:0000405',
-                         iri='http://www.ebi.ac.uk/efo/EFO_0000405', status='current')
+                         iri='http://www.ebi.ac.uk/efo/EFO_0000405', status=Status.CURRENT)
     term3 = OntologyTerm(label='/ Insulin-resistant diabetes mellitus /', curie='HP:0000831',
-                         iri='http://purl.obolibrary.org/obo/HP_0000831', status='needs_import')
+                         iri='http://purl.obolibrary.org/obo/HP_0000831', status=Status.NEEDS_IMPORT)
     term4 = OntologyTerm(label='/ breast-ovarian cancer, familial, susceptibility to, 3 /', curie='MONDO:0013253',
-                         iri='http://purl.obolibrary.org/obo/MONDO_0013253', status='needs_import')
+                         iri='http://purl.obolibrary.org/obo/MONDO_0013253', status=Status.NEEDS_IMPORT)
     term5 = OntologyTerm(label='/ pancreatic cancer, susceptibility to, 4 /', curie='MONDO:0013685',
-                         iri='http://purl.obolibrary.org/obo/MONDO_0013685', status='awaiting_import')
+                         iri='http://purl.obolibrary.org/obo/MONDO_0013685', status=Status.AWAITING_IMPORT)
     term6 = OntologyTerm(label='/ Hypogonadism, diabetes mellitus, alopecia, mental retardation and \
           electrocardiographic abnormalities', description='The description for Hypogonadism, diabetes \
           mellitus, alopecia, mental retardation and electrocardiographic abnormalities ',
-                         cross_refs='MONDO:0013685,HP:0000400', status='awaiting_creation')
+                         cross_refs='MONDO:0013685,HP:0000400', status=Status.AWAITING_CREATION)
     term7 = OntologyTerm(label='/ Familial cancer of breast, 2 /',
                          description='Description for familial cancer of breast, 2',
-                         cross_refs="Orphanet:0000405", status='awaiting_creation')
+                         cross_refs="Orphanet:0000405", status=Status.AWAITING_CREATION)
     term8 = OntologyTerm(label='/ Diastrophic dysplasia /',
                          description='Description for Diastrophic dysplasia',
-                         cross_refs="", status='awaiting_creation')
+                         cross_refs="", status=Status.AWAITING_CREATION)
     term9 = OntologyTerm(label='/ obsolete_adrenocortical carcinoma /', curie='EFO:0003093',
-                         iri='http://www.ebi.ac.uk/efo/EFO_0003093', status='obsolete')
+                         iri='http://www.ebi.ac.uk/efo/EFO_0003093', status=Status.OBSOLETE)
     term10 = OntologyTerm(label='/ Spastic paraplegia /', curie='HP:999999999',
-                                iri=' http://purl.obolibrary.org/obo/HP_999999999', status='deleted')
+                                iri=' http://purl.obolibrary.org/obo/HP_999999999', status=Status.DELETED)
     for term in (term1, term2, term3, term4, term5, term6, term7, term8, term9, term10):
         term.save()
     # TRAITS
-    trait1 = Trait(name='/ Diabetes mellitus /', status='current', number_of_source_records=9)
+    trait1 = Trait(name='/ Diabetes mellitus /', status=Status.CURRENT, number_of_source_records=9)
     trait2 = Trait(name='/ digestive system disease /', status='awaiting_review', number_of_source_records=4)
-    trait3 = Trait(name='/ Familial cancer of breast /', status='needs_import', number_of_source_records=5)
+    trait3 = Trait(name='/ Familial cancer of breast /', status=Status.NEEDS_IMPORT, number_of_source_records=5)
     trait4 = Trait(name='/ Insulin-resistant diabetes mellitus /', status='awaiting_review', number_of_source_records=1)
     trait5 = Trait(name='/ pancreatic cancer, susceptibility to, 4 /',
-                   status='awaiting_import', number_of_source_records=5)
+                   status=Status.AWAITING_IMPORT, number_of_source_records=5)
     trait6 = Trait(name='/ Hypogonadism, diabetes mellitus, alopecia, mental retardation and \
           electrocardiographic abnormalities /', status='needs_creation', number_of_source_records=12)
     trait7 = Trait(name='/ Pancreatic cancer 4 /', status='awaiting_review', number_of_source_records=1)
-    trait8 = Trait(name='/ Familial cancer of breast /', status='awaiting_creation', number_of_source_records=4)
+    trait8 = Trait(name='/ Familial cancer of breast /', status=Status.AWAITING_CREATION, number_of_source_records=4)
     trait9 = Trait(name='/ Diastrophic dysplasia /', status='obsolete', number_of_source_records=7)
     trait10 = Trait(name='/ Spastic paraplegia /', status='deleted', number_of_source_records=7)
     for trait in (trait1, trait2, trait3, trait4, trait5, trait6, trait7, trait8, trait9, trait10):
