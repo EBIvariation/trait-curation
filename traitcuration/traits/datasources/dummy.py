@@ -32,9 +32,9 @@ def import_dummy_data():
     term8 = OntologyTerm(label='/ Diastrophic dysplasia /',
                          description='Description for Diastrophic dysplasia',
                          cross_refs="", status='awaiting_creation')
-    term9 = OntologyTerm(label='/ Diastrophic dysplasia /', curie='Orphanet:628',
-                         iri='http://www.orpha.net/ORDO/Orphanet_628', status='obsolete')
-    term10 = OntologyTerm(label='/ Spastic paraplegia /', curie='HP:HP_999999999',
+    term9 = OntologyTerm(label='/ obsolete_adrenocortical carcinoma /', curie='EFO:0003093',
+                         iri='http://www.ebi.ac.uk/efo/EFO_0003093', status='obsolete')
+    term10 = OntologyTerm(label='/ Spastic paraplegia /', curie='HP:999999999',
                                 iri=' http://purl.obolibrary.org/obo/HP_999999999', status='deleted')
     for term in (term1, term2, term3, term4, term5, term6, term7, term8, term9, term10):
         term.save()
@@ -54,9 +54,9 @@ def import_dummy_data():
     for trait in (trait1, trait2, trait3, trait4, trait5, trait6, trait7, trait8, trait9, trait10):
         trait.save()
     # USERS
-    user1 = User(username='/ user1', email='user1@user.com')
-    user2 = User(username='/ user2', email='user2@user.com')
-    user3 = User(username='/ user3', email='user3@user.com')
+    user1 = User(username='/ user1 /', email='user1@user.com')
+    user2 = User(username='/ user2 /', email='user2@user.com')
+    user3 = User(username='/ user3 /', email='user3@user.com')
     for user in (user1, user2, user3):
         user.save()
     # MAPPINGS
