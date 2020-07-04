@@ -70,6 +70,9 @@ class Mapping(models.Model):
     def __str__(self):
         return f"{self.trait_id} - {self.term_id}"
 
+    class Meta:
+        unique_together = ('trait_id', 'term_id',)
+
 
 class MappingSuggestion(models.Model):
     trait_id = models.ForeignKey(Trait, on_delete=models.PROTECT)

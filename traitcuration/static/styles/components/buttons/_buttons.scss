@@ -10,6 +10,15 @@
       background-color: darken($color-success, 5%) !important;
     }
   }
+
+  &--primary {
+    background-color: $color-primary !important;
+    color: white !important;
+
+    &:active {
+      background-color: lighten($color-primary, 5%) !important;
+    }
+  }
 }
 .button-outlined {
   background-color: white !important;
