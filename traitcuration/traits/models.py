@@ -1,21 +1,35 @@
 from django.db import models
+from enum import Enum
+
+
+class Status(Enum):
+    CURRENT = 'current'
+    UNMAPPED = 'unmapped'
+    OBSOLETE = 'obsolete'
+    DELETED = 'deleted'
+    NEEDS_IMPORT = 'needs_import'
+    AWAITING_IMPORT = 'awaiting_import'
+    NEEDS_CREATION = 'needs_creation'
+    AWAITING_CREATION = 'awaiting_creation'
+    AWAITING_REVIEW = 'awaiting_review'
+
+    @classmethod
+    def trait_choices(cls):
+        return tuple((i.name, i.value) for i in cls)
+
+    @classmethod
+    def term_choices(cls):
+        choices = list()
+        for i in cls:
+            if i.name != 'UNMAPPED' and i.name != 'AWAITING_REVIEW':
+                choices.append((i.name, i.value))
+        return tuple(choices)
 
 
 class Trait(models.Model):
-    class Status(models.TextChoices):
-        CURRENT = 'current'
-        UNMAPPED = 'unmapped'
-        OBSOLETE = 'obsolete'
-        DELETED = 'deleted'
-        NEEDS_IMPORT = 'needs_import'
-        AWAITING_IMPORT = 'awaiting_import'
-        NEEDS_CREATION = 'needs_creation'
-        AWAITING_CREATION = 'awaiting_creation'
-        AWAITING_REVIEW = 'awaiting_review'
-
     name = models.CharField(max_length=200)
     current_mapping = models.ForeignKey('Mapping', on_delete=models.SET_NULL, null=True, blank=True)
-    status = models.CharField(max_length=50, choices=Status.choices)
+    status = models.CharField(max_length=50, choices=Status.trait_choices())
     number_of_source_records = models.IntegerField(blank=True, null=True)
     timestamp_added = models.DateTimeField(auto_now=True)
     timestamp_updated = models.DateTimeField(auto_now_add=True)
@@ -34,19 +48,10 @@ class User(models.Model):
 
 
 class OntologyTerm(models.Model):
-    class Status(models.TextChoices):
-        CURRENT = 'current'
-        OBSOLETE = 'obsolete'
-        DELETED = 'deleted'
-        NEEDS_IMPORT = 'needs_import'
-        AWAITING_IMPORT = 'awaiting_import'
-        NEEDS_CREATION = 'needs_creation'
-        AWAITING_CREATION = 'awaiting_creation'
-
     curie = models.CharField(max_length=50, blank=True, null=True, unique=True)
     iri = models.URLField(null=True, blank=True, unique=True)
     label = models.CharField(max_length=200)
-    status = models.CharField(max_length=50, choices=Status.choices)
+    status = models.CharField(max_length=50, choices=Status.term_choices())
     description = models.TextField(blank=True, null=True)
     cross_refs = models.TextField(blank=True, null=True)
 

@@ -5,7 +5,7 @@ terms in the app's database
 import requests
 import logging
 
-from ..models import Trait, MappingSuggestion, OntologyTerm, User
+from ..models import Trait, MappingSuggestion, OntologyTerm, User, Status
 from .ols import make_ols_query, get_ontology_id
 
 logging.basicConfig()
@@ -24,7 +24,7 @@ def get_zooma_suggestions():
     for trait in traits:
         logger.info(f"Retrieving ZOOMA suggestions for trait: {trait.name}")
         suggestion_list = get_zooma_suggestions_for_trait(trait)
-        # A set of suggested terms found in the query, used to exclude those terms from being deleted from the database 
+        # A set of suggested terms found in the query, used to exclude those terms from being deleted from the database
         # when the delete_unused_mappings function is called
         suggested_terms = set()
         for suggestion in suggestion_list:
@@ -80,10 +80,10 @@ def get_term_status(ontology_id, is_obsolete):
     'Obsolete' if the is_obsolete flag is true, 'Current' if its ontology is EFO, and 'Needs Import' otherwise
     """
     if is_obsolete:
-        return OntologyTerm.Status.OBSOLETE
+        return Status.OBSOLETE
     if ontology_id == 'efo':
-        return OntologyTerm.Status.CURRENT
-    return OntologyTerm.Status.NEEDS_IMPORT
+        return Status.CURRENT
+    return Status.NEEDS_IMPORT
 
 
 def create_mapping_suggestion(trait, term):
