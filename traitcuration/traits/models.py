@@ -1,8 +1,8 @@
 from django.db import models
-from enum import Enum
+# from enum import Enum
 
 
-class Status(Enum):
+class Status(models.TextChoices):
     CURRENT = 'current'
     UNMAPPED = 'unmapped'
     OBSOLETE = 'obsolete'
@@ -23,6 +23,7 @@ class Status(Enum):
         for i in cls:
             if i.name != 'UNMAPPED' and i.name != 'AWAITING_REVIEW':
                 choices.append((i.name, i.value))
+        print(tuple(choices))
         return tuple(choices)
 
 
