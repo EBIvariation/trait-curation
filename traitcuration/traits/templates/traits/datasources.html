@@ -2,8 +2,11 @@
 {% block title %} External Datasources {%endblock %} 
 {% block content %}
 <div class="uk-container uk-container-xlarge">
-  <a href="{% url 'fetch_data' %}"
-    ><button class="uk-button uk-button-primary">FETCH DATA</button>
+  <a href="{% url 'clinvar_data' %}"
+    ><button class="uk-button uk-button-primary">CLINVAR DATA</button>
+  </a>
+  <a href="{% url 'zooma_suggestions' %}"
+    ><button class="uk-button uk-button-primary">ZOOMA SUGGESTIONS</button>
   </a>
 </div>
 {% endblock %}

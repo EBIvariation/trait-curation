@@ -1,21 +1,36 @@
 from django.db import models
+# from enum import Enum
 
-STATUS_FIELDS = [
-        ('current', 'Current'),
-        ('unmapped', 'Unmapped'),
-        ('obsolete', 'Obsolete'),
-        ('deleted', 'Deleted'),
-        ('needs_import', 'Needs Import'),
-        ('awaiting_import', 'Awaiting Import'),
-        ('needs_creation', 'Needs Creation'),
-        ('awaiting_creation', 'Awaiting Creation'),
-]
+
+class Status(models.TextChoices):
+    CURRENT = 'current'
+    UNMAPPED = 'unmapped'
+    OBSOLETE = 'obsolete'
+    DELETED = 'deleted'
+    NEEDS_IMPORT = 'needs_import'
+    AWAITING_IMPORT = 'awaiting_import'
+    NEEDS_CREATION = 'needs_creation'
+    AWAITING_CREATION = 'awaiting_creation'
+    AWAITING_REVIEW = 'awaiting_review'
+
+    @classmethod
+    def trait_choices(cls):
+        return tuple((i.name, i.value) for i in cls)
+
+    @classmethod
+    def term_choices(cls):
+        choices = list()
+        for i in cls:
+            if i.name != 'UNMAPPED' and i.name != 'AWAITING_REVIEW':
+                choices.append((i.name, i.value))
+        print(tuple(choices))
+        return tuple(choices)
 
 
 class Trait(models.Model):
     name = models.CharField(max_length=200)
     current_mapping = models.ForeignKey('Mapping', on_delete=models.SET_NULL, null=True, blank=True)
-    status = models.CharField(max_length=50, choices=STATUS_FIELDS + [('awaiting_review', 'Awaiting Review')])
+    status = models.CharField(max_length=50, choices=Status.trait_choices())
     number_of_source_records = models.IntegerField(blank=True, null=True)
     timestamp_added = models.DateTimeField(auto_now=True)
     timestamp_updated = models.DateTimeField(auto_now_add=True)
@@ -35,14 +50,14 @@ class User(models.Model):
 
 class OntologyTerm(models.Model):
     curie = models.CharField(max_length=50, blank=True, null=True, unique=True)
-    uri = models.URLField(null=True, blank=True, unique=True)
+    iri = models.URLField(null=True, blank=True, unique=True)
     label = models.CharField(max_length=200)
-    status = models.CharField(max_length=50, choices=STATUS_FIELDS)
+    status = models.CharField(max_length=50, choices=Status.term_choices())
     description = models.TextField(blank=True, null=True)
     cross_refs = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.curie} | {self.label}"
+        return f"{self.curie} - {self.label}"
 
 
 class Mapping(models.Model):
@@ -63,7 +78,10 @@ class MappingSuggestion(models.Model):
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.trait_id} | {self.term_id}"
+        return f"Trait: {self.trait_id} | Term: {self.term_id}"
+
+    class Meta:
+        unique_together = ('trait_id', 'term_id',)
 
 
 class Review(models.Model):
