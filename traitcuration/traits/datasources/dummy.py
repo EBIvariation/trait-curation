@@ -57,7 +57,8 @@ def import_dummy_data():
     user1 = User(username='/ user1 /', email='user1@user.com')
     user2 = User(username='/ user2 /', email='user2@user.com')
     user3 = User(username='/ user3 /', email='user3@user.com')
-    for user in (user1, user2, user3):
+    user4 = User(username="ZOOMA", email="zooma@zooma.com")
+    for user in (user1, user2, user3, user4):
         user.save()
     # MAPPINGS
     m1 = Mapping(trait_id=trait1, term_id=term1, curator=user1, is_reviewed=True)
@@ -72,6 +73,20 @@ def import_dummy_data():
     m10 = Mapping(trait_id=trait10, term_id=term10, curator=user2, is_reviewed=True)
     for mapping in (m1, m2, m3, m4, m5, m6, m7, m8, m9, m10):
         mapping.save()
+    # MAPPING SUGGESTIONS
+    ms1 = MappingSuggestion(trait_id=trait1, term_id=term1, made_by=user4)
+    ms2 = MappingSuggestion(trait_id=trait2, term_id=term2, made_by=user4)
+    ms3 = MappingSuggestion(trait_id=trait3, term_id=term3, made_by=user4)
+    ms4 = MappingSuggestion(trait_id=trait4, term_id=term4, made_by=user4)
+    ms5 = MappingSuggestion(trait_id=trait5, term_id=term5, made_by=user4)
+    ms6 = MappingSuggestion(trait_id=trait6, term_id=term6, made_by=user4)
+    ms7 = MappingSuggestion(trait_id=trait7, term_id=term7, made_by=user4)
+    ms8 = MappingSuggestion(trait_id=trait8, term_id=term8, made_by=user4)
+    ms9 = MappingSuggestion(trait_id=trait9, term_id=term9, made_by=user4)
+    ms10 = MappingSuggestion(trait_id=trait10, term_id=term10, made_by=user4)
+    for mapping_suggestion in (ms1, ms2, ms3, ms4, ms5, ms6, ms7, ms8, ms9, ms10):
+        mapping_suggestion.save()
+    # SAVE CURRENT MAPPINGS
     for i in range(1, 10):
         trait = eval('trait' + str(i))
         mapping = eval('m' + str(i))
