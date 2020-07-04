@@ -96,7 +96,7 @@ def create_mapping_suggestion(trait, term):
     """
     zooma = User.objects.filter(username="ZOOMA").first()
     if zooma is None:
-        zooma = User(username="ZOOMA", email="zooma@zooma.com")
+        zooma = User(username="ZOOMA", email="eva-dev@ebi.ac.uk")
         zooma.save()
     if MappingSuggestion.objects.filter(trait_id=trait, term_id=term).exists():
         logger.info(f"Mapping suggestion {trait} - {term} already exists in the database")
