@@ -7,7 +7,7 @@ from django.forms.models import model_to_dict
 from django.http import HttpResponse
 
 from .utils import get_status_dict
-from .models import Trait, Mapping, OntologyTerm, User
+from .models import Trait, Mapping, OntologyTerm, User, Status
 from .datasources import clinvar, zooma, dummy
 
 
@@ -31,7 +31,7 @@ def update_mapping(request, pk):
     term_id = request_body['term']
     term = get_object_or_404(OntologyTerm, pk=term_id)
     trait = get_object_or_404(Trait, pk=pk)
-    user = get_object_or_404(User, username='user1')
+    user = get_object_or_404(User, username='/ user1 /')
     # If a mapping instance with the given trait and term already exists, then map the trait to that, and reset reviews
     if Mapping.objects.filter(trait_id=trait, term_id=term).exists():
         mapping = Mapping.objects.filter(trait_id=trait, term_id=term).first()
@@ -41,7 +41,7 @@ def update_mapping(request, pk):
         mapping = Mapping(trait_id=trait, term_id=term, curator=user, is_reviewed=False)
     mapping.save()
     trait.current_mapping = mapping
-    trait.status = trait.Status.AWAITING_REVIEW
+    trait.status = Status.AWAITING_REVIEW
     trait.timestamp_updated = datetime.now()
     trait.save()
     return HttpResponse(json.dumps(model_to_dict(mapping)), content_type="application/json")
