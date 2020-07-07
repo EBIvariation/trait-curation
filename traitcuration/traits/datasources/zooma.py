@@ -42,7 +42,7 @@ def get_zooma_suggestions_for_trait(trait):
     formatted_trait_name = trait.name.replace(' ', '+')
     response = requests.get(
         f"{BASE_URL}/services/annotate?propertyValue={formatted_trait_name} \
-        &filter=required:[none],ontologies:[efo,mondo,hp,orphanet]")
+        &filter=required:[none],ontologies:[efo,mondo,hp,ordo]")
     return response.json()
 
 
