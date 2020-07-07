@@ -16,6 +16,19 @@ URL = 'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.tx
 NUMBER_OF_RECORDS = 200
 
 
+def run_clinvar():
+    """
+    This function initiates the process of downloading, parsing and storing ClinVar data
+    """
+    try:
+        download_clinvar_data()
+        traits_dict = parse_trait_names_and_source_records()
+        store_data(traits_dict)
+    except Exception as e:
+        print(f"Error: {e}")
+        return
+
+
 def download_clinvar_data():
     """
     This function downloads the latest ClinVar TSV release data and extracts it into a 'variant_summary.txt' file

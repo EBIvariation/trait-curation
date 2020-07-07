@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'compressor'
+    'compressor',
+    'django_celery_results'
 ]
 
 MIDDLEWARE = [
@@ -141,6 +142,18 @@ COMPRESS_PRECOMPILERS = (
     ('text/x-sass', 'django_libsass.SassCompiler'),
     ('text/x-scss', 'django_libsass.SassCompiler'),
 )
+
+
+# Celery config
+CELERY_BROKER_URL = os.environ.get('REDIS_URL')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_IMPORTS = (
+    'traitcuration.traits.tasks',
+    'traitcuration.traits.datasources',
+)
+
 
 # Activate Django-Heroku, only on Heroku environments.
 if '/app' in os.environ['HOME']:
