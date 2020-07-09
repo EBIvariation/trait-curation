@@ -15,24 +15,28 @@ logger.setLevel(logging.INFO)
 BASE_URL = "http://www.ebi.ac.uk/spot/zooma/v2/api"
 
 
-def get_zooma_suggestions():
+def run_zooma_for_all_traits():
     """
     Retrieves zooma mapping suggestions for all traits and creates terms and suggestions in the app's database for each
     of them.
     """
     traits = Trait.objects.all()
     for trait in traits:
-        logger.info(f"Retrieving ZOOMA suggestions for trait: {trait.name}")
-        suggestion_list = get_zooma_suggestions_for_trait(trait)
-        # A set of suggested terms found in the query, used to exclude those terms from being deleted from the database
-        # when the delete_unused_mappings function is called.
-        suggested_terms = set()
-        for suggestion in suggestion_list:
-            suggested_term_iri = suggestion["semanticTags"][0]  # E.g. http://purl.obolibrary.org/obo/HP_0004839
-            suggested_term = create_local_term(suggested_term_iri)
-            create_mapping_suggestion(trait, suggested_term)
-            suggested_terms.add(suggested_term)
-        delete_unused_suggestions(trait, suggested_terms)
+        run_zooma_for_single_trait(trait)
+
+
+def run_zooma_for_single_trait(trait):
+    logger.info(f"Retrieving ZOOMA suggestions for trait: {trait.name}")
+    suggestion_list = get_zooma_suggestions_for_trait(trait)
+    # A set of suggested terms found in the query, used to exclude those terms from being deleted from the database
+    # when the delete_unused_mappings function is called.
+    suggested_terms = set()
+    for suggestion in suggestion_list:
+        suggested_term_iri = suggestion["semanticTags"][0]  # E.g. http://purl.obolibrary.org/obo/HP_0004839
+        suggested_term = create_local_term(suggested_term_iri)
+        create_mapping_suggestion(trait, suggested_term)
+        suggested_terms.add(suggested_term)
+    delete_unused_suggestions(trait, suggested_terms)
 
 
 def get_zooma_suggestions_for_trait(trait):

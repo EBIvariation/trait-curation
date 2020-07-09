@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'compressor',
-    'django_celery_results'
+    'django_celery_results',
+    'celery_progress'
 ]
 
 MIDDLEWARE = [
@@ -145,7 +146,7 @@ COMPRESS_PRECOMPILERS = (
 
 
 # Celery config
-CELERY_BROKER_URL = os.environ.get('REDIS_URL')
+CELERY_BROKER_URL = 'redis://h:p19fcadfde5e95f9ff2f24c97140b5003e72801730bf58a61029f78ab444b5188@ec2-34-204-117-137.compute-1.amazonaws.com:28359'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'django-db'
