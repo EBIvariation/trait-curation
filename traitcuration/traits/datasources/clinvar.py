@@ -1,7 +1,7 @@
 """
 This module contains utility functions for downloading, parsing and storing trait data fron ClinVar
 """
-
+import traceback
 import csv
 import gzip
 import itertools
@@ -24,8 +24,9 @@ def run_clinvar():
         download_clinvar_data()
         traits_dict = parse_trait_names_and_source_records()
         store_data(traits_dict)
-    except Exception as e:
-        print(f"Error: {e}")
+    except Exception:
+        track = traceback.format_exc()
+        print(track)
         return
 
 

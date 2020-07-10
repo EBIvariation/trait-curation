@@ -67,7 +67,7 @@ def clinvar_data(request):
 
 def zooma_suggestions(request):
     result = get_zooma_suggestions.delay()
-    request.session['task_id'] = result.task_id  
+    request.session['task_id'] = result.task_id
     return redirect('datasources')
 
 
