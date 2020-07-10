@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 
 <head>
+    {% load account %}
+    {% load socialaccount %}
     {% load compress %}
     {% load static %}
     {% compress css %}
@@ -37,7 +39,33 @@
         <div class="uk-navbar-right">
             <ul class="uk-navbar-nav">
                 <li class="header__item">
-                    <a class="header__link" href="#" uk-icon="icon: user"></a>
+                    <a class="header__link" uk-icon="icon: user"></a>
+                    <div 
+                    uk-drop="mode:click; pos:bottom-left; offset:-10;" 
+                    class="uk-card uk-card-body uk-card-default header__dropdown"
+                    >
+                    {% if not user.is_anonymous %}
+                        <ul class="uk-nav uk-nav-default">
+                            <li class="uk-nav-header">Logged in as {% user_display user %}</li>
+                            <li class="uk-nav-divider"></li>
+                            <li>
+                                <a href="/accounts/logout/?next={{request.path}}"> 
+                                    <span uk-icon="sign-out" class="uk-margin-small-right"> </span> Sign Out
+                                </a>
+                            </li>
+                        </ul>
+                    {% else %}
+                    <ul class="uk-nav uk-nav-default">
+                        <li class="uk-nav-header">Not Logged In</li>
+                        <li class="uk-nav-divider"></li>
+                        <li>
+                            <a href="/accounts/google/login/?next={{request.path}}"> 
+                                <span uk-icon="google" class="uk-margin-small-right"> </span> Log In with Google
+                            </a>
+                        </li>
+                    </ul>
+                    {% endif %}
+                    </div>
                 </li>
             </ul>
         </div>
