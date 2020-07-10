@@ -49,8 +49,7 @@ def update_mapping(request, pk):
 
 
 def datasources(request):
-    if request.session['task_id'] is None:
-        request.session['task_id'] = 'None'
+    request.session['task_id'] = request.session.get('task_id', 'None')
     return render(request, 'traits/datasources.html')
 
 
@@ -68,7 +67,6 @@ def clinvar_data(request):
 def zooma_suggestions(request):
     result = get_zooma_suggestions.delay()
     request.session['task_id'] = result.task_id
-    print(request.session['task_id'])
     return redirect('datasources')
 
 
