@@ -1,7 +1,7 @@
 """
 This module contains utility functions for downloading, parsing and storing trait data fron ClinVar
 """
-
+import traceback
 import csv
 import gzip
 import itertools
@@ -14,6 +14,20 @@ from ..models import Trait
 # during development.
 URL = 'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz'
 NUMBER_OF_RECORDS = 200
+
+
+def run_clinvar():
+    """
+    This function initiates the process of downloading, parsing and storing ClinVar data
+    """
+    try:
+        download_clinvar_data()
+        traits_dict = parse_trait_names_and_source_records()
+        store_data(traits_dict)
+    except Exception:
+        track = traceback.format_exc()
+        print(track)
+        return
 
 
 def download_clinvar_data():

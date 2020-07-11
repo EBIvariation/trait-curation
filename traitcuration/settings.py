@@ -44,8 +44,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'compressor'
+    'django.contrib.sites',
+    'compressor',
+    'django_celery_results',
+    'celery_progress',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
+
+SITE_ID = 2
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -87,6 +96,17 @@ DATABASES = {
     }
 }
 
+# Auth
+
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+LOGIN_REDIRECT_URL = '/'
+ACCOUNT_LOGOUT_ON_GET = True
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -141,6 +161,18 @@ COMPRESS_PRECOMPILERS = (
     ('text/x-sass', 'django_libsass.SassCompiler'),
     ('text/x-scss', 'django_libsass.SassCompiler'),
 )
+
+
+# Celery config
+CELERY_BROKER_URL = 'redis://h:p19fcadfde5e95f9ff2f24c97140b5003e72801730bf58a61029f78ab444b5188@ec2-34-204-117-137.compute-1.amazonaws.com:28359'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_IMPORTS = (
+    'traitcuration.traits.tasks',
+    'traitcuration.traits.datasources',
+)
+
 
 # Activate Django-Heroku, only on Heroku environments.
 if '/app' in os.environ['HOME']:

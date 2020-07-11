@@ -1,6 +1,9 @@
 {% extends "traits/base.html" %} 
-{% block title %} External Datasources {%endblock %} 
+{% block title %} External Datasources {% endblock %} 
+{% load static %} 
+
 {% block content %}
+<script src="{% static 'js/datasources.js' %}"></script>
 <div class="uk-container uk-container-xlarge">
   <a href="{% url 'all_data' %}"
     ><button class="uk-button uk-button-primary">IMPORT ALL DATA</button>
@@ -14,5 +17,18 @@
   <a href="{% url 'zooma_suggestions' %}"
     ><button class="uk-button uk-button-primary">ZOOMA SUGGESTIONS</button>
   </a>
+  <div class='progress-wrapper'>
+    <div id='progress-bar' class='progress-bar' style="background-color: #68a9ef; width: 0%;">&nbsp;</div>
+  </div>
+  <div id="progress-bar-message">Waiting for progress to start...</div>
+  <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      console.log('{{request.session.task_id}}')
+      if ('{{request.session.task_id}}' === 'None') return;
+      var progressUrl = "{% url 'celery_progress:task_status' request.session.task_id %}";
+      CeleryProgressBar.initProgressBar(progressUrl);
+    });
+  </script>
 </div>
 {% endblock %}
