@@ -6,7 +6,7 @@ import csv
 import gzip
 import itertools
 import os
-import urllib.request
+import requests
 
 from ..models import Trait
 
@@ -35,7 +35,8 @@ def download_clinvar_data():
     This function downloads the latest ClinVar TSV release data and extracts it into a 'variant_summary.txt' file
     """
     print("Downloading ClinVar data...")
-    urllib.request.urlretrieve(URL, './variant_summary.txt.gz')
+    r = requests.get(URL, allow_redirects=True)
+    open('variant_summary.txt.gz', 'wb').write(r.content)
 
 
 def parse_trait_names_and_source_records():
