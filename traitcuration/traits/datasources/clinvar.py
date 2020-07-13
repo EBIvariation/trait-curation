@@ -9,7 +9,7 @@ import os
 import logging
 import requests
 
-from ..models import Trait
+from ..models import Trait, Status
 
 # Constants to use. URL defines the clinvar data location and NUMBER_OF_RECORDS defines how many traits to parse
 # during development.
@@ -86,6 +86,6 @@ def store_data(traits_dict):
             trait = Trait.objects.filter(name=trait_name).first()
             trait.number_of_source_records = traits_dict[trait_name]
         else:
-            trait = Trait(name=trait_name, status="unmapped",
+            trait = Trait(name=trait_name, status=Status.UNMAPPED,
                           number_of_source_records=traits_dict[trait_name])
         trait.save()
