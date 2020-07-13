@@ -9,6 +9,8 @@ import os
 import logging
 import requests
 
+from django.db import transaction
+
 from ..models import Trait, Status
 
 # Constants to use. URL defines the clinvar data location and NUMBER_OF_RECORDS defines how many traits to parse
@@ -75,6 +77,7 @@ def parse_trait_names_and_source_records():
         return traits_dict
 
 
+@transaction.atomic
 def store_data(traits_dict):
     """
     This function accepts a dictionary in the form of keys=trait names and values=source record numbers
