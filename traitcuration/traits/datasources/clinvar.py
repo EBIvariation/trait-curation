@@ -6,6 +6,7 @@ import csv
 import gzip
 import itertools
 import os
+import logging
 import requests
 
 from ..models import Trait
@@ -14,6 +15,10 @@ from ..models import Trait
 # during development.
 URL = 'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz'
 NUMBER_OF_RECORDS = 200
+
+logging.basicConfig()
+logger = logging.getLogger('CLINVAR')
+logger.setLevel(logging.INFO)
 
 
 def run_clinvar():
@@ -26,7 +31,7 @@ def run_clinvar():
         store_data(traits_dict)
     except Exception:
         track = traceback.format_exc()
-        print(track)
+        logger.error(track)
         return
 
 
@@ -34,7 +39,7 @@ def download_clinvar_data():
     """
     This function downloads the latest ClinVar TSV release data and extracts it into a 'variant_summary.txt' file
     """
-    print("Downloading ClinVar data...")
+    logger.info("Downloading ClinVar data...")
     r = requests.get(URL, allow_redirects=True)
     open('variant_summary.txt.gz', 'wb').write(r.content)
 
@@ -45,7 +50,7 @@ def parse_trait_names_and_source_records():
     along with their calculated source record number, in a form of a dictionary where the key is the trait name
     and the value is the source record number.
     """
-    print("Parsing ClinVar data...")
+    logger.info("Parsing ClinVar data...")
     with gzip.open('variant_summary.txt.gz', 'rt') as tsvfile:
         reader = csv.DictReader(tsvfile, dialect='excel-tab')
         # A dictionary with trait names as keys and sets of source records as values
@@ -75,7 +80,7 @@ def store_data(traits_dict):
     This function accepts a dictionary in the form of keys=trait names and values=source record numbers
     and stores them in the database using the Django ORM.
     """
-    print("Storing ClinVar data...")
+    logger.info("Storing ClinVar data...")
     for trait_name in traits_dict.keys():
         if Trait.objects.filter(name=trait_name).exists():
             trait = Trait.objects.filter(name=trait_name).first()
