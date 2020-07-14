@@ -8,7 +8,7 @@ from django.http import HttpResponse
 
 from .utils import get_status_dict, get_user_info
 from .models import Trait, Mapping, OntologyTerm, User, Status
-from .datasources import dummy
+from .datasources import dummy, zooma
 from .tasks import get_zooma_suggestions, get_clinvar_data, get_clinvar_data_and_suggestions
 
 
@@ -48,6 +48,18 @@ def update_mapping(request, pk):
     trait.timestamp_updated = datetime.now()
     trait.save()
     return HttpResponse(json.dumps(model_to_dict(mapping)), content_type="application/json")
+
+
+def add_mapping(request, pk):
+    # Parse request body parameters, expected a trait id
+    request_body = json.loads(request.body.decode('utf-8'))
+    trait = get_object_or_404(Trait, pk=pk)
+    termIRI = request_body['term']
+    term = zooma.create_local_term(termIRI)
+    username = '/ user1 /'
+    zooma.create_mapping_suggestion(trait, term, username)
+    # If a mapping instance with the given trait and term already exists, then map the trait to that, and reset reviews
+    return HttpResponse('Success')
 
 
 def datasources(request):
