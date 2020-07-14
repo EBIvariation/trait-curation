@@ -53,7 +53,7 @@
 
 <div class="trait-container">
   <div class="uk-container uk-container-xlarge">
-    <div class="info-section__wrapper">
+    <section class="info-section__wrapper">
       <div class="info-section__column">
         <span class="info-section__title">TRAIT NAME</span>
         <span class="info-section__value">{{trait.name}}</span>
@@ -72,45 +72,59 @@
           {{trait.status | status_readable_name}}
         </span>
       </div>
-    </div>
-    <h4>SUGGESTED TERMS</h4>
-    <table id="suggestionTable" class="uk-table uk-table-small uk-table-divider uk-table-hover">
-      <thead>
-        <tr>
-          <th class="uk-width-1-6">TERM</th>
-          <th class="uk-width-large">TERM LABEL</th>
-          <th class="uk-width-1-6">SUGGESTED BY</th>
-          <th class="uk-width-1-6">TERM STATUS</th>
-        </tr>
-      </thead>
-      <tbody class="list">
-      {% with trait.mappingsuggestion_set.all as suggestions %}
-      {% with trait.current_mapping.term_id as current_term %}
-      {% for suggestion in suggestions %}
-        <tr 
-        onclick="selectRow(this, 'suggestionTable', '{{trait.id}}', '{{suggestion.term_id.id}}')"
-        class="suggestion-table__row 
-        {% if suggestion.term_id == current_term %} suggestion-table__row--current {% endif %}">
-          <td>
-            <a target="_blank" href="{{suggestion.term_id.iri}}">
-              {{suggestion.term_id.curie}} 
-              {% if suggestion.term_id == current_term %} 
-              <span class="uk-label label--primary">MAPPED TERM</span>
-              {% endif %}</a>
-          </td>
-          <td>{{suggestion.term_id.label}}</td>
-          <td> {{suggestion.made_by}}</td>
-          <td>
-            <span class="uk-label label--{{status_dict | get_dict_item:suggestion.term_id.status}}">
-              {{suggestion.term_id.status | status_readable_name}}</span>
-          </td>
-        </tr>
-      {% endfor %} {% endwith %} {% endwith %}
-      </tbody>
-    </table>
+    </section>
 
-    <button onclick="mapButtonClicked()" class="uk-button button button--primary">MAP TO SELECTION</button>
+    <section class="section">
 
+      <h4>SUGGESTED TERMS</h4>
+      <table id="suggestionTable" class="uk-table uk-table-small uk-table-divider uk-table-hover">
+        <thead>
+          <tr>
+            <th class="uk-width-1-6">TERM</th>
+            <th class="uk-width-large">TERM LABEL</th>
+            <th class="uk-width-1-6">SUGGESTED BY</th>
+            <th class="uk-width-1-6">TERM STATUS</th>
+          </tr>
+        </thead>
+        <tbody class="list">
+        {% with trait.mappingsuggestion_set.all as suggestions %}
+        {% with trait.current_mapping.term_id as current_term %}
+        {% for suggestion in suggestions %}
+          <tr 
+          onclick="selectRow(this, 'suggestionTable', '{{trait.id}}', '{{suggestion.term_id.id}}')"
+          class="suggestion-table__row 
+          {% if suggestion.term_id == current_term %} suggestion-table__row--current {% endif %}">
+            <td>
+              <a class="suggestion-table__link" target="_blank" href="{{suggestion.term_id.iri}}">
+                {{suggestion.term_id.curie}} 
+                {% if suggestion.term_id == current_term %} 
+                <span class="uk-label label--primary">MAPPED TERM</span>
+                {% endif %}</a>
+            </td>
+            <td>{{suggestion.term_id.label}}</td>
+            <td> {{suggestion.made_by}}</td>
+            <td>
+              <span class="uk-label label--{{status_dict | get_dict_item:suggestion.term_id.status}}">
+                {{suggestion.term_id.status | status_readable_name}}</span>
+            </td>
+          </tr>
+        {% endfor %} {% endwith %} {% endwith %}
+        </tbody>
+      </table>
+  
+      <button onclick="mapButtonClicked()" class="uk-button button button--primary">MAP TO SELECTION</button>
+    </section>
+
+    <section class="section">
+      <h4> OTHER ACTIONS </h4>
+      <div class="actions">
+        <div class="action__container">
+          <span class="action__title">Suggest an existing term</span>
+          <input id="existingTermIRI" class="action__input" type="text" placeholder="Paste an existing term IRI...">
+          <button class="uk-button button button--primary" onclick="existingTermButtonClicked()">MAP</button>
+        </div>
+      </div>
+    </section>
   </div>
 </div>
 {% endblock %}
