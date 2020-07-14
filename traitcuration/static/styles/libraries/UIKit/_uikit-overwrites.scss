@@ -1,6 +1,8 @@
 /* 
   Styling to overwrite UIKit attributes.
 */
+@import "../../utilities/variables";
+
 .uk-navbar-nav > li > a,
 .uk-navbar-item,
 .uk-navbar-toggle {
@@ -14,4 +16,19 @@
 .uk-label {
   text-align: center;
   border-radius: 0.6rem !important;
+}
+
+.uk-notification-message {
+  font-family: $lato !important;
+  padding: 1.25rem !important;
+
+  &-danger {
+    background: $color-danger !important;
+    color: white !important;
+  }
+
+  &-warning {
+    background: $color-warning !important;
+    color: white !important;
+  }
 }
