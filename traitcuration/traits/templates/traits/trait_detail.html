@@ -164,12 +164,14 @@
         <div class="action__container">
           <span class="action__title">Suggest an existing term</span>
           <input id="existingTermIRI" class="action__input" type="text" placeholder="Paste an existing term IRI...">
-          <button class="uk-button button button--primary" onclick="existingTermButtonClicked()">MAP</button>
+          <button class="uk-button button button--primary" onclick="existingTermButtonClicked()">
+            ADD TERM AND MAP
+          </button>
         </div>
         <div class="action__container">
           <span class="action__title">Suggest a new term</span>
           <button class="uk-button button button--primary" onclick="newTermButtonClicked()">
-            CREATE A NEW TERM
+            CREATE NEW TERM
           </button>
         </div>
       </div>
@@ -191,7 +193,7 @@
               {{ new_term_form.cross_refs }}
             </div>
           </div>
-          <input type="submit" value="Submit" class="button button--primary uk-button new_term__button">
+          <input type="submit" value="SUBMIT AND MAP" class="button button--primary uk-button new_term__button">
         </form>
       </div>
     </section>
