@@ -58,6 +58,7 @@ def add_mapping(request, pk):
     trait = get_object_or_404(Trait, pk=pk)
     username = '/ user1 /'
     body = parse_request_body(request)
+    term = None
     if "term_iri" in body:
         termIRI = body['term_iri']
         term = zooma.create_local_term(termIRI)
@@ -70,6 +71,11 @@ def add_mapping(request, pk):
                             cross_refs=term_cross_refs, status=Status.NEEDS_CREATION)
         term.save()
         zooma.create_mapping_suggestion(trait, term, username)
+    mapping = Mapping(trait_id=trait, term_id=term, curator=User.objects.filter(
+        username=username).first(), is_reviewed=False)
+    mapping.save()
+    trait.current_mapping = mapping
+    trait.save()
     return redirect(reverse('trait_detail', args=[pk]))
 
 
