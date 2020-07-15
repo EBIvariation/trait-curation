@@ -176,6 +176,33 @@
             CREATE NEW TERM
           </button>
         </div>
+        <div class="action__container">
+          <span class="action__title">Suggest a new term</span>
+          <button class="uk-button button button--primary" onclick="newTermButtonClicked()">
+            CREATE A NEW TERM
+          </button>
+        </div>
+      </div>
+      <div class="new_term hidden">
+        <h4>New Term Information</h4>
+        <form id="form" action="{% url 'add_mapping' trait.id %}" method="post">
+          {% csrf_token %}
+          <div class="fields">
+            <div class="field__container">
+              <label for="{{ new_term_form.label.id_for_label }}">Label:</label>
+              {{ new_term_form.label }}
+            </div>
+            <div class="field__container">
+              <label for="{{ new_term_form.description.id_for_label }}">Description:</label>
+              {{ new_term_form.description }}
+            </div>
+            <div class="field__container">
+              <label for="{{ new_term_form.cross_refs.id_for_label }}">Cross references:</label>
+              {{ new_term_form.cross_refs }}
+            </div>
+          </div>
+          <input type="submit" value="Submit" class="button button--primary uk-button new_term__button">
+        </form>
       </div>
       <div class="new_term hidden">
         <h4>New Term Information</h4>
