@@ -47,8 +47,9 @@
 }
 
 .actions {
-    display: flex;
-    gap: 2.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3.75rem;
 }
 
 .action {
@@ -59,7 +60,7 @@
   }
 
   &__title {
-    white-space: pre; 
+    white-space: pre;
   }
 
   &__input {
@@ -76,3 +77,33 @@
 }
 
 
+.new_term {
+  margin-top: 1.25rem;
+
+  &__button {
+    margin-top: 1.25rem !important;
+  }
+}
+
+.fields {
+  display: flex;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem; 
+
+}
+
+.field {
+  &__text-field {
+    width: 21.875rem !important;
+  }
+
+  &__text-area {
+    height: 11.25rem !important;
+  }
+  
+  &__container {
+    display: flex;
+    flex-direction: column;
+  }
+}

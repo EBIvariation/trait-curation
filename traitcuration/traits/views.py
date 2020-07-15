@@ -1,15 +1,16 @@
-
 import json
 from datetime import datetime
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
+from django.urls import reverse
 
-from .utils import get_status_dict, get_user_info
+from .utils import get_status_dict, get_user_info, parse_request_body
 from .models import Trait, Mapping, OntologyTerm, User, Status
 from .datasources import dummy, zooma
 from .tasks import get_zooma_suggestions, get_clinvar_data, get_clinvar_data_and_suggestions
+from .forms import NewTermForm
 
 
 def browse(request):
@@ -22,13 +23,14 @@ def browse(request):
 def trait_detail(request, pk):
     trait = get_object_or_404(Trait, pk=pk)
     status_dict = get_status_dict()
-    context = {"trait": trait, "status_dict": status_dict}
+    new_term_form = NewTermForm()
+    context = {"trait": trait, "status_dict": status_dict, "new_term_form": new_term_form}
     return render(request, 'traits/trait_detail.html', context)
 
 
 def update_mapping(request, pk):
     # Parse request body parameters, expected a trait id
-    request_body = json.loads(request.body.decode('utf-8'))
+    request_body = parse_request_body(request)
     term_id = request_body['term']
     term = get_object_or_404(OntologyTerm, pk=term_id)
     trait = get_object_or_404(Trait, pk=pk)
@@ -51,15 +53,24 @@ def update_mapping(request, pk):
 
 
 def add_mapping(request, pk):
-    # Parse request body parameters, expected a trait id
-    request_body = json.loads(request.body.decode('utf-8'))
+    if request.method == 'GET':
+        return redirect(reverse('trait_detail', args=[pk]))
     trait = get_object_or_404(Trait, pk=pk)
-    termIRI = request_body['term']
-    term = zooma.create_local_term(termIRI)
     username = '/ user1 /'
-    zooma.create_mapping_suggestion(trait, term, username)
-    # If a mapping instance with the given trait and term already exists, then map the trait to that, and reset reviews
-    return HttpResponse('Success')
+    body = parse_request_body(request)
+    if "term_iri" in body:
+        termIRI = body['term_iri']
+        term = zooma.create_local_term(termIRI)
+        zooma.create_mapping_suggestion(trait, term, username)
+    else:
+        term_label = body['label']
+        term_description = body['description']
+        term_cross_refs = body['cross_refs']
+        term = OntologyTerm(label=term_label, description=term_description,
+                            cross_refs=term_cross_refs, status=Status.NEEDS_CREATION)
+        term.save()
+        zooma.create_mapping_suggestion(trait, term, username)
+    return redirect(reverse('trait_detail', args=[pk]))
 
 
 def datasources(request):
