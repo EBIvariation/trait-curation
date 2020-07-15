@@ -73,7 +73,7 @@ async function existingTermButtonClicked() {
       `https://www.ebi.ac.uk/ols/api/ontologies/${termOntologyId}/terms?iri=${termIRI}`
     );
     axios
-      .post(`/traits/${currentTraitId}/mapping/add`, { term: termIRI })
+      .post(`/traits/${currentTraitId}/mapping/add`, { term_iri: termIRI })
       .then((response) => {
         // handle success
         console.log(response);
