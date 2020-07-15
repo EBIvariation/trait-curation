@@ -6,10 +6,18 @@ let selectedTableId = "";
 let currentTraitId = window.location.href.split("/").slice(-2)[0];
 let selectedTermId = -1;
 
-/* 
-This function takes in the clicked row of the mapping suggestion table, and the term and trait ids for its mapping
-suggestion, and sets them as selected
-*/
+
+// Check if the "Newly suggested terms" table is empty, and hide it if it is.
+const NewTermSuggestionTable = document.querySelector('#newSuggestionTable')
+console.log(NewTermSuggestionTable.rows.length)
+if (NewTermSuggestionTable.rows.length === 1) {
+  NewTermSuggestionTable.classList.add('hidden')
+  document.querySelector('#newSuggestionTable-title').classList.add('hidden')
+} 
+  
+
+/*  This function takes in the clicked row of the mapping suggestion table, and the term and trait ids for its mapping
+suggestion, and sets them as selected */
 function selectRow(row, tableId, traitId, termId) {
   selectedTableId = tableId;
   selectedRowIndex = row.rowIndex;
@@ -26,7 +34,6 @@ function selectRow(row, tableId, traitId, termId) {
     row.classList.remove("suggestion-table__row--selected");
   selectedRow.classList.add("suggestion-table__row--selected");
 }
-
 
 // This function makes an ajax request to create a current mapping with the selected term
 function mapButtonClicked() {
@@ -61,11 +68,9 @@ async function existingTermButtonClicked() {
       return;
     }
   }
-  /*
-    Extract the ontology id from the term iri, to be used for OLS queries by reading the last part of an iri and
-    reading the ontology id using the term prefix
-    E.g. extract 'mondo' from http://purl.obolibrary.org/obo/MONDO_0019482
-  */
+  /* Extract the ontology id from the term iri, to be used for OLS queries by reading the last part of an iri and
+     reading the ontology id using the term prefix
+     E.g. extract 'mondo' from http://purl.obolibrary.org/obo/MONDO_0019482 */
   termOntologyId = termIRI.split("/").slice(-1)[0].split("_")[0].toLowerCase();
   if (termOntologyId === 'orphanet') termOntologyId = 'ordo'
   try {
@@ -86,5 +91,18 @@ async function existingTermButtonClicked() {
       pos: "top-center",
       timeout: 3000,
     });
+  }
+}
+
+
+// Show a form to create a new term suggestion, once the 'Create a new term' button is clicked
+function newTermButtonClicked() {
+  newTermForm = document.querySelector(".new_term");
+  if (newTermForm.classList.contains("hidden")) {
+    newTermForm.classList.remove("hidden");
+    newTermForm.scrollIntoView();
+    document.querySelector("#id_label").focus();
+  } else {
+    newTermForm.classList.add("hidden");
   }
 }

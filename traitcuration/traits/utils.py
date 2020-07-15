@@ -1,3 +1,6 @@
+import json
+
+
 def get_status_dict(traits=[]):
     status_dict = {
         "all": {"count": len(traits), "class": "primary"},
@@ -14,3 +17,11 @@ def get_status_dict(traits=[]):
     for trait in traits:
         status_dict[trait.status]["count"] += 1
     return status_dict
+
+
+def parse_request_body(request):
+    """
+    Accepts a Django request body as an argument and returns a dict object with the request body.
+    """
+    body = request.POST.dict() if request.POST.dict() else json.loads(request.body.decode('utf-8'))
+    return body

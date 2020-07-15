@@ -1,3 +1,7 @@
 /* Styling to make our life easier, such as variables, mixins and functions */
 
 @import "./variables";
+
+.hidden {
+    display: none !important;
+}
