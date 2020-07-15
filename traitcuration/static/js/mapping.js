@@ -67,6 +67,7 @@ async function existingTermButtonClicked() {
     E.g. extract 'mondo' from http://purl.obolibrary.org/obo/MONDO_0019482
   */
   termOntologyId = termIRI.split("/").slice(-1)[0].split("_")[0].toLowerCase();
+  if (termOntologyId === 'orphanet') termOntologyId = 'ordo'
   try {
     await axios.get(
       `https://www.ebi.ac.uk/ols/api/ontologies/${termOntologyId}/terms?iri=${termIRI}`
@@ -86,6 +87,4 @@ async function existingTermButtonClicked() {
       timeout: 3000,
     });
   }
-  // .then()
-  // .catch( err => console.log(err));
 }
