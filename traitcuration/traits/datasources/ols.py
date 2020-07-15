@@ -42,6 +42,6 @@ def get_ontology_id(term_iri):
     """
     ontology_id = term_iri.split('/')[-1].split('_')[0].lower()
     # Orphanet terms use Orphanet_XXXXXXX syntax, but their OLS id is 'ordo'
-    if ontology_id == 'Orphanet':
+    if ontology_id == 'orphanet':
         ontology_id = 'ordo'
     return ontology_id

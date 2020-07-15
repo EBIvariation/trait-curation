@@ -8,7 +8,8 @@ from django.http import HttpResponse
 
 from .utils import get_status_dict
 from .models import Trait, Mapping, OntologyTerm, User, Status
-from .datasources import clinvar, zooma, dummy
+from .datasources import dummy
+from .tasks import get_zooma_suggestions, get_clinvar_data, get_clinvar_data_and_suggestions
 
 
 def browse(request):
@@ -48,36 +49,28 @@ def update_mapping(request, pk):
 
 
 def datasources(request):
+    # The task_id session variable is used to track task progress via the progress bar in the datasources page
+    request.session['task_id'] = request.session.get('task_id', 'None')
     return render(request, 'traits/datasources.html')
 
 
 def all_data(request):
-    try:
-        dummy.import_dummy_data()
-        clinvar.download_clinvar_data()
-        traits_dict = clinvar.parse_trait_names_and_source_records()
-        clinvar.store_data(traits_dict)
-        zooma.get_zooma_suggestions()
-        return redirect('browse')
-    except Exception as e:
-        print(f"Error: {e}")
+    dummy.import_dummy_data()
+    get_clinvar_data_and_suggestions.delay()
+    return redirect('datasources')
 
 
 def clinvar_data(request):
-    try:
-        clinvar.download_clinvar_data()
-        traits_dict = clinvar.parse_trait_names_and_source_records()
-        clinvar.store_data(traits_dict)
-        return redirect('browse')
-    except Exception as e:
-        print(f"Error: {e}")
+    get_clinvar_data.delay()
+    return redirect('datasources')
 
 
 def zooma_suggestions(request):
-    zooma.get_zooma_suggestions()
+    result = get_zooma_suggestions.delay()
+    request.session['task_id'] = result.task_id
     return redirect('datasources')
 
 
 def dummy_data(request):
     dummy.import_dummy_data()
-    return redirect('browse')
+    return redirect('datasources')
