@@ -37,37 +37,23 @@
             {% endwith %}
         </div>
         <div class="uk-navbar-right">
-            <ul class="uk-navbar-nav">
-                <li class="header__item">
-                    <a class="header__link" uk-icon="icon: user"></a>
-                    <div 
-                    uk-drop="mode:click; pos:bottom-left; offset:-10;" 
-                    class="uk-card uk-card-body uk-card-default header__dropdown"
-                    >
-                    {% if not user.is_anonymous %}
-                        <ul class="uk-nav uk-nav-default">
-                            <li class="uk-nav-header">Logged in as {% user_display user %}</li>
-                            <li class="uk-nav-divider"></li>
-                            <li>
-                                <a href="/accounts/logout/?next={{request.path}}"> 
-                                    <span uk-icon="sign-out" class="uk-margin-small-right"> </span> Sign Out
-                                </a>
-                            </li>
-                        </ul>
-                    {% else %}
-                    <ul class="uk-nav uk-nav-default">
-                        <li class="uk-nav-header">Not Logged In</li>
-                        <li class="uk-nav-divider"></li>
-                        <li>
-                            <a href="/accounts/google/login/?next={{request.path}}"> 
-                                <span uk-icon="google" class="uk-margin-small-right"> </span> Log In with Google
-                            </a>
-                        </li>
-                    </ul>
-                    {% endif %}
-                    </div>
-                </li>
-            </ul>
+            {% if user.is_anonymous %}
+                <button class="uk-button button button-outlined--transparent">
+                    <a href="/accounts/google/login/?next={{request.path}}">
+                        <span uk-icon="google" class="uk-margin-small-right"> </span> LOG IN 
+                    </a> 
+                </button>
+            {% else %}
+                <div class="auth-links">
+                    <span uk-icon="icon: user; ratio: 1.3" class="auth-links__icon"></span>
+                    <span>{% user_display user %}</span>
+                    <button class="uk-button button button-outlined--transparent">
+                        <a href="/accounts/logout/?next={{request.path}}">
+                            <span uk-icon="sign-out" class="uk-margin-small-right"> </span> SIGN OUT 
+                        </a> 
+                    </button>
+                </div>
+            {% endif %}
         </div>
     </nav>
 
