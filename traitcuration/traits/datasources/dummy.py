@@ -54,10 +54,10 @@ def import_dummy_data():
     for trait in (trait1, trait2, trait3, trait4, trait5, trait6, trait7, trait8, trait9, trait10):
         trait.save()
     # USERS
-    user1 = User(username='/ user1 /', email='user1@user.com')
-    user2 = User(username='/ user2 /', email='user2@user.com')
-    user3 = User(username='/ user3 /', email='user3@user.com')
-    user4 = User(username="ZOOMA", email="zooma@zooma.com")
+    user1 = User(email='user1@user.com')
+    user2 = User(email='user2@user.com')
+    user3 = User(email='user3@user.com')
+    user4 = User(email="eva-dev@ebi.ac.uk", first_name="ZOOMA")
     for user in (user1, user2, user3, user4):
         user.save()
     # MAPPINGS

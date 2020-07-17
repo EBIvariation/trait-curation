@@ -32,7 +32,7 @@ def update_mapping(request, pk):
     term_id = request_body['term']
     term = get_object_or_404(OntologyTerm, pk=term_id)
     trait = get_object_or_404(Trait, pk=pk)
-    user = get_object_or_404(User, username='/ user1 /')
+    user = get_object_or_404(User, email='user1@user.com')
     # If a mapping instance with the given trait and term already exists, then map the trait to that, and reset reviews
     if Mapping.objects.filter(trait_id=trait, term_id=term).exists():
         mapping = Mapping.objects.filter(trait_id=trait, term_id=term).first()
@@ -61,7 +61,9 @@ def all_data(request):
 
 
 def clinvar_data(request):
+    print('hi')
     get_clinvar_data.delay()
+    print('hi')
     return redirect('datasources')
 
 
