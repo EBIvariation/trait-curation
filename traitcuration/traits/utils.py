@@ -1,3 +1,6 @@
+from allauth.socialaccount.models import SocialAccount
+
+
 def get_status_dict(traits=[]):
     status_dict = {
         "all": {"count": len(traits), "class": "primary"},
@@ -14,3 +17,8 @@ def get_status_dict(traits=[]):
     for trait in traits:
         status_dict[trait.status]["count"] += 1
     return status_dict
+
+
+def get_user_info(request):
+    user_info = SocialAccount.objects.get(user=request.user).extra_data
+    return user_info
