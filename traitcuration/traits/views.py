@@ -41,8 +41,7 @@ def update_mapping(request, pk):
         mapping.is_reviewed = False
         mapping.review_set.all().delete()
     else:
-        mapping = Mapping(trait_id=trait, term_id=term,
-                          curator=user, is_reviewed=False)
+        mapping = Mapping(trait_id=trait, term_id=term, curator=user, is_reviewed=False)
     mapping.save()
     trait.current_mapping = mapping
     trait.status = Status.AWAITING_REVIEW
@@ -64,9 +63,7 @@ def all_data(request):
 
 
 def clinvar_data(request):
-    print('hi')
     get_clinvar_data.delay()
-    print('hi')
     return redirect('datasources')
 
 
