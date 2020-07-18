@@ -2,6 +2,8 @@
 {% block title %} Trait Detail {% endblock %}
 {% load trait_filters %} 
 {% load static %} 
+{% load socialaccount %}
+{% load account %}  
 
 {% block content %}
 <script src="{% static 'js/mapping.js' %}"></script>
@@ -43,9 +45,11 @@
       {% else %}
       <span class="uk-label label--warning"> IN REVIEW </span>
       {% endif %}
-      <button class="uk-button button--success sidebar__section-review-button">
-        <span uk-icon="check"> REVIEW </span>
-      </button>
+        {% if not user.is_anonymous %}
+        <button class="uk-button button--success sidebar__section-review-button">
+          <span uk-icon="check"> REVIEW </span>
+        </button>
+        {% endif %}
       {% endif %}
     </div>
   </div>
@@ -109,7 +113,9 @@
       </tbody>
     </table>
 
+    {% if not user.is_anonymous %}
     <button onclick="mapButtonClicked()" class="uk-button button button--primary">MAP TO SELECTION</button>
+    {% endif %}
 
   </div>
 </div>
