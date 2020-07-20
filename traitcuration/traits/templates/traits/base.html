@@ -45,9 +45,9 @@
                 </button>
             {% else %}
                 <div class="auth-links">
-                    <span uk-icon="icon: user; ratio: 1.3" class="auth-links__icon"></span>
-                    <span>{% user_display user %}</span>
-                    <button class="uk-button button button-outlined--transparent">
+                    <span uk-icon="icon: user; ratio: 1.3" class="auth-links__item"></span>
+                    <span class="auth-links__item">{% user_display user %}</span>
+                    <button class="uk-button button button-outlined--transparent auth-links__item">
                         <a href="/accounts/logout/?next={{request.path}}">
                             <span uk-icon="sign-out" class="uk-margin-small-right"> </span> SIGN OUT 
                         </a> 
