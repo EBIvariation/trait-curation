@@ -44,6 +44,7 @@ class Trait(models.Model):
 class User(AbstractUser):
     username = None
     email = models.EmailField(_('email address'), unique=True)
+    role = models.CharField(max_length=20, blank=True, null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
