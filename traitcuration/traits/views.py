@@ -5,14 +5,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.urls import reverse
-<<<<<<< HEAD
 from django.contrib.auth.decorators import login_required
 
 from .utils import get_status_dict, get_user_info, parse_request_body
-=======
-
-from .utils import get_status_dict, parse_request_body
->>>>>>> 54d6aca60693497f57ecef8eb2db03780b13c7ee
 from .models import Trait, Mapping, OntologyTerm, User, Status
 from .datasources import dummy, zooma
 from .tasks import get_zooma_suggestions, get_clinvar_data, get_clinvar_data_and_suggestions
