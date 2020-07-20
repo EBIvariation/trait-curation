@@ -5,6 +5,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 from .utils import get_status_dict, get_user_info, parse_request_body
 from .models import Trait, Mapping, OntologyTerm, User, Status
@@ -28,6 +29,7 @@ def trait_detail(request, pk):
     return render(request, 'traits/trait_detail.html', context)
 
 
+@login_required
 def update_mapping(request, pk):
     # Parse request body parameters, expected a trait id
     request_body = parse_request_body(request)
@@ -52,17 +54,19 @@ def update_mapping(request, pk):
     return HttpResponse(json.dumps(model_to_dict(mapping)), content_type="application/json")
 
 
+@login_required
 def add_mapping(request, pk):
     if request.method == 'GET':
         return redirect(reverse('trait_detail', args=[pk]))
     trait = get_object_or_404(Trait, pk=pk)
-    username = '/ user1 /'
+    user_info = get_user_info(request)
+    user = get_object_or_404(User, email=user_info['email'])
     body = parse_request_body(request)
     term = None
     if "term_iri" in body:
         termIRI = body['term_iri']
         term = zooma.create_local_term(termIRI)
-        zooma.create_mapping_suggestion(trait, term, username)
+        zooma.create_mapping_suggestion(trait, term, user_email=user_info["email"])
     else:
         term_label = body['label']
         term_description = body['description']
@@ -70,9 +74,8 @@ def add_mapping(request, pk):
         term = OntologyTerm(label=term_label, description=term_description,
                             cross_refs=term_cross_refs, status=Status.NEEDS_CREATION)
         term.save()
-        zooma.create_mapping_suggestion(trait, term, username)
-    mapping = Mapping(trait_id=trait, term_id=term, curator=User.objects.filter(
-        username=username).first(), is_reviewed=False)
+        zooma.create_mapping_suggestion(trait, term, user_email=user_info["email"])
+    mapping = Mapping(trait_id=trait, term_id=term, curator=user, is_reviewed=False)
     mapping.save()
     trait.current_mapping = mapping
     trait.save()
