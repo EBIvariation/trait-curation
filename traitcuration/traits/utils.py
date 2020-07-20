@@ -1,10 +1,7 @@
 import json
 
-<<<<<<< HEAD
 from allauth.socialaccount.models import SocialAccount
 
-=======
->>>>>>> 54d6aca60693497f57ecef8eb2db03780b13c7ee
 
 def get_status_dict(traits=[]):
     status_dict = {
@@ -24,14 +21,11 @@ def get_status_dict(traits=[]):
     return status_dict
 
 
-<<<<<<< HEAD
 def get_user_info(request):
     user_info = SocialAccount.objects.get(user=request.user).extra_data
     return user_info
 
 
-=======
->>>>>>> 54d6aca60693497f57ecef8eb2db03780b13c7ee
 def parse_request_body(request):
     """
     Accepts a Django request body as an argument and returns a dict object with the request body.

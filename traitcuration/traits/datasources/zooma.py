@@ -94,7 +94,6 @@ def get_term_status(is_obsolete, ontology_id=None):
     return Status.NEEDS_IMPORT
 
 
-<<<<<<< HEAD
 def create_mapping_suggestion(trait, term, user_email='eva-dev@ebi.ac.uk'):
     """
     Creates a mapping suggestion in the app's database, if it doesn't exist already.
@@ -102,15 +101,6 @@ def create_mapping_suggestion(trait, term, user_email='eva-dev@ebi.ac.uk'):
     user = User.objects.filter(email=user_email).first()
     if user_email == "eva-dev@ebi.ac.uk" and user is None:
         zooma = User(first_name="ZOOMA", email="eva-dev@ebi.ac.uk")
-=======
-def create_mapping_suggestion(trait, term, username='ZOOMA'):
-    """
-    Creates a mapping suggestion in the app's database, if it doesn't exist already.
-    """
-    user = User.objects.filter(username=username).first()
-    if username == 'ZOOMA' and user is None:
-        zooma = User(username="ZOOMA", email="eva-dev@ebi.ac.uk")
->>>>>>> 54d6aca60693497f57ecef8eb2db03780b13c7ee
         zooma.save()
     if MappingSuggestion.objects.filter(trait_id=trait, term_id=term).exists():
         logger.info(f"Mapping suggestion {trait} - {term} already exists in the database")
