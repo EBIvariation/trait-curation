@@ -5,7 +5,6 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.urls import reverse
-from django.contrib.auth.decorators import login_required
 
 from .utils import get_status_dict, get_user_info, parse_request_body
 from .models import Trait, Mapping, OntologyTerm, User, Status
@@ -22,6 +21,7 @@ def browse(request):
 
 
 def trait_detail(request, pk):
+    print(request.user)
     trait = get_object_or_404(Trait, pk=pk)
     status_dict = get_status_dict()
     new_term_form = NewTermForm()
@@ -29,8 +29,11 @@ def trait_detail(request, pk):
     return render(request, 'traits/trait_detail.html', context)
 
 
-@login_required
 def update_mapping(request, pk):
+    if request.method == 'GET':
+        return redirect(reverse('trait_detail', args=[pk]))
+    if request.user == "AnonymousUser":
+        return HttpResponse('Unauthorized', status=401)
     # Parse request body parameters, expected a trait id
     request_body = parse_request_body(request)
     term_id = request_body['term']
@@ -54,10 +57,11 @@ def update_mapping(request, pk):
     return HttpResponse(json.dumps(model_to_dict(mapping)), content_type="application/json")
 
 
-@login_required
 def add_mapping(request, pk):
     if request.method == 'GET':
         return redirect(reverse('trait_detail', args=[pk]))
+    if request.user == "AnonymousUser":
+        return HttpResponse('Unauthorized', status=401)
     trait = get_object_or_404(Trait, pk=pk)
     user_info = get_user_info(request)
     user = get_object_or_404(User, email=user_info['email'])
