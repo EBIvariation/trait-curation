@@ -37,7 +37,10 @@ function selectRow(row, tableId, traitId, termId) {
 
 // This function makes an ajax request to create a current mapping with the selected term
 function mapButtonClicked() {
-  if (selectedRowIndex < 1) return;
+  if (selectedRowIndex < 1) {
+    showNotification('No mapping selected', 'warning');
+    return;
+  }
   axios
     .post(`/traits/${currentTraitId}/mapping`, {
       term: parseInt(selectedTermId),
@@ -55,16 +58,14 @@ and mapping for that term */
 async function existingTermButtonClicked() {
   // Check if the IRI field is empty
   termIRI = document.getElementById("existingTermIRI").value;
-  if (termIRI === "") return;
+  if (termIRI === "") {
+    showNotification('No term IRI given', 'warning');
+    return;
+  }
   // Check if a mapping suggestion with the given IRI already exists in the suggestions
   for (const row of document.querySelectorAll(".suggestion-table__link")) {
     if (row.getAttribute('href') === termIRI) {
-      UIkit.notification({
-        message: "A suggestion of this term already exists",
-        status: "warning",
-        pos: "top-center",
-        timeout: 3000,
-      })
+      showNotification('A suggestion of this term already exists', 'warning');
       return;
     }
   }
@@ -85,12 +86,7 @@ async function existingTermButtonClicked() {
         location.reload();
       });
   } catch (err) {
-    UIkit.notification({
-      message: "Error verifying term! Check if given IRI is valid",
-      status: "danger",
-      pos: "top-center",
-      timeout: 3000,
-    });
+    showNotification('Error verifying term! Check if given IRI is valid', 'danger');
   }
 }
 
@@ -105,4 +101,13 @@ function newTermButtonClicked() {
   } else {
     newTermForm.classList.add("hidden");
   }
+}
+
+function showNotification(message, status) {
+  UIkit.notification({
+    message: message,
+    status: status,
+    pos: "top-center",
+    timeout: 3000,
+  });
 }
