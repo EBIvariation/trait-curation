@@ -54,7 +54,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
 ]
 
-SITE_ID = 2
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -99,6 +98,7 @@ DATABASES = {
 # Auth
 AUTH_USER_MODEL = 'traits.User'
 
+SITE_ID = 2
 
 AUTHENTICATION_BACKENDS = [
     # Needed to login by username in Django admin, regardless of `allauth`
