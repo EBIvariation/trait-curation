@@ -49,21 +49,23 @@
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 3.75rem;
+  //gap: 3.75rem;
 }
 
 .action {
   &__container {
+    margin-right: 3.75rem;
     display: flex;
-    gap: 1.25rem;
     align-items: center;
   }
 
   &__title {
     white-space: pre;
+    margin-right: 1.25rem;
   }
 
   &__input {
+    margin-right: 1.25rem;
     width: 18rem;
     border: none;
     border-bottom: 1px solid $color-gray;
@@ -87,7 +89,6 @@
 
 .fields {
   display: flex;
-  gap: 2.5rem;
   flex-wrap: wrap;
   margin-top: 1.25rem; 
 
@@ -103,6 +104,7 @@
   }
   
   &__container {
+    margin-right: 2.5rem;
     display: flex;
     flex-direction: column;
   }
