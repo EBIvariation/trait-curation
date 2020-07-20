@@ -124,6 +124,7 @@
             <th class="uk-width-1-6">TERM</th>
             <th class="uk-width-large">DESCRIPTION</th>
             <th class="uk-width-large">CROSS REFERENCES</th>
+            <th class="uk-width-1-6">SUGGESTED BY</th>
             <th class="uk-width-1-6">TERM STATUS</th>
           </tr>
         </thead>
@@ -143,6 +144,7 @@
             </td>
             <td>{{suggestion.term_id.description}}</td>
             <td> {{suggestion.term_id.cross_refs}}</td>
+            <td> {{suggestion.made_by.get_full_name}}</td>
             <td>
               <span class="uk-label label--{{status_dict | get_dict_item:suggestion.term_id.status}}">
                 {{suggestion.term_id.status | status_readable_name}}</span>
