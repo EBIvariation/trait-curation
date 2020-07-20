@@ -23,3 +23,14 @@
     color: white !important;
   }
 }
+
+.auth-links {
+  display: flex;
+  align-items: center;
+  color: white;
+
+  &__item {
+    margin-left: 0.9375rem !important;
+  }
+}
+
