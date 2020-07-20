@@ -160,6 +160,7 @@
       {% endif %}
     </section>
 
+    {% if not user.is_anonymous %}
     <section class="section">
       <h4> OTHER ACTIONS </h4>
       <div class="actions">
@@ -220,6 +221,7 @@
         </form>
       </div>
     </section>
+    {% endif %}
   </div>
 </div>
 
