@@ -98,7 +98,8 @@ DATABASES = {
 # Auth
 AUTH_USER_MODEL = 'traits.User'
 
-SITE_ID = 2
+# The id of the 'site' entry in the database, required by django-allauth to know the app's URL.
+SITE_ID = 1
 
 AUTHENTICATION_BACKENDS = [
     # Needed to login by username in Django admin, regardless of `allauth`
