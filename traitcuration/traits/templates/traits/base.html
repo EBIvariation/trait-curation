@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 
 <head>
+    {% load account %}
+    {% load socialaccount %}
     {% load compress %}
     {% load static %}
     {% compress css %}
@@ -35,11 +37,23 @@
             {% endwith %}
         </div>
         <div class="uk-navbar-right">
-            <ul class="uk-navbar-nav">
-                <li class="header__item">
-                    <a class="header__link" href="#" uk-icon="icon: user"></a>
-                </li>
-            </ul>
+            {% if user.is_anonymous %}
+                <button class="uk-button button button-outlined--transparent">
+                    <a href="/accounts/google/login/?next={{request.path}}">
+                        <span uk-icon="google" class="uk-margin-small-right"> </span> LOG IN 
+                    </a> 
+                </button>
+            {% else %}
+                <div class="auth-links">
+                    <span uk-icon="icon: user; ratio: 1.3" class="auth-links__item"></span>
+                    <span class="auth-links__item">{% user_display user %}</span>
+                    <button class="uk-button button button-outlined--transparent auth-links__item">
+                        <a href="/accounts/logout/?next={{request.path}}">
+                            <span uk-icon="sign-out" class="uk-margin-small-right"> </span> SIGN OUT 
+                        </a> 
+                    </button>
+                </div>
+            {% endif %}
         </div>
     </nav>
 

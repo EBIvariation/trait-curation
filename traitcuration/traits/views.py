@@ -6,7 +6,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
 
-from .utils import get_status_dict
+from .utils import get_status_dict, get_user_info
 from .models import Trait, Mapping, OntologyTerm, User, Status
 from .datasources import dummy
 from .tasks import get_zooma_suggestions, get_clinvar_data, get_clinvar_data_and_suggestions
@@ -32,12 +32,14 @@ def update_mapping(request, pk):
     term_id = request_body['term']
     term = get_object_or_404(OntologyTerm, pk=term_id)
     trait = get_object_or_404(Trait, pk=pk)
-    user = get_object_or_404(User, username='/ user1 /')
+    user_info = get_user_info(request)
+    user = get_object_or_404(User, email=user_info['email'])
     # If a mapping instance with the given trait and term already exists, then map the trait to that, and reset reviews
     if Mapping.objects.filter(trait_id=trait, term_id=term).exists():
         mapping = Mapping.objects.filter(trait_id=trait, term_id=term).first()
         mapping.curator = user
         mapping.is_reviewed = False
+        mapping.review_set.all().delete()
     else:
         mapping = Mapping(trait_id=trait, term_id=term, curator=user, is_reviewed=False)
     mapping.save()

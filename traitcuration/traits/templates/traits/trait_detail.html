@@ -2,6 +2,8 @@
 {% block title %} Trait Detail {% endblock %}
 {% load trait_filters %} 
 {% load static %} 
+{% load socialaccount %}
+{% load account %}  
 
 {% block content %}
 <script src="{% static 'js/mapping.js' %}"></script>
@@ -17,7 +19,7 @@
       <p class="sidebar__section-title">CURATOR</p>
       <span uk-icon="user" class="uk-margin-small-right"></span>
       <span class="sidebar__section-text">
-        {{trait.current_mapping.curator}}
+        {{trait.current_mapping.curator.get_full_name}}
       </span>
       <hr />
       {% endif %}
@@ -29,7 +31,7 @@
       {% for review in reviews %}
       <div class="sidebar__review-section">
         <span uk-icon="user" class="uk-margin-small-right"></span>
-        <span class="sidebar__section-text"> {{review.reviewer}} </span>
+        <span class="sidebar__section-text"> {{review.reviewer.get_full_name}} </span>
       </div>
       {% endfor %}
       <hr />
@@ -43,9 +45,11 @@
       {% else %}
       <span class="uk-label label--warning"> IN REVIEW </span>
       {% endif %}
-      <button class="uk-button button--success sidebar__section-review-button">
-        <span uk-icon="check"> REVIEW </span>
-      </button>
+        {% if not user.is_anonymous %}
+        <button class="uk-button button--success sidebar__section-review-button">
+          <span uk-icon="check"> REVIEW </span>
+        </button>
+        {% endif %}
       {% endif %}
     </div>
   </div>
@@ -99,7 +103,7 @@
               {% endif %}</a>
           </td>
           <td>{{suggestion.term_id.label}}</td>
-          <td> {{suggestion.made_by}}</td>
+          <td> {{suggestion.made_by.get_full_name}}</td>
           <td>
             <span class="uk-label label--{{status_dict | get_dict_item:suggestion.term_id.status}}">
               {{suggestion.term_id.status | status_readable_name}}</span>
@@ -109,7 +113,9 @@
       </tbody>
     </table>
 
+    {% if not user.is_anonymous %}
     <button onclick="mapButtonClicked()" class="uk-button button button--primary">MAP TO SELECTION</button>
+    {% endif %}
 
   </div>
 </div>
