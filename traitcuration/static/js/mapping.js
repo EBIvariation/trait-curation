@@ -3,13 +3,13 @@ This module contains all the funcionality for mapping traits to ontology terms, 
 */
 let selectedRowIndex = -1;
 let selectedTableId = "";
-let currentTraitId = window.location.href.split("/").slice(-2)[0];
+let currentTraitId = -1;
 let selectedTermId = -1;
 
 
 // Setter function for current trait id
 function setCurrentTraitId(traitId) {
-  currentTraitId = traitId
+  currentTraitId = traitId;
 }
 
 // Check if the "Newly suggested terms" table is empty, and hide it if it is.
