@@ -21,11 +21,16 @@ def browse(request):
 
 
 def trait_detail(request, pk):
-    print(request.user)
     trait = get_object_or_404(Trait, pk=pk)
+    reviewer_emails = list()
+    if trait.current_mapping is not None:
+        for review in trait.current_mapping.review_set.all():
+            reviewer_emails.append(review.reviewer.email)
+    print(reviewer_emails)
     status_dict = get_status_dict()
     new_term_form = NewTermForm()
-    context = {"trait": trait, "status_dict": status_dict, "new_term_form": new_term_form}
+    context = {"trait": trait, "status_dict": status_dict,
+               "new_term_form": new_term_form, "reviewer_emails": reviewer_emails}
     return render(request, 'traits/trait_detail.html', context)
 
 
@@ -93,9 +98,9 @@ def review(request, pk):
         return HttpResponse('Unauthorized', status=401)
     user_info = get_user_info(request)
     user = get_object_or_404(User, email=user_info['email'])
-    body = parse_request_body(request)
-    current_mapping_id = body['current_mapping_id']
-    mapping = get_object_or_404(Mapping, pk=current_mapping_id)
+    mapping = Trait.objects.get(pk=pk).current_mapping
+    if mapping is None:
+        return redirect(reverse('trait_detail', args=[pk]))
     if mapping.curator.id == user.id:
         return redirect(reverse('trait_detail', args=[pk]))
     for review in mapping.review_set.all():
