@@ -3,7 +3,7 @@ This module contains all the funcionality for mapping traits to ontology terms, 
 */
 let selectedRowIndex = -1;
 let selectedTableId = "";
-let currentTraitId = -1;
+let currentTraitId = window.location.href.split("/").slice(-2)[0];
 let selectedTermId = -1;
 
 
