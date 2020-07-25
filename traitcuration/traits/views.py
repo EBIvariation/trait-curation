@@ -1,15 +1,16 @@
-
 import json
 from datetime import datetime
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
+from django.urls import reverse
 
-from .utils import get_status_dict, get_user_info
+from .utils import get_status_dict, get_user_info, parse_request_body
 from .models import Trait, Mapping, OntologyTerm, User, Status
-from .datasources import dummy
+from .datasources import dummy, zooma
 from .tasks import get_zooma_suggestions, get_clinvar_data, get_clinvar_data_and_suggestions
+from .forms import NewTermForm
 
 
 def browse(request):
@@ -20,15 +21,21 @@ def browse(request):
 
 
 def trait_detail(request, pk):
+    print(request.user)
     trait = get_object_or_404(Trait, pk=pk)
     status_dict = get_status_dict()
-    context = {"trait": trait, "status_dict": status_dict}
+    new_term_form = NewTermForm()
+    context = {"trait": trait, "status_dict": status_dict, "new_term_form": new_term_form}
     return render(request, 'traits/trait_detail.html', context)
 
 
 def update_mapping(request, pk):
+    if request.method == 'GET':
+        return redirect(reverse('trait_detail', args=[pk]))
+    if request.user == "AnonymousUser":
+        return HttpResponse('Unauthorized', status=401)
     # Parse request body parameters, expected a trait id
-    request_body = json.loads(request.body.decode('utf-8'))
+    request_body = parse_request_body(request)
     term_id = request_body['term']
     term = get_object_or_404(OntologyTerm, pk=term_id)
     trait = get_object_or_404(Trait, pk=pk)
@@ -48,6 +55,35 @@ def update_mapping(request, pk):
     trait.timestamp_updated = datetime.now()
     trait.save()
     return HttpResponse(json.dumps(model_to_dict(mapping)), content_type="application/json")
+
+
+def add_mapping(request, pk):
+    if request.method == 'GET':
+        return redirect(reverse('trait_detail', args=[pk]))
+    if request.user == "AnonymousUser":
+        return HttpResponse('Unauthorized', status=401)
+    trait = get_object_or_404(Trait, pk=pk)
+    user_info = get_user_info(request)
+    user = get_object_or_404(User, email=user_info['email'])
+    body = parse_request_body(request)
+    term = None
+    if "term_iri" in body:
+        termIRI = body['term_iri']
+        term = zooma.create_local_term(termIRI)
+        zooma.create_mapping_suggestion(trait, term, user_email=user_info["email"])
+    else:
+        term_label = body['label']
+        term_description = body['description']
+        term_cross_refs = body['cross_refs']
+        term = OntologyTerm(label=term_label, description=term_description,
+                            cross_refs=term_cross_refs, status=Status.NEEDS_CREATION)
+        term.save()
+        zooma.create_mapping_suggestion(trait, term, user_email=user_info["email"])
+    mapping = Mapping(trait_id=trait, term_id=term, curator=user, is_reviewed=False)
+    mapping.save()
+    trait.current_mapping = mapping
+    trait.save()
+    return redirect(reverse('trait_detail', args=[pk]))
 
 
 def datasources(request):

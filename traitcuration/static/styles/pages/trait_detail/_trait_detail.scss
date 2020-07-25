@@ -45,3 +45,67 @@
     }
   }
 }
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.action {
+  &__container {
+    margin-right: 3.75rem;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;;
+  }
+
+  &__title {
+    white-space: pre;
+    margin-right: 1.25rem;
+  }
+
+  &__input {
+    margin-right: 1.25rem;
+    width: 18rem;
+    border: none;
+    border-bottom: 1px solid $color-gray;
+    padding: 0.125rem;
+    font-family: $lato;
+
+    &:focus {
+      border-bottom: 1px solid $color-primary;
+    }
+  }
+}
+
+
+.new_term {
+  margin-top: 1.25rem;
+
+  &__button {
+    margin-top: 1.25rem !important;
+  }
+}
+
+.fields {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 1.25rem; 
+
+}
+
+.field {
+  &__text-field {
+    width: 21.875rem !important;
+  }
+
+  &__text-area {
+    height: 11.25rem !important;
+  }
+  
+  &__container {
+    margin-right: 2.5rem;
+    display: flex;
+    flex-direction: column;
+  }
+}
