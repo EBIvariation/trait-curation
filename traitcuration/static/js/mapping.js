@@ -8,8 +8,9 @@ let selectedTermId = -1;
 
 // Setter function for current trait id
 function setCurrentTraitId(traitId) {
-  currentTraitId = traitId
+  currentTraitId = traitId;
 }
+
 
 // Check if the "Newly suggested terms" table is empty, and hide it if it is.
 const NewTermSuggestionTable = document.querySelector('#newSuggestionTable')
@@ -37,6 +38,7 @@ function selectRow(row, tableId, traitId, termId) {
     row.classList.remove("suggestion-table__row--selected");
   selectedRow.classList.add("suggestion-table__row--selected");
 }
+
 
 // This function makes an ajax request to create a current mapping with the selected term
 function mapButtonClicked() {
@@ -106,6 +108,7 @@ function newTermButtonClicked() {
   }
 }
 
+
 function showNotification(message, status) {
   UIkit.notification({
     message: message,
@@ -114,6 +117,7 @@ function showNotification(message, status) {
     timeout: 3000,
   });
 }
+
 
 function reviewButtonClicked() {
   axios
@@ -124,3 +128,4 @@ function reviewButtonClicked() {
       location.reload();
     });
 }
+
