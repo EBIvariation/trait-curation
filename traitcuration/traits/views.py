@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.urls import reverse
 
 from .utils import get_status_dict, get_user_info, parse_request_body
-from .models import Trait, Mapping, OntologyTerm, User, Status
+from .models import Trait, Mapping, OntologyTerm, User, Status, Review
 from .datasources import dummy, zooma
 from .tasks import get_zooma_suggestions, get_clinvar_data, get_clinvar_data_and_suggestions
 from .forms import NewTermForm
@@ -21,11 +21,16 @@ def browse(request):
 
 
 def trait_detail(request, pk):
-    print(request.user)
     trait = get_object_or_404(Trait, pk=pk)
+    reviewer_emails = list()
+    if trait.current_mapping is not None:
+        for review in trait.current_mapping.review_set.all():
+            reviewer_emails.append(review.reviewer.email)
+    print(reviewer_emails)
     status_dict = get_status_dict()
     new_term_form = NewTermForm()
-    context = {"trait": trait, "status_dict": status_dict, "new_term_form": new_term_form}
+    context = {"trait": trait, "status_dict": status_dict,
+               "new_term_form": new_term_form, "reviewer_emails": reviewer_emails}
     return render(request, 'traits/trait_detail.html', context)
 
 
@@ -83,6 +88,25 @@ def add_mapping(request, pk):
     mapping.save()
     trait.current_mapping = mapping
     trait.save()
+    return redirect(reverse('trait_detail', args=[pk]))
+
+
+def review(request, pk):
+    if request.method == 'GET':
+        return redirect(reverse('trait_detail', args=[pk]))
+    if request.user == "AnonymousUser":
+        return HttpResponse('Unauthorized', status=401)
+    user_info = get_user_info(request)
+    user = get_object_or_404(User, email=user_info['email'])
+    mapping = Trait.objects.get(pk=pk).current_mapping
+    if mapping is None:
+        return redirect(reverse('trait_detail', args=[pk]))
+    if mapping.curator.id == user.id:
+        return redirect(reverse('trait_detail', args=[pk]))
+    for review in mapping.review_set.all():
+        if review.reviewer.id == user.id:
+            return redirect(reverse('trait_detail', args=[pk]))
+    Review(mapping_id=mapping, reviewer=user).save()
     return redirect(reverse('trait_detail', args=[pk]))
 
 

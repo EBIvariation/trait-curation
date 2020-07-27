@@ -26,6 +26,11 @@
       background-color: lighten($color-primary, 5%) !important;
     }
   }
+
+  &--disabled {
+    background: rgba(255,255,255,0.2) !important;
+    padding: 0 1rem !important;
+  }
 }
 .button-outlined {
   background-color: white !important;
