@@ -37,7 +37,7 @@ class Trait(ComputedFieldsModel):
     timestamp_added = models.DateTimeField(auto_now=True)
     timestamp_updated = models.DateTimeField(auto_now_add=True)
 
-    @computed(models.CharField(max_length=150, choices=Status.trait_choices()), depends=[
+    @computed(models.CharField(max_length=30, choices=Status.trait_choices()), depends=[
         ['current_mapping', ['is_reviewed']],
         ['current_mapping.term_id', ['status']]
     ])
@@ -71,7 +71,7 @@ class OntologyTerm(models.Model):
     curie = models.CharField(max_length=50, blank=True, null=True, unique=True)
     iri = models.URLField(null=True, blank=True, unique=True)
     label = models.CharField(max_length=200)
-    status = models.CharField(max_length=50, choices=Status.term_choices())
+    status = models.CharField(max_length=30, choices=Status.term_choices())
     description = models.TextField(blank=True, null=True)
     cross_refs = models.TextField(blank=True, null=True)
 
