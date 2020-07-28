@@ -5,6 +5,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.urls import reverse
+from django.db import transaction
 
 from .utils import get_status_dict, get_user_info, parse_request_body
 from .models import Trait, Mapping, OntologyTerm, User, Status
@@ -29,6 +30,7 @@ def trait_detail(request, pk):
     return render(request, 'traits/trait_detail.html', context)
 
 
+@transaction.atomic
 def update_mapping(request, pk):
     if request.method == 'GET':
         return redirect(reverse('trait_detail', args=[pk]))

@@ -1,9 +1,12 @@
 """
 This module holds dummy data to import during development
 """
+from django.db import transaction
+
 from ..models import OntologyTerm, MappingSuggestion, Trait, Mapping, User, Review, Status
 
 
+@transaction.atomic
 def import_dummy_data():
     Review.objects.all().delete()
     MappingSuggestion.objects.all().delete()
