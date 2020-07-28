@@ -4,6 +4,7 @@ from django.urls import path, include
 urlpatterns = [
     path('', views.browse, name="browse"),
     path('<int:pk>/', views.trait_detail, name="trait_detail"),
+    path('<int:pk>/comment', views.comment, name="comment"),
     path('<int:pk>/mapping', views.update_mapping, name='update_mapping'),
     path('<int:pk>/mapping/add', views.add_mapping, name='add_mapping'),
     path('<int:pk>/mapping/review', views.review, name='review'),

@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.urls import reverse
 
 from .utils import get_status_dict, get_user_info, parse_request_body
-from .models import Trait, Mapping, OntologyTerm, User, Status, Review
+from .models import Trait, Mapping, OntologyTerm, User, Status, Review, Comment
 from .datasources import dummy, zooma
 from .tasks import get_zooma_suggestions, get_clinvar_data, get_clinvar_data_and_suggestions
 from .forms import NewTermForm
@@ -32,6 +32,21 @@ def trait_detail(request, pk):
     context = {"trait": trait, "status_dict": status_dict,
                "new_term_form": new_term_form, "reviewer_emails": reviewer_emails}
     return render(request, 'traits/trait_detail.html', context)
+
+
+def comment(request, pk):
+    if request.method == 'GET':
+        return redirect(reverse('trait_detail', args=[pk]))
+    if request.user == "AnonymousUser":
+        return HttpResponse('Unauthorized', status=401)
+    request_body = parse_request_body(request)
+    comment_body = request_body['comment_body']
+    user_info = get_user_info(request)
+    trait = get_object_or_404(Trait, pk=pk)
+    user = get_object_or_404(User, email=user_info['email'])
+    comment = Comment(trait_id=trait, author=user, body=comment_body)
+    comment.save()
+    return redirect(reverse('trait_detail', args=[pk]))
 
 
 def update_mapping(request, pk):

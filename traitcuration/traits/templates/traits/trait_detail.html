@@ -236,6 +236,44 @@
       </div>
     </section>
     {% endif %}
+    <section class="section">
+      <h4>TRAIT HISTORY</h4>
+
+      <div class="post-comment__container">
+        <div class="post-comment__header">
+          <span uk-icon="user"></span>
+          <span>Comment as {{user.get_full_name}}</span>
+          <button class="uk-button button--primary post-comment__submit" onclick="commentButtonClicked()">Submit</button>
+        </div>
+
+        <div class="post-comment__body">
+          <textarea id="commentBody" class="uk-textarea post-comment__textarea" placeholder="Leave a commment...">
+          </textarea>
+        </div>
+      </div>
+      
+
+      {% for comment in trait.comment_set.all|dictsortreversed:"date" %}
+      <div class="uk-comment comment">
+        <header class="uk-comment-header">
+            <div class="uk-grid-medium uk-flex-middle" uk-grid>
+                <div class="uk-width-auto">
+                </div>
+                <div class="uk-width-expand">
+                    <h4 class="uk-comment-title uk-margin-remove">{{comment.author.get_full_name}}</h4>
+                    <ul class="uk-comment-meta uk-subnav uk-subnav-divider uk-margin-remove-top">
+                        <li>{{comment.date}}</li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+        <div class="uk-comment-body">
+            <p>{{comment.body}} </p>
+        </div>
+      </div>
+
+      {% endfor %}
+    </section>
   </div>
 </div>
 
