@@ -26,11 +26,20 @@ def trait_detail(request, pk):
     if trait.current_mapping is not None:
         for review in trait.current_mapping.review_set.all():
             reviewer_emails.append(review.reviewer.email)
-    print(reviewer_emails)
     status_dict = get_status_dict()
+    history_events = list()
+    comments = trait.comment_set.all()
+    for comment in comments:
+        history_events.append({'type': 'comment', 'date': comment.date, 'content': comment})
+    mappings = trait.mapping_set.all()
+    for mapping in mappings:
+        history_events.append({'type': 'mapping', 'date': mapping.timestamp_mapped, 'content': mapping})
+        reviews = mapping.review_set.all()
+        for review in reviews:
+            history_events.append({'type': 'review', 'date': mapping.timestamp_mapped, 'content': review})
     new_term_form = NewTermForm()
     context = {"trait": trait, "status_dict": status_dict,
-               "new_term_form": new_term_form, "reviewer_emails": reviewer_emails}
+               "new_term_form": new_term_form, "reviewer_emails": reviewer_emails, "history_events": history_events}
     return render(request, 'traits/trait_detail.html', context)
 
 

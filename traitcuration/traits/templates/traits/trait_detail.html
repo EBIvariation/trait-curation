@@ -239,6 +239,7 @@
     <section class="section">
       <h4>TRAIT HISTORY</h4>
 
+      {% if not user.is_anonymous %}
       <div class="post-comment__container">
         <div class="post-comment__header">
           <span uk-icon="user"></span>
@@ -247,30 +248,40 @@
         </div>
 
         <div class="post-comment__body">
-          <textarea id="commentBody" class="uk-textarea post-comment__textarea" placeholder="Leave a commment...">
-          </textarea>
+          <textarea 
+          id="commentBody" 
+          class="uk-textarea post-comment__textarea" 
+          placeholder="Leave a commment..."></textarea>
         </div>
       </div>
-      
+      {% endif%}
 
-      {% for comment in trait.comment_set.all|dictsortreversed:"date" %}
-      <div class="uk-comment comment">
-        <header class="uk-comment-header">
-            <div class="uk-grid-medium uk-flex-middle" uk-grid>
-                <div class="uk-width-auto">
-                </div>
-                <div class="uk-width-expand">
-                    <h4 class="uk-comment-title uk-margin-remove">{{comment.author.get_full_name}}</h4>
-                    <ul class="uk-comment-meta uk-subnav uk-subnav-divider uk-margin-remove-top">
-                        <li>{{comment.date}}</li>
-                    </ul>
-                </div>
-            </div>
-        </header>
-        <div class="uk-comment-body">
-            <p>{{comment.body}} </p>
-        </div>
+      {% for event in history_events|dictsortreversed:"date" %}
+      {% if event.type == 'comment' %}
+      <div class="event event--comment">
+        <span class="event__title">{{event.content.author.get_full_name}} commented</span>
+        <span class="event__date">{{event.content.date}}</span>
+        <p>{{event.content.body}}</p>
       </div>
+
+      {% elif event.type == 'review' %}
+      <div class="event">
+        <p class="event__title"> 
+          {{event.content.reviewer.get_full_name}} reviewed mapping of trait {{trait.name}} 
+          to term {{event.content.mapping_id.term_id.label}}
+        </p>
+        <span class="event__date">{{event.date}}</span>
+      </div>
+
+      {% elif event.type == 'mapping' %}
+      <div class="event"">
+        <p class="event__title"> 
+          {{event.content.curator.get_full_name}} mapped trait {{trait.name}} to term {{event.content.term_id.label}}
+        </p>
+        <span class="event__date">{{event.date}}</span>
+      </div>
+
+      {% endif %}
 
       {% endfor %}
     </section>
