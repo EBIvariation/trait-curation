@@ -48,7 +48,7 @@
           {% if user.email in reviewer_emails %}
           <button class="uk-button button button--disabled sidebar__section-review-button" disabled> REVIEWED </button>
           {% else %}
-          <button class="uk-button button--success sidebar__section-review-button" onclick="reviewButtonClicked()">
+          <button class="uk-button button button--success sidebar__section-review-button" onclick="reviewButtonClicked()">
             <span uk-icon="check"> REVIEW </span>
           </button>
           {% endif %}
@@ -244,7 +244,7 @@
         <div class="post-comment__header">
           <span uk-icon="user"></span>
           <span>Comment as {{user.get_full_name}}</span>
-          <button class="uk-button button--primary post-comment__submit" onclick="commentButtonClicked()">Submit</button>
+          <button class="uk-button button button--primary post-comment__submit" onclick="commentButtonClicked()">Submit</button>
         </div>
 
         <div class="post-comment__body">
