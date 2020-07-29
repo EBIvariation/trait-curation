@@ -1,10 +1,11 @@
 """
 This module holds dummy data to import during development
 """
-from ..models import OntologyTerm, MappingSuggestion, Trait, Mapping, User, Review, Status
+from ..models import OntologyTerm, MappingSuggestion, Trait, Mapping, User, Review, Status, Comment
 
 
 def import_dummy_data():
+    Comment.objects.all().delete()
     Review.objects.all().delete()
     MappingSuggestion.objects.all().delete()
     Mapping.objects.all().delete()
