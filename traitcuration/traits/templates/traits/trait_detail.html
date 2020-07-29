@@ -267,8 +267,8 @@
       {% elif event.type == 'review' %}
       <div class="event">
         <p class="event__title"> 
-          {{event.content.reviewer.get_full_name}} reviewed mapping of trait {{trait.name}} 
-          to term {{event.content.mapping_id.term_id.label}}
+          {{event.content.reviewer.get_full_name}} reviewed mapping of trait "{{trait.name}}"
+          to term "{{event.content.mapping_id.term_id.label}}"
         </p>
         <span class="event__date">{{event.date}}</span>
       </div>
@@ -276,7 +276,8 @@
       {% elif event.type == 'mapping' %}
       <div class="event"">
         <p class="event__title"> 
-          {{event.content.curator.get_full_name}} mapped trait {{trait.name}} to term {{event.content.term_id.label}}
+          {{event.content.curator.get_full_name}} mapped trait 
+          "{{trait.name}}"" to term "{{event.content.term_id.label}}""
         </p>
         <span class="event__date">{{event.date}}</span>
       </div>

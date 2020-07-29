@@ -36,7 +36,7 @@ def trait_detail(request, pk):
         history_events.append({'type': 'mapping', 'date': mapping.timestamp_mapped, 'content': mapping})
         reviews = mapping.review_set.all()
         for review in reviews:
-            history_events.append({'type': 'review', 'date': mapping.timestamp_mapped, 'content': review})
+            history_events.append({'type': 'review', 'date': review.timestamp, 'content': review})
     new_term_form = NewTermForm()
     context = {"trait": trait, "status_dict": status_dict,
                "new_term_form": new_term_form, "reviewer_emails": reviewer_emails, "history_events": history_events}
