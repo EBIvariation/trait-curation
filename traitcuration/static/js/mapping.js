@@ -143,6 +143,8 @@ function commentButtonClicked() {
     showNotification("The comment form is empty", "warning")
     return;
   }
+  // Empty the textarea once the comment has been submitted
+  document.querySelector('#commentBody').value = "";
   axios
     .post(`/traits/${currentTraitId}/comment`, {
       comment_body: commentBody,
