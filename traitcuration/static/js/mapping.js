@@ -6,6 +6,7 @@ let selectedTableId = -1;
 let currentTraitId = -1;
 let selectedTermId = -1;
 
+
 // Setter function for current trait id
 function setCurrentTraitId(traitId) {
   currentTraitId = traitId;
@@ -27,15 +28,21 @@ function selectRow(row, tableId, traitId, termId) {
   selectedRowIndex = row.rowIndex;
   currentTraitId = traitId;
   selectedTermId = termId;
+
+  // Remove the 'selected' class from all table rows
+  for (const row of document.getElementsByTagName("tr"))
+    row.classList.remove("suggestion-table__row--selected");
+
   // If the currently mapped row was selected, set the selected index as -1 to prevent unnecessary mapping requests
   selectedRow = document.getElementById(selectedTableId).rows[selectedRowIndex];
-  if (selectedRow.classList.contains("suggestion-table__row--current")) {
+  if (selectedRow.classList.contains("suggestion-table__row--current") || 
+      selectedRow.classList.contains("suggestion-table__row--awaiting_review")
+      ) {
     selectedRowIndex = -1;
     return;
   }
-  // Remove the 'selected' class from all table rows, and add it to the selected row
-  for (const row of document.getElementsByTagName("tr"))
-    row.classList.remove("suggestion-table__row--selected");
+
+  // Add the 'selected' class to the selected row
   selectedRow.classList.add("suggestion-table__row--selected");
 }
 
