@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
+from computedfields.models import ComputedFieldsModel, computed
 
 from .managers import CustomUserManager
 
@@ -29,13 +30,21 @@ class Status(models.TextChoices):
         return tuple(choices)
 
 
-class Trait(models.Model):
+class Trait(ComputedFieldsModel):
     name = models.CharField(max_length=200)
     current_mapping = models.ForeignKey('Mapping', on_delete=models.SET_NULL, null=True, blank=True)
-    status = models.CharField(max_length=50, choices=Status.trait_choices())
     number_of_source_records = models.IntegerField(blank=True, null=True)
     timestamp_added = models.DateTimeField(auto_now=True)
     timestamp_updated = models.DateTimeField(auto_now_add=True)
+
+    @computed(models.CharField(max_length=30, choices=Status.trait_choices()), depends=[
+        ['current_mapping', ['is_reviewed']],
+        ['current_mapping.term_id', ['status']]
+    ])
+    def status(self):
+        if not self.current_mapping:
+            return Status.UNMAPPED
+        return self.current_mapping.term_id.status if self.current_mapping.is_reviewed else Status.AWAITING_REVIEW
 
     def __str__(self):
         return self.name
@@ -62,7 +71,7 @@ class OntologyTerm(models.Model):
     curie = models.CharField(max_length=50, blank=True, null=True, unique=True)
     iri = models.URLField(null=True, blank=True, unique=True)
     label = models.CharField(max_length=200)
-    status = models.CharField(max_length=50, choices=Status.term_choices())
+    status = models.CharField(max_length=30, choices=Status.term_choices())
     description = models.TextField(blank=True, null=True)
     cross_refs = models.TextField(blank=True, null=True)
 
@@ -70,12 +79,17 @@ class OntologyTerm(models.Model):
         return f"{self.curie} - {self.label}"
 
 
-class Mapping(models.Model):
+class Mapping(ComputedFieldsModel):
     trait_id = models.ForeignKey(Trait, on_delete=models.PROTECT)
     term_id = models.ForeignKey(OntologyTerm, on_delete=models.PROTECT)
     curator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    is_reviewed = models.BooleanField()
     timestamp_mapped = models.DateTimeField(auto_now=True)
+
+    @computed(models.BooleanField(), depends=[
+        ['review_set', []],
+    ])
+    def is_reviewed(self):
+        return self.review_set.count() >= 2
 
     def __str__(self):
         return f"{self.trait_id} - {self.term_id}"
@@ -100,6 +114,7 @@ class MappingSuggestion(models.Model):
 class Review(models.Model):
     mapping_id = models.ForeignKey(Mapping, on_delete=models.PROTECT)
     reviewer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.mapping_id} by {self.reviewer}"

@@ -2,7 +2,7 @@
 This module contains all the funcionality for mapping traits to ontology terms, via a trait's suggestion table
 */
 let selectedRowIndex = -1;
-let selectedTableId = "";
+let selectedTableId = -1;
 let currentTraitId = -1;
 let selectedTermId = -1;
 
@@ -12,9 +12,9 @@ function setCurrentTraitId(traitId) {
   currentTraitId = traitId;
 }
 
+
 // Check if the "Newly suggested terms" table is empty, and hide it if it is.
 const NewTermSuggestionTable = document.querySelector('#newSuggestionTable')
-console.log(NewTermSuggestionTable.rows.length)
 if (NewTermSuggestionTable.rows.length === 1) {
   NewTermSuggestionTable.classList.add('hidden')
   document.querySelector('#newSuggestionTable-title').classList.add('hidden')
@@ -28,17 +28,24 @@ function selectRow(row, tableId, traitId, termId) {
   selectedRowIndex = row.rowIndex;
   currentTraitId = traitId;
   selectedTermId = termId;
+
+  // Remove the 'selected' class from all table rows
+  for (const row of document.getElementsByTagName("tr"))
+    row.classList.remove("suggestion-table__row--selected");
+
   // If the currently mapped row was selected, set the selected index as -1 to prevent unnecessary mapping requests
   selectedRow = document.getElementById(selectedTableId).rows[selectedRowIndex];
-  if (selectedRow.classList.contains("suggestion-table__row--current")) {
+  if (selectedRow.classList.contains("suggestion-table__row--current") || 
+      selectedRow.classList.contains("suggestion-table__row--awaiting_review")
+      ) {
     selectedRowIndex = -1;
     return;
   }
-  // Remove the 'selected' class from all table rows, and add it to the selected row
-  for (const row of document.getElementsByTagName("tr"))
-    row.classList.remove("suggestion-table__row--selected");
+
+  // Add the 'selected' class to the selected row
   selectedRow.classList.add("suggestion-table__row--selected");
 }
+
 
 // This function makes an ajax request to create a current mapping with the selected term
 function mapButtonClicked() {
@@ -108,6 +115,7 @@ function newTermButtonClicked() {
   }
 }
 
+
 function showNotification(message, status) {
   UIkit.notification({
     message: message,
@@ -116,3 +124,15 @@ function showNotification(message, status) {
     timeout: 3000,
   });
 }
+
+
+function reviewButtonClicked() {
+  axios
+    .post(`/traits/${currentTraitId}/mapping/review`)
+    .then((response) => {
+      // handle success
+      console.log(response);
+      location.reload();
+    });
+}
+

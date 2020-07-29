@@ -44,10 +44,14 @@
       {% else %}
       <span class="uk-label label--warning"> IN REVIEW </span>
       {% endif %}
-        {% if not user.is_anonymous %}
-        <button class="uk-button button--success sidebar__section-review-button">
-          <span uk-icon="check"> REVIEW </span>
-        </button>
+        {% if not user.is_anonymous and trait.current_mapping.curator.email != user.email %}
+          {% if user.email in reviewer_emails %}
+          <button class="uk-button button button--disabled sidebar__section-review-button" disabled> REVIEWED </button>
+          {% else %}
+          <button class="uk-button button--success sidebar__section-review-button" onclick="reviewButtonClicked()">
+            <span uk-icon="check"> REVIEW </span>
+          </button>
+          {% endif %}
         {% endif %}
       {% endif %}
     </div>
@@ -97,7 +101,12 @@
           <tr 
           onclick="selectRow(this, 'suggestionTable', '{{trait.id}}', '{{suggestion.term_id.id}}')"
           class="suggestion-table__row 
-          {% if suggestion.term_id == current_term %} suggestion-table__row--current {% endif %}">
+          {% if suggestion.term_id == current_term and trait.current_mapping.is_reviewed %} 
+          suggestion-table__row--current 
+          {% endif %}
+          {% if suggestion.term_id == current_term and not trait.current_mapping.is_reviewed %} 
+          suggestion-table__row--awaiting_review 
+          {% endif %}">
             <td>
               <a class="suggestion-table__link" target="_blank" href="{{suggestion.term_id.iri}}">
                 {{suggestion.term_id.curie}} 
@@ -134,7 +143,12 @@
           <tr 
           onclick="selectRow(this, 'newSuggestionTable', '{{trait.id}}', '{{suggestion.term_id.id}}')"
           class="suggestion-table__row 
-          {% if suggestion.term_id == current_term %} suggestion-table__row--current {% endif %}">
+          {% if suggestion.term_id == current_term and trait.current_mapping.is_reviewed %} 
+          suggestion-table__row--current 
+          {% endif %}
+          {% if suggestion.term_id == current_term and not trait.current_mapping.is_reviewed %} 
+          suggestion-table__row--awaiting_review 
+          {% endif %}">
             <td>
               <span class="suggestion-table__link">
                 {{suggestion.term_id.label}} 

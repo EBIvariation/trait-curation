@@ -33,15 +33,23 @@
     padding: 0 2rem !important;
 
     &--current {
-      background-color: lighten($color-secondary, 30%);
+      background-color: lighten($color-success, 30%);
 
       &:hover {
-        background-color: lighten($color-secondary, 30%) !important;
+        background-color: lighten($color-success, 30%) !important;
+      }
+    }
+
+    &--awaiting_review {
+      background-color: #f0ce9c;
+
+      &:hover {
+        background-color: #f0ce9c !important;
       }
     }
 
     &--selected {
-      background-color: #ffffdd !important;
+      background-color: darken(#ffffdd,10%) !important;
     }
   }
 }
