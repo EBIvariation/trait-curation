@@ -7,6 +7,9 @@ import logging
 
 from retry import retry
 
+from ..models import Status, OntologyTerm
+
+
 logging.basicConfig()
 logger = logging.getLogger('ZOOMA')
 logger.setLevel(logging.INFO)
@@ -51,3 +54,36 @@ def get_ontology_id(term_iri):
     if ontology_id == 'orphanet':
         ontology_id = 'ordo'
     return ontology_id
+
+
+def get_term_status(is_obsolete, ontology_id=None):
+    """
+    Takes the ontology_id of a term and a whether it is obsolete or not, and returns its calculated status.
+    'Obsolete' if the is_obsolete flag is true, 'Deleted' if no info was found in any ontology, 'Current' if its
+    ontology is EFO, and 'Needs Import' if info about the term was found in another ontology.
+    """
+    if ontology_id is None:
+        return Status.DELETED
+    if is_obsolete:
+        return Status.OBSOLETE
+    if ontology_id == 'efo':
+        return Status.CURRENT
+    return Status.NEEDS_IMPORT
+
+
+def check_awaiting_import_terms():
+    awaiting_import_terms = OntologyTerm.objects.filter(status=Status.AWAITING_IMPORT)
+    for term in awaiting_import_terms:
+        term_info = make_ols_query(term.iri, 'efo')
+        if term_info is not None:
+            term.status = get_term_status(term_info['is_obsolete'], 'efo')
+            term.save()
+
+
+def check_current_terms():
+    current_terms = OntologyTerm.objects.filter(status=Status.CURRENT)
+    for term in current_terms:
+        term_info = make_ols_query(term.iri, 'efo')
+        if term_info is not None:
+            term.status = get_term_status(term_info['is_obsolete'], 'efo')
+            term.save()
