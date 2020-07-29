@@ -12,6 +12,7 @@ urlpatterns = [
     path('datasources/dummy', views.dummy_data, name="dummy_data"),
     path('datasources/zooma', views.zooma_suggestions, name="zooma_suggestions"),
     path('datasources/clinvar', views.clinvar_data, name="clinvar_data"),
+    path('datasources/ols', views.ols_queries, name="ols"),
     path('celery-progress/', include('celery_progress.urls')),  # the endpoint is configurable
 
 ]

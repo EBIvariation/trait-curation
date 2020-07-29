@@ -10,7 +10,7 @@ from django.db import transaction
 from .utils import get_status_dict, get_user_info, parse_request_body
 from .models import Trait, Mapping, OntologyTerm, User, Status, Review
 from .datasources import dummy, zooma
-from .tasks import get_zooma_suggestions, get_clinvar_data, get_clinvar_data_and_suggestions
+from .tasks import get_zooma_suggestions, get_clinvar_data, get_clinvar_data_and_suggestions, get_ols_status
 from .forms import NewTermForm
 
 
@@ -137,4 +137,9 @@ def zooma_suggestions(request):
 
 def dummy_data(request):
     dummy.import_dummy_data()
+    return redirect('datasources')
+
+
+def ols_queries(request):
+    get_ols_status.delay()
     return redirect('datasources')
