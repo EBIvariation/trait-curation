@@ -114,6 +114,7 @@ class MappingSuggestion(models.Model):
 class Review(models.Model):
     mapping_id = models.ForeignKey(Mapping, on_delete=models.PROTECT)
     reviewer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.mapping_id} by {self.reviewer}"
