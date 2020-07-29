@@ -17,6 +17,9 @@
   <a href="{% url 'zooma_suggestions' %}"
     ><button class="uk-button uk-button-primary">ZOOMA SUGGESTIONS</button>
   </a>
+  <a href="{% url 'ols' %}"
+    ><button class="uk-button uk-button-primary">OLS STATUS UPDATES</button>
+  </a>
   <div class='progress-wrapper'>
     <div id='progress-bar' class='progress-bar' style="background-color: #68a9ef; width: 0%;">&nbsp;</div>
   </div>
@@ -24,7 +27,6 @@
   <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      console.log('{{request.session.task_id}}')
       if ('{{request.session.task_id}}' === 'None') return;
       var progressUrl = "{% url 'celery_progress:task_status' request.session.task_id %}";
       CeleryProgressBar.initProgressBar(progressUrl);
