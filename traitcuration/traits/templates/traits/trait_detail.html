@@ -143,7 +143,12 @@
           <tr 
           onclick="selectRow(this, 'newSuggestionTable', '{{trait.id}}', '{{suggestion.term_id.id}}')"
           class="suggestion-table__row 
-          {% if suggestion.term_id == current_term%} suggestion-table__row--current {% endif %}">
+          {% if suggestion.term_id == current_term and trait.current_mapping.is_reviewed %} 
+          suggestion-table__row--current 
+          {% endif %}
+          {% if suggestion.term_id == current_term and not trait.current_mapping.is_reviewed %} 
+          suggestion-table__row--awaiting_review 
+          {% endif %}">
             <td>
               <span class="suggestion-table__link">
                 {{suggestion.term_id.label}} 
