@@ -69,7 +69,7 @@ def check_awaiting_import_terms():
     logger.info('CHECKING AWAITING IMPORT TERMS')
     awaiting_import_terms = OntologyTerm.objects.filter(status=Status.AWAITING_IMPORT)
     for term in awaiting_import_terms:
-        logger.info("Checking term", term.iri)
+        logger.info(f"Checking term {term.iri}")
         term_info = make_ols_query(term.iri, 'efo')
         if term_info is not None:
             term.status = get_term_status(term_info['is_obsolete'], 'efo')
@@ -81,7 +81,7 @@ def check_term_status():
     terms = OntologyTerm.objects.filter(
         status__in=[Status.AWAITING_IMPORT, Status.NEEDS_IMPORT, Status.CURRENT])
     for term in terms:
-        logger.info("Checking term", term.iri)
+        logger.info(f"Checking term {term.iri}")
         term_ontology_id = get_ontology_id(term.iri)
         term_info = make_ols_query(term.iri, term_ontology_id)
         if term_info is not None:
