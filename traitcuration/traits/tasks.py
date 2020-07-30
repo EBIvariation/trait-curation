@@ -30,5 +30,6 @@ def get_clinvar_data_and_suggestions():
 
 @shared_task
 def get_ols_status():
+    ols.check_term_status()
     ols.check_awaiting_import_terms()
     return 'Successful status update'
