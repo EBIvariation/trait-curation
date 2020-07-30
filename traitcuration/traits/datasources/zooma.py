@@ -5,6 +5,8 @@ terms in the app's database.
 import requests
 import logging
 
+from django.db import transaction
+
 from ..models import Trait, MappingSuggestion, OntologyTerm, User, Status
 from .ols import make_ols_query, get_ontology_id
 
@@ -50,6 +52,7 @@ def get_zooma_suggestions_for_trait(trait):
     return response.json()
 
 
+@transaction.atomic
 def create_local_term(suggested_term_iri):
     """
     Takes in a single zooma suggestion result and creates an ontology term for it in the app's database. If that term
@@ -94,6 +97,7 @@ def get_term_status(is_obsolete, ontology_id=None):
     return Status.NEEDS_IMPORT
 
 
+@transaction.atomic
 def create_mapping_suggestion(trait, term, user_email='eva-dev@ebi.ac.uk'):
     """
     Creates a mapping suggestion in the app's database, if it doesn't exist already.
@@ -110,6 +114,7 @@ def create_mapping_suggestion(trait, term, user_email='eva-dev@ebi.ac.uk'):
     logger.info(f"Created mapping suggestion {suggestion}")
 
 
+@transaction.atomic
 def delete_unused_suggestions(trait, suggested_terms):
     """
     Takes in a trait and a set of suggested_terms, found in the previously executed ZOOMA query. This function gets all
