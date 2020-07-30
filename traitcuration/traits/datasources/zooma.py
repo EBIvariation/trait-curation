@@ -7,7 +7,7 @@ import logging
 
 from django.db import transaction
 
-from ..models import Trait, MappingSuggestion, OntologyTerm, User, Status
+from ..models import Trait, MappingSuggestion, OntologyTerm, User
 from .ols import make_ols_query, get_ontology_id, get_term_status
 
 logging.basicConfig()
@@ -80,7 +80,6 @@ def create_local_term(suggested_term_iri):
     term = OntologyTerm(curie=term_info['curie'], iri=suggested_term_iri, label=term_info['label'], status=term_status)
     term.save()
     return term
-
 
 
 @transaction.atomic
