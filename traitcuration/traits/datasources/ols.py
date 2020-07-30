@@ -7,11 +7,11 @@ import logging
 
 from retry import retry
 
-from ..models import Trait, Status, OntologyTerm
+from ..models import Status, OntologyTerm
 
 
 logging.basicConfig()
-logger = logging.getLogger('ZOOMA')
+logger = logging.getLogger('OLS')
 logger.setLevel(logging.INFO)
 
 BASE_URL = "https://www.ebi.ac.uk/ols/api/"
@@ -66,18 +66,26 @@ def get_term_status(is_obsolete, ontology_id=None):
 
 
 def check_awaiting_import_terms():
+    logger.info('CHECKING AWAITING IMPORT TERMS')
     awaiting_import_terms = OntologyTerm.objects.filter(status=Status.AWAITING_IMPORT)
     for term in awaiting_import_terms:
+        logger.info("Checking term", term.iri)
         term_info = make_ols_query(term.iri, 'efo')
         if term_info is not None:
             term.status = get_term_status(term_info['is_obsolete'], 'efo')
             term.save()
 
 
-def check_current_terms():
-    current_terms = OntologyTerm.objects.filter(status=Status.CURRENT)
-    for term in current_terms:
-        term_info = make_ols_query(term.iri, 'efo')
+def check_term_status():
+    logger.info('CHECKING ALL TERM STATUS')
+    terms = OntologyTerm.objects.filter(
+        status__in=[Status.AWAITING_IMPORT, Status.NEEDS_IMPORT, Status.CURRENT])
+    for term in terms:
+        logger.info("Checking term", term.iri)
+        term_ontology_id = get_ontology_id(term.iri)
+        term_info = make_ols_query(term.iri, term_ontology_id)
         if term_info is not None:
-            term.status = get_term_status(term_info['is_obsolete'], 'efo')
-            term.save()
+            term.status = get_term_status(term_info['is_obsolete'], term_ontology_id)
+        else:
+            term.status = Status.DELETED
+        term.save()
