@@ -10,7 +10,7 @@
   <div class="sidebar__wrapper">
     <div class="sidebar__section">
       <p class="sidebar__section-title">LAST UPDATED</p>
-      <span class="sidebar__section-text"> {{trait.timestamp_updated}} </span>
+      <span date="{{trait.timestamp_updated.isoformat}}" class="date sidebar__section-text"> </span>
       <hr />
     </div>
     <div class="sidebar__section">
@@ -236,6 +236,7 @@
       </div>
     </section>
     {% endif %}
+
     <section class="section">
       <h4>TRAIT HISTORY</h4>
 
@@ -260,7 +261,7 @@
       {% if event.type == 'comment' %}
       <div class="event event--comment">
         <span class="event__title">{{event.content.author.get_full_name}} commented</span>
-        <span class="event__date">{{event.content.date}}</span>
+        <span date="{{event.date.isoformat}}" class="date event__date"></span>
         <p>{{event.content.body}}</p>
       </div>
 
@@ -270,7 +271,7 @@
           {{event.content.reviewer.get_full_name}} reviewed mapping of trait "{{trait.name}}"
           to term "{{event.content.mapping_id.term_id.label}}"
         </p>
-        <span class="event__date">{{event.date}}</span>
+        <span date="{{event.date.isoformat}}" class="date event__date"></span>
       </div>
 
       {% elif event.type == 'mapping' %}
@@ -279,7 +280,7 @@
           {{event.content.curator.get_full_name}} mapped trait 
           "{{trait.name}}"" to term "{{event.content.term_id.label}}""
         </p>
-        <span class="event__date">{{event.date}}</span>
+        <span date="{{event.date.isoformat}}" class="date event__date"></span>
       </div>
 
       {% endif %}
@@ -291,6 +292,7 @@
 
 <script src="{% static 'js/mapping.js' %}"></script>
 <script>
-  setCurrentTraitId("{{trait.id}}")
+  setCurrentTraitId("{{trait.id}}");
+  outputDates();
 </script>
 {% endblock %}
