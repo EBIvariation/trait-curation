@@ -72,6 +72,9 @@ def get_term_status(is_obsolete, ontology_id=None):
 
 
 def check_awaiting_import_terms():
+    """
+    Checks if terms with the 'awaiting_import' status are now found in EFO, and if they are, assigns them as 'current'.
+    """
     logger.info('CHECKING AWAITING IMPORT TERMS')
     awaiting_import_terms = OntologyTerm.objects.filter(status=Status.AWAITING_IMPORT)
     for term in awaiting_import_terms:
@@ -83,6 +86,10 @@ def check_awaiting_import_terms():
 
 
 def check_term_status():
+    """
+    Queries OLS for terms with the 'awaiting_import', 'needs_import' and 'current' status, in their parent ontology,
+    to determine whether they have become obsolete or deleted.
+    """
     logger.info('CHECKING ALL TERM STATUS')
     terms = OntologyTerm.objects.filter(
         status__in=[Status.AWAITING_IMPORT, Status.NEEDS_IMPORT, Status.CURRENT])
