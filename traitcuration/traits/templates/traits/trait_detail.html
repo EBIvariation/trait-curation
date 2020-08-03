@@ -259,28 +259,38 @@
 
       {% for event in history_events|dictsortreversed:"date" %}
       {% if event.type == 'comment' %}
-      <div class="event event--comment">
-        <span class="event__title">{{event.content.author.get_full_name}} commented</span>
-        <span date="{{event.date.isoformat}}" class="date event__date"></span>
-        <p>{{event.content.body}}</p>
+      <div class="event"">
+        <p> 
+          <span class="bold" > {{event.content.author.get_full_name}}</span> commented on 
+          <span date="{{event.date.isoformat}}" class="date bold"></span>
+        </p>
+        <p>
+          {{event.content.body}}
+        </p>
       </div>
 
       {% elif event.type == 'review' %}
-      <div class="event">
-        <p class="event__title"> 
-          {{event.content.reviewer.get_full_name}} reviewed mapping of trait "{{trait.name}}"
-          to term "{{event.content.mapping_id.term_id.curie}} - {{event.content.mapping_id.term_id.label}}"
+      <div class="event"">
+        <p> 
+          <span class="bold" > {{event.content.reviewer.get_full_name}}</span> confirmed the mapping on 
+          <span date="{{event.date.isoformat}}" class="date bold"></span>
         </p>
-        <span date="{{event.date.isoformat}}" class="date event__date"></span>
+        <p>
+          <a href="{{event.content.term_id.iri}}">{{event.content.mapping_id.term_id.curie}}</a> — 
+          <span class="bold"> {{trait.name}}</span>
+        </p>
       </div>
 
       {% elif event.type == 'mapping' %}
       <div class="event"">
-        <p class="event__title"> 
-          {{event.content.curator.get_full_name}} mapped trait 
-          "{{trait.name}}" to term "{{event.content.term_id.curie}} - {{event.content.term_id.label}}"
+        <p> 
+          <span class="bold" > {{event.content.curator.get_full_name}}</span>  proposed a mapping on 
+          <span date="{{event.date.isoformat}}" class="date bold"></span>
         </p>
-        <span date="{{event.date.isoformat}}" class="date event__date"></span>
+        <p>
+          <a href="{{event.content.term_id.iri}}">{{event.content.term_id.curie}}</a> — 
+          <span class="bold"> {{trait.name}}</span>
+        </p>
       </div>
 
       {% endif %}

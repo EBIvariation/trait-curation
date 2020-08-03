@@ -24,7 +24,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
-<body>
+<body onload="outputDates()">
     <nav class="uk-navbar-container header" uk-sticky uk-navbar>
         <div class="uk-navbar-left">
             {% with request.resolver_match.url_name as url_name %}
