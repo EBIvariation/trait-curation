@@ -1,6 +1,7 @@
 // This module contains utilities for date formatting and output.
 
-const timeFormat = "MMMM Do YYYY, H:MM ";
+
+const timeFormat = "MMMM Do YYYY, H:mm"; // e.g. July 29th 2020, 14:25
 
 // Uses moment.js library to format a ISO formatted date string
 function formatDate(isoformat_timestamp) {
