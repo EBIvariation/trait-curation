@@ -136,3 +136,22 @@ function reviewButtonClicked() {
     });
 }
 
+
+function commentButtonClicked() {
+  commentBody = document.querySelector('#commentBody').value;
+  if (commentBody.trim().length === 0) {
+    showNotification("The comment form is empty", "warning")
+    return;
+  }
+  // Empty the textarea once the comment has been submitted
+  document.querySelector('#commentBody').value = "";
+  axios
+    .post(`/traits/${currentTraitId}/comment`, {
+      comment_body: commentBody,
+    })
+    .then((response) => {
+      // handle success
+      console.log(response);
+      location.reload();
+    });
+}

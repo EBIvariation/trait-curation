@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.db import transaction
 
 from .utils import get_status_dict, get_user_info, parse_request_body
-from .models import Trait, Mapping, OntologyTerm, User, Status, Review
+from .models import Trait, Mapping, OntologyTerm, User, Status, Review, Comment
 from .datasources import dummy, zooma
 from .tasks import get_zooma_suggestions, get_clinvar_data, get_clinvar_data_and_suggestions
 from .forms import NewTermForm
@@ -27,12 +27,37 @@ def trait_detail(request, pk):
     if trait.current_mapping is not None:
         for review in trait.current_mapping.review_set.all():
             reviewer_emails.append(review.reviewer.email)
-    print(reviewer_emails)
     status_dict = get_status_dict()
+    history_events = list()
+    comments = trait.comment_set.all()
+    for comment in comments:
+        history_events.append({'type': 'comment', 'date': comment.date, 'content': comment})
+    mappings = trait.mapping_set.all()
+    for mapping in mappings:
+        history_events.append({'type': 'mapping', 'date': mapping.timestamp_mapped, 'content': mapping})
+        reviews = mapping.review_set.all()
+        for review in reviews:
+            history_events.append({'type': 'review', 'date': review.timestamp, 'content': review})
     new_term_form = NewTermForm()
     context = {"trait": trait, "status_dict": status_dict,
-               "new_term_form": new_term_form, "reviewer_emails": reviewer_emails}
+               "new_term_form": new_term_form, "reviewer_emails": reviewer_emails, "history_events": history_events}
     return render(request, 'traits/trait_detail.html', context)
+
+
+@transaction.atomic
+def comment(request, pk):
+    if request.method == 'GET':
+        return redirect(reverse('trait_detail', args=[pk]))
+    if request.user == "AnonymousUser":
+        return HttpResponse('Unauthorized', status=401)
+    request_body = parse_request_body(request)
+    comment_body = request_body['comment_body']
+    user_info = get_user_info(request)
+    trait = get_object_or_404(Trait, pk=pk)
+    user = get_object_or_404(User, email=user_info['email'])
+    comment = Comment(trait_id=trait, author=user, body=comment_body)
+    comment.save()
+    return redirect(reverse('trait_detail', args=[pk]))
 
 
 @transaction.atomic

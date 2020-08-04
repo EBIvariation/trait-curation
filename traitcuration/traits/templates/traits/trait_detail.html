@@ -10,7 +10,7 @@
   <div class="sidebar__wrapper">
     <div class="sidebar__section">
       <p class="sidebar__section-title">LAST UPDATED</p>
-      <span class="sidebar__section-text"> {{trait.timestamp_updated}} </span>
+      <span date="{{trait.timestamp_updated.isoformat}}" class="date sidebar__section-text"> </span>
       <hr />
     </div>
     <div class="sidebar__section">
@@ -48,7 +48,7 @@
           {% if user.email in reviewer_emails %}
           <button class="uk-button button button--disabled sidebar__section-review-button" disabled> REVIEWED </button>
           {% else %}
-          <button class="uk-button button--success sidebar__section-review-button" onclick="reviewButtonClicked()">
+          <button class="uk-button button button--success sidebar__section-review-button" onclick="reviewButtonClicked()">
             <span uk-icon="check"> REVIEW </span>
           </button>
           {% endif %}
@@ -236,11 +236,81 @@
       </div>
     </section>
     {% endif %}
+
+    <section class="section">
+      <h4>TRAIT HISTORY</h4>
+
+      {% if not user.is_anonymous %}
+      <div class="post-comment__container">
+        <div class="post-comment__header">
+          <span uk-icon="user"></span>
+          <span>Comment as {{user.get_full_name}}</span>
+          <button class="uk-button button button--primary post-comment__submit" onclick="commentButtonClicked()">Submit</button>
+        </div>
+
+        <div class="post-comment__body">
+          <textarea 
+          id="commentBody" 
+          class="uk-textarea post-comment__textarea" 
+          placeholder="Leave a commment..."></textarea>
+        </div>
+      </div>
+      {% endif%}
+
+      {% for event in history_events|dictsortreversed:"date" %}
+      {% if event.type == 'comment' %}
+      <div class="event"">
+        <p> 
+          <span class="bold" > {{event.content.author.get_full_name}}</span> commented on 
+          <span date="{{event.date.isoformat}}" class="date bold"></span>
+        </p>
+        <p>
+          {{event.content.body}}
+        </p>
+      </div>
+
+      {% elif event.type == 'review' %}
+      <div class="event"">
+        <p> 
+          <span class="bold" > {{event.content.reviewer.get_full_name}}</span> confirmed the mapping on 
+          <span date="{{event.date.isoformat}}" class="date bold"></span>
+        </p>
+        <p>
+          {% if event.content.mapping_id.term_id.iri %}
+          <a target="_blank" href="{{ event.content.mapping_id.term_id.iri }}">
+            {{event.content.mapping_id.term_id.curie}}
+          </a>  —
+          {% endif %}
+          <span class="bold"> {{event.content.mapping_id.term_id.label}}</span>
+        </p>
+      </div>
+
+      {% elif event.type == 'mapping' %}
+      <div class="event"">
+        <p> 
+          <span class="bold" > {{event.content.curator.get_full_name}}</span>  proposed a mapping on 
+          <span date="{{event.date.isoformat}}" class="date bold"></span>
+        </p>
+        <p>
+          {% if event.content.term_id.iri %}
+          <a target="_blank" href="{{ event.content.term_id.iri }}">
+            {{event.content.term_id.curie}}
+          </a> —
+          {% endif %}
+          <span class="bold"> {{event.content.term_id.label}}</span>
+        </p>
+      </div>
+
+      {% endif %}
+
+      {% endfor %}
+    </section>
   </div>
 </div>
 
 <script src="{% static 'js/mapping.js' %}"></script>
 <script>
-  setCurrentTraitId("{{trait.id}}")
+  setCurrentTraitId("{{trait.id}}");
+  outputDates();
 </script>
 {% endblock %}
