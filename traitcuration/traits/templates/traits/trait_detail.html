@@ -276,8 +276,12 @@
           <span date="{{event.date.isoformat}}" class="date bold"></span>
         </p>
         <p>
-          <a href="{{event.content.term_id.iri}}">{{event.content.mapping_id.term_id.curie}}</a> — 
-          <span class="bold"> {{trait.name}}</span>
+          {% if event.content.mapping_id.term_id.iri %}
+          <a target="_blank" href="{{ event.content.mapping_id.term_id.iri }}">
+            {{event.content.mapping_id.term_id.curie}}
+          </a>  —
+          {% endif %}
+          <span class="bold"> {{event.content.mapping_id.term_id.label}}</span>
         </p>
       </div>
 
@@ -288,7 +292,11 @@
           <span date="{{event.date.isoformat}}" class="date bold"></span>
         </p>
         <p>
-          <a href="{{event.content.term_id.iri}}">{{event.content.term_id.curie}}</a> — 
+          {% if event.content.term_id.iri %}
+          <a target="_blank" href="{{ event.content.term_id.iri }}">
+            {{event.content.term_id.curie}}
+          </a> —
+          {% endif %}
           <span class="bold"> {{event.content.term_id.label}}</span>
         </p>
       </div>
