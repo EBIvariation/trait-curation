@@ -86,7 +86,7 @@ class Mapping(ComputedFieldsModel):
     timestamp_mapped = models.DateTimeField(auto_now=True)
 
     @computed(models.BooleanField(), depends=[
-        ['review_set', []],
+        ['review_set', ['mapping_id']],
     ])
     def is_reviewed(self):
         return self.review_set.count() >= 2
