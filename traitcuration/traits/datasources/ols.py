@@ -4,8 +4,9 @@ ontology_id extraction
 """
 import requests
 import logging
-
 from retry import retry
+
+from django.db import transaction
 
 from ..models import Status, OntologyTerm
 
@@ -65,6 +66,7 @@ def get_term_status(is_obsolete, ontology_id=None):
     return Status.NEEDS_IMPORT
 
 
+@transaction.atomic
 def ols_update():
     """
     Query OLS for all terms with 'current', 'awaiting_import' and 'needs_import' status and update their status
