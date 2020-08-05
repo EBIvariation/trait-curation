@@ -14,7 +14,7 @@ logger.setLevel(logging.INFO)
 BASE_URL = "https://www.ebi.ac.uk/ols/api/"
 
 
-@retry(tries=10, delay=5, backoff=1.2, jitter=(1, 3), logger=logger)
+@retry(tries=3, delay=5, backoff=1.2, jitter=(1, 3), logger=logger)
 def make_ols_query(identifier_value, ontology_id, identifier_type='iri'):
     """
     Takes in an identifier type (iri or curie), the value for that indenrifier to query for, and the ontology id to
@@ -32,10 +32,11 @@ def make_ols_query(identifier_value, ontology_id, identifier_type='iri'):
 
 def parse_ols_results(results):
     term_info = results["_embedded"]["terms"][0]
+    term_iri = term_info["iri"]  # E.g. http://www.ebi.ac.uk/efo/EFO_0000400
     term_curie = term_info["obo_id"]  # E.g. EFO:0000400
     term_label = term_info["label"]  # E.g. Diabetes mellitus
     term_is_obsolete = term_info["is_obsolete"]  # True or False value on whether the term is obsolete or not
-    info_dict = {"curie": term_curie, "label": term_label, "is_obsolete": term_is_obsolete}
+    info_dict = {"curie": term_curie, "iri": term_iri, "label": term_label, "is_obsolete": term_is_obsolete}
     return info_dict
 
 
