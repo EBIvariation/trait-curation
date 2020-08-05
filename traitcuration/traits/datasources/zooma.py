@@ -11,7 +11,7 @@ from ..models import Trait, MappingSuggestion, OntologyTerm, User
 from .ols import make_ols_query, get_ontology_id, get_term_status
 
 logging.basicConfig()
-logger = logging.getLogger('ZOOMA')
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 BASE_URL = "http://www.ebi.ac.uk/spot/zooma/v2/api"
