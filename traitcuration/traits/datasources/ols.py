@@ -71,65 +71,36 @@ def get_term_status(is_obsolete, ontology_id=None):
     return Status.NEEDS_IMPORT
 
 
-def check_awaiting_import_terms():
-    """
-    Checks if terms with the 'awaiting_import' status are now found in EFO, and if they are, assigns them as 'current'.
-    """
-    logger.info('CHECKING AWAITING IMPORT TERMS')
-    awaiting_import_terms = OntologyTerm.objects.filter(status=Status.AWAITING_IMPORT)
-    for term in awaiting_import_terms:
-        logger.info(f"Checking term {term.iri}")
-        term_info = make_ols_query(term.iri, 'efo')
-        if term_info is not None:
-            term.status = get_term_status(term_info['is_obsolete'], 'efo')
-            term.save()
-
-
-def check_term_status():
-    """
-    Queries OLS for terms with the 'awaiting_import', 'needs_import' and 'current' status, in their parent ontology,
-    to determine whether they have become obsolete or deleted.
-    """
-    logger.info('CHECKING ALL TERM STATUS')
-    terms = OntologyTerm.objects.filter(
-        status__in=[Status.AWAITING_IMPORT, Status.NEEDS_IMPORT, Status.CURRENT])
-    for term in terms:
-        logger.info(f"Checking term {term.iri}")
-        term_ontology_id = get_ontology_id(term.iri)
-        term_info = make_ols_query(term.iri, term_ontology_id)
-        if term_info is not None:
-            term.status = get_term_status(term_info['is_obsolete'], term_ontology_id)
-        else:
-            term.status = Status.DELETED
-        term.save()
-
-
 def ols_update():
     """
     Query OLS for all terms with 'current', 'awaiting_import' and 'needs_import' status and update their status
     """
     for term in OntologyTerm.objects.filter(status__in=[Status.CURRENT, Status.AWAITING_IMPORT, Status.NEEDS_IMPORT]):
+        logger.info(f"Querying OLS for {term}")
         efo_response = make_ols_query(term.iri, 'efo')
         term_ontology_id = get_ontology_id(term.iri)
         parent_ontology_response = None
         if term_ontology_id != 'efo':
             parent_ontology_response = make_ols_query(term.iri, term_ontology_id)
-        term.status = update_status(term.status, efo_response, parent_ontology_response)
+        term.status = update_status(term, efo_response, parent_ontology_response)
         term.save()
 
 
-def update_status(term_status, efo_response, parent_ontology_response):
+def update_status(term, efo_response, parent_ontology_response):
     """
     Get the existing term status of a term and the OLS query response in EFO and in its parent ontology if any, and
     compute the new status.
     """
-    term_ontology_response = efo_response if term_status == Status.CURRENT else parent_ontology_response
-    if term_status == Status.AWAITING_IMPORT and efo_response is not None:
+    term_ontology_response = efo_response if term.status == Status.CURRENT else parent_ontology_response
+    if term.status == Status.AWAITING_IMPORT and efo_response is not None:
+        logger.info(f"FOUND IN EFO: Term {term}")
         return Status.CURRENT
     else:
         if term_ontology_response is None:
+            logger.info(f"FOUND DELETED: Term {term}")
             return Status.DELETED
         elif term_ontology_response['is_obsolete'] is True:
+            logger.info(f"FOUND OBSOLETE: Term {term}")
             return Status.OBSOLETE
         else:
-            return term_status
+            return term.status
