@@ -19,7 +19,7 @@ URL = 'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.tx
 NUMBER_OF_RECORDS = 1000
 
 logging.basicConfig()
-logger = logging.getLogger('CLINVAR')
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 

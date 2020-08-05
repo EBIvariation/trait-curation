@@ -13,7 +13,7 @@ from .oxo import make_oxo_query
 
 
 logging.basicConfig()
-logger = logging.getLogger('ZOOMA')
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 BASE_URL = "http://www.ebi.ac.uk/spot/zooma/v2/api"

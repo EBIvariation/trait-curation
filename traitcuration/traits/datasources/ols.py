@@ -11,7 +11,7 @@ from ..models import Status, OntologyTerm
 
 
 logging.basicConfig()
-logger = logging.getLogger('OLS')
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 BASE_URL = "https://www.ebi.ac.uk/ols/api/"
