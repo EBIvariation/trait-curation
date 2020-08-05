@@ -15,17 +15,22 @@ BASE_URL = "https://www.ebi.ac.uk/ols/api/"
 
 
 @retry(tries=10, delay=5, backoff=1.2, jitter=(1, 3), logger=logger)
-def make_ols_query(term_iri, ontology_id):
+def make_ols_query(identifier_value, ontology_id, identifier_type='iri'):
     """
-    Takes in a term iri (or IRI as referenced in OLS documentation) and the ontology id to search against. Returns a
-    dictionary for that term with the fields 'label', 'obo_id' which is the CURIE and 'is_obsolete' as True or False.
+    Takes in an identifier type (iri or curie), the value for that indenrifier to query for, and the ontology id to
+    search against. Returns a dictionary for that term with the fields 'label', 'obo_id' which is the CURIE and
+    'is_obsolete' as True or False.
     """
-    response = requests.get(f"{BASE_URL}ontologies/{ontology_id}/terms?iri={term_iri}")
+    response = requests.get(f"{BASE_URL}ontologies/{ontology_id}/terms?{identifier_type}={identifier_value}")
     # 404 errors are expected. In any other case, raise an exception and retry the query
     if response.status_code == 404:
         return None
     response.raise_for_status()
     results = response.json()
+    return parse_ols_results(results)
+
+
+def parse_ols_results(results):
     term_info = results["_embedded"]["terms"][0]
     term_curie = term_info["obo_id"]  # E.g. EFO:0000400
     term_label = term_info["label"]  # E.g. Diabetes mellitus
