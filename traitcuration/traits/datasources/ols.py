@@ -102,3 +102,34 @@ def check_term_status():
         else:
             term.status = Status.DELETED
         term.save()
+
+
+def ols_update():
+    """
+    Query OLS for all terms with 'current', 'awaiting_import' and 'needs_import' status and update their status
+    """
+    for term in OntologyTerm.objects.filter(status__in=[Status.CURRENT, Status.AWAITING_IMPORT, Status.NEEDS_IMPORT]):
+        efo_response = make_ols_query(term.iri, 'efo')
+        term_ontology_id = get_ontology_id(term.iri)
+        parent_ontology_response = None
+        if term_ontology_id != 'efo':
+            parent_ontology_response = make_ols_query(term.iri, term_ontology_id)
+        term.status = update_status(term.status, efo_response, parent_ontology_response)
+        term.save()
+
+
+def update_status(term_status, efo_response, parent_ontology_response):
+    """
+    Get the existing term status of a term and the OLS query response in EFO and in its parent ontology if any, and
+    compute the new status.
+    """
+    term_ontology_response = efo_response if term_status == Status.CURRENT else parent_ontology_response
+    if term_status == Status.AWAITING_IMPORT and efo_response is not None:
+        return Status.CURRENT
+    else:
+        if term_ontology_response is None:
+            return Status.DELETED
+        elif term_ontology_response['is_obsolete'] is True:
+            return Status.OBSOLETE
+        else:
+            return term_status
