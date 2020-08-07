@@ -89,4 +89,6 @@ def get_term_status(efo_response, parent_ontology_response=None, previous_status
         return Status.OBSOLETE
     if efo_response is not None:
         return Status.CURRENT
+    if not previous_status:
+        return Status.NEEDS_IMPORT
     return previous_status
