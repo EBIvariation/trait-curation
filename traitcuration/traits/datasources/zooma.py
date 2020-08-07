@@ -167,7 +167,7 @@ def find_automatic_mapping(trait, created_terms, high_confidence_term_iris):
         oxo_results = make_oxo_query([term_curie])
         for result in oxo_results['_embedded']['searchResults'][0]['mappingResponseList']:
             result_iri = make_ols_query(identifier_value=result['curie'],
-                                        ontology_id=ontology_id, identifier_type='curie')['iri']
+                                        ontology_id=ontology_id, identifier_type='obo_id')['iri']
             suggested_term = create_local_term(result_iri)
             created_terms.add(suggested_term)
             create_mapping_suggestion(trait, suggested_term)
