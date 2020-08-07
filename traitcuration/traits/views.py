@@ -1,5 +1,8 @@
 import json
+import requests
+import time
 from datetime import datetime
+from github import Github
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.forms.models import model_to_dict
@@ -135,6 +138,31 @@ def review(request, pk):
             return redirect(reverse('trait_detail', args=[pk]))
     Review(mapping_id=mapping, reviewer=user).save()
     return redirect(reverse('trait_detail', args=[pk]))
+
+
+def github_callback(request):
+    payload = {}
+    payload['client_id'] = '328c5e48d8b20f2849bd'
+    payload['client_secret'] = '594e44da561dbd9169d57796de9c1cfa6a462f71'
+    payload['code'] = request.GET['code']
+    headers = {}
+    headers['Accept'] = 'application/json'
+    result = requests.post('https://github.com/login/oauth/access_token', data=payload, headers=headers)
+    request.session['github_access_token'] = result.json()['access_token']
+    return redirect('github')
+
+
+def github(request):
+    if request.session.get('github_access_token') is None:
+        params = {}
+        params['client_id'] = '328c5e48d8b20f2849bd'
+        params['scope'] = 'user,repo'
+        return redirect('https://github.com/login/oauth/authorize', params=params)
+    access_token = request.session.get('github_access_token')
+    g = Github(access_token)
+    repo = g.get_repo('IEEEdiots/CAH')
+    repo.create_issue(title="Test issue 1", body="Testing issue body")
+    return redirect('datasources')
 
 
 def datasources(request):
