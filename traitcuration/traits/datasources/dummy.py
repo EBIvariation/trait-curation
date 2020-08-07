@@ -20,7 +20,8 @@ def import_dummy_data():
                          iri='http://www.ebi.ac.uk/efo/EFO_0000400', status=Status.CURRENT)
     term2 = OntologyTerm(label='/ digestive system disease /', curie='EFO:0000405',
                          iri='http://www.ebi.ac.uk/efo/EFO_0000405', status=Status.CURRENT)
-    term3 = OntologyTerm(label='/ Hereditary breast cancer /', curie='Orphanet:227535',
+    # Current term falsely registered as awaiting import, to test ols updates
+    term3 = OntologyTerm(label='/ Hereditary breast cancer - INCORRECT/', curie='Orphanet:227535',
                          iri='http://www.orpha.net/ORDO/Orphanet_227535', status=Status.AWAITING_IMPORT)
     term4 = OntologyTerm(label='/ breast-ovarian cancer, familial, susceptibility to, 3 /', curie='MONDO:0013253',
                          iri='http://purl.obolibrary.org/obo/MONDO_0013253', status=Status.NEEDS_IMPORT)
@@ -36,6 +37,7 @@ def import_dummy_data():
     term8 = OntologyTerm(label='/ Diastrophic dysplasia /',
                          description='Description for Diastrophic dysplasia',
                          cross_refs="", status=Status.AWAITING_CREATION)
+    # Obsolete term falsely registered as current, to test ols updates
     term9 = OntologyTerm(label='/ obsolete_adrenocortical carcinoma /', curie='EFO:0003093',
                          iri='http://www.ebi.ac.uk/efo/EFO_0003093', status=Status.CURRENT)
     term10 = OntologyTerm(label='/ Spastic paraplegia /', curie='HP:999999999',
