@@ -57,21 +57,6 @@ def get_ontology_id(term_iri):
     return ontology_id
 
 
-# def get_term_status(is_obsolete, ontology_id=None):
-#     """
-#     Takes the ontology_id of a term and a whether it is obsolete or not, and returns its calculated status.
-#     'Obsolete' if the is_obsolete flag is true, 'Deleted' if no info was found in any ontology, 'Current' if its
-#     ontology is EFO, and 'Needs Import' if info about the term was found in another ontology.
-#     """
-#     if ontology_id is None:
-#         return Status.DELETED
-#     if is_obsolete:
-#         return Status.OBSOLETE
-#     if ontology_id == 'efo':
-#         return Status.CURRENT
-#     return Status.NEEDS_IMPORT
-
-
 @transaction.atomic
 def ols_update():
     """
@@ -86,11 +71,15 @@ def ols_update():
         parent_ontology_response = None
         if term_ontology_id != 'efo':
             parent_ontology_response = make_ols_query(term.iri, term_ontology_id)
-        term.status = get_term_status(efo_response, parent_ontology_response)
+        term.status = get_term_status(efo_response, parent_ontology_response, term.status)
+        if term.status == Status.CURRENT:
+            term.label = efo_response['label']
+        elif term.status in [Status.NEEDS_IMPORT, Status.AWAITING_IMPORT]:
+            term.label = parent_ontology_response['label']
         term.save()
 
 
-def get_term_status(efo_response, parent_ontology_response=None):
+def get_term_status(efo_response, parent_ontology_response=None, previous_status=None):
     if not efo_response and not parent_ontology_response:
         logger.info("FOUND DELETED")
         return Status.DELETED
@@ -100,4 +89,4 @@ def get_term_status(efo_response, parent_ontology_response=None):
         return Status.OBSOLETE
     if efo_response is not None:
         return Status.CURRENT
-    return Status.NEEDS_IMPORT
+    return previous_status
