@@ -32,3 +32,9 @@ def parse_request_body(request):
     """
     body = request.POST.dict() if request.POST.dict() else json.loads(request.body.decode('utf-8'))
     return body
+
+
+def get_initial_issue_body(traits_for_import_count, traits_for_creation_count):
+    return (f"This release consists of {traits_for_import_count} potential entries to import and"
+            f"{traits_for_creation_count} potential terms to create."
+            "\n\nSpreadsheet: {speadsheet_url}")
