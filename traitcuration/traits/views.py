@@ -1,6 +1,6 @@
 import json
 import requests
-import time
+import gspread
 from datetime import datetime
 from github import Github
 
@@ -10,14 +10,15 @@ from django.http import HttpResponse
 from django.urls import reverse
 from django.db import transaction
 
-from .utils import get_status_dict, get_user_info, parse_request_body
+from .utils import get_status_dict, get_user_info, parse_request_body, get_initial_issue_body
 from .models import Trait, Mapping, OntologyTerm, User, Status, Review, Comment
 from .datasources import dummy, zooma
 from .tasks import get_zooma_suggestions, get_clinvar_data, get_clinvar_data_and_suggestions, get_ols_status
-from .forms import NewTermForm
+from .forms import NewTermForm, GitHubSubmissionForm
 
 
 def browse(request):
+    request.session['github_access_token'] = None
     traits = Trait.objects.all()
     status_dict = get_status_dict(traits)
     context = {"traits": traits, "status_dict": status_dict}
@@ -149,20 +150,105 @@ def github_callback(request):
     headers['Accept'] = 'application/json'
     result = requests.post('https://github.com/login/oauth/access_token', data=payload, headers=headers)
     request.session['github_access_token'] = result.json()['access_token']
-    return redirect('github')
+    return redirect('post_issue')
 
 
-def github(request):
+def post_issue(request):
+    # Parse the form data containing the GitHub issue information
+    if request.session.get('github_request'):
+        request_body = request.session.get('github_request')
+        print('lul')
+        print(request_body)
+    else:
+        request_body = parse_request_body(request)
+        request.session['github_request'] = request_body
+
+    issue_title = request_body['title']
+    issue_body = request_body['body']
+
+    # Authenticate the user in Google Sheets and in GitHub
+    gc = gspread.oauth()
+
     if request.session.get('github_access_token') is None:
         params = {}
         params['client_id'] = '328c5e48d8b20f2849bd'
         params['scope'] = 'user,repo'
-        return redirect('https://github.com/login/oauth/authorize', params=params)
+        return redirect("https://github.com/login/oauth/authorize?scope=user,repo&client_id=328c5e48d8b20f2849bd")
     access_token = request.session.get('github_access_token')
+    print(access_token)
     g = Github(access_token)
-    repo = g.get_repo('IEEEdiots/CAH')
-    repo.create_issue(title="Test issue 1", body="Testing issue body")
+
+    # Create the spreadsheet
+    sh = gc.create(issue_title)
+    needs_import_worksheet = sh.add_worksheet(title="Terms to import", rows="100", cols="20")
+    sh.del_worksheet(sh.sheet1)
+    needs_import_worksheet.update('A1', 'IRI of selected mapping')
+    needs_import_worksheet.update('B1', 'Label of selected mapping')
+    needs_import_worksheet.update('C1', 'ClinVar label')
+    needs_import_worksheet.update('D1', 'ClinVar Freq')
+    needs_import_worksheet.format("A1:D1", {
+        "backgroundColor": {
+            "red": 0.82,
+            "green": 0.88,
+            "blue": 0.89
+        },
+        "textFormat": {
+            "bold": True
+        }
+    })
+    needs_import_traits = Trait.objects.filter(status=Status.NEEDS_IMPORT)
+    for index, trait in enumerate(needs_import_traits):
+        row_index = 2 + index
+        needs_import_worksheet.update_cell(row_index, 1, trait.current_mapping.term_id.iri)
+        needs_import_worksheet.update_cell(row_index, 2, trait.current_mapping.term_id.label)
+        needs_import_worksheet.update_cell(row_index, 3, trait.name)
+        needs_import_worksheet.update_cell(row_index, 4, trait.number_of_source_records)
+    needs_creation_worksheet = sh.add_worksheet(title="Terms to create", rows="100", cols="20")
+    needs_creation_worksheet.update('A1', 'Suggested term label')
+    needs_creation_worksheet.update('B1', 'Suggested term description')
+    needs_creation_worksheet.update('C1', 'Suggested term x-refs')
+    needs_creation_worksheet.update('D1', 'ClinVar label')
+    needs_creation_worksheet.update('E1', 'ClinVar freq')
+    needs_creation_worksheet.format("A1:E1", {
+        "backgroundColor": {
+            "red": 0.82,
+            "green": 0.88,
+            "blue": 0.89
+        },
+        "textFormat": {
+            "bold": True
+        }
+    })
+    needs_creation_traits = Trait.objects.filter(status=Status.NEEDS_CREATION)
+    for index, trait in enumerate(needs_creation_traits):
+        row_index = 2 + index
+        needs_creation_worksheet.update_cell(row_index, 1, trait.current_mapping.term_id.label)
+        needs_creation_worksheet.update_cell(row_index, 2, trait.current_mapping.term_id.description)
+        needs_creation_worksheet.update_cell(row_index, 3, trait.current_mapping.term_id.cross_refs)
+        needs_creation_worksheet.update_cell(row_index, 4, trait.name)
+        needs_creation_worksheet.update_cell(row_index, 5, trait.number_of_source_records)
+
+    # Create the GitHub issue
+    issue_body = issue_body.replace("{speadsheet_url}", sh.url)
+    repo = g.get_repo("joj0s/django-notes-app")
+    repo.create_issue(title=issue_title, body=issue_body)
+
     return redirect('datasources')
+
+
+def feedback(request):
+    for key, value in request.session.items():
+        print('{} => {}'.format(key, value))
+    traits_for_feedback = Trait.objects.filter(status__in=[Status.NEEDS_IMPORT, Status.NEEDS_CREATION])
+    traits_for_import_count = traits_for_feedback.filter(status=Status.NEEDS_IMPORT).count()
+    traits_for_creation_count = traits_for_feedback.filter(status=Status.NEEDS_CREATION).count()
+    github_form = GitHubSubmissionForm()
+    now = datetime.now()
+    github_form.fields['title'].initial = f"EVA-EFO import {now.month}/{now.year}"
+    github_form.fields['body'].initial = get_initial_issue_body(traits_for_import_count, traits_for_creation_count)
+    context = {"traits_for_feedback": traits_for_feedback, "traits_for_import_count": traits_for_import_count,
+               "traits_for_creation_count": traits_for_creation_count, "github_form": github_form}
+    return render(request, 'traits/feedback.html', context)
 
 
 def datasources(request):
