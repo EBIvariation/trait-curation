@@ -198,15 +198,15 @@
           {% csrf_token %}
           <div class="fields">
             <div class="field__container">
-              <label for="{{ new_term_form.label.id_for_label }}">Label:</label>
+              <label class="field__label bold" for="{{ new_term_form.label.id_for_label }}">Label</label>
               {{ new_term_form.label }}
             </div>
             <div class="field__container">
-              <label for="{{ new_term_form.description.id_for_label }}">Description:</label>
+              <label class="field__label bold" for="{{ new_term_form.description.id_for_label }}">Description</label>
               {{ new_term_form.description }}
             </div>
             <div class="field__container">
-              <label for="{{ new_term_form.cross_refs.id_for_label }}">Cross references:</label>
+              <label class="field__label bold" for="{{ new_term_form.cross_refs.id_for_label }}">Cross references</label>
               {{ new_term_form.cross_refs }}
             </div>
           </div>

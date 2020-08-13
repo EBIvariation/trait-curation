@@ -97,23 +97,35 @@
 
 .fields {
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   margin-top: 1.25rem;
 }
 
 .field {
   &__text-field {
-    width: 21.875rem !important;
+    max-width: 21.875rem !important;
+    
+    &--large {
+      max-width: 50rem !important;
+    }
   }
 
   &__text-area {
+    resize: none;
     height: 11.25rem !important;
   }
 
   &__container {
     margin-right: 2.5rem;
+    max-width: 50rem;
     display: flex;
     flex-direction: column;
+    margin-bottom: 1rem;
+  }
+
+  &__label {
+    margin-bottom: 0.4rem;
   }
 }
 
