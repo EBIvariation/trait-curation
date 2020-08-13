@@ -109,6 +109,7 @@ function newTermButtonClicked() {
   if (newTermForm.classList.contains("hidden")) {
     newTermForm.classList.remove("hidden");
     newTermForm.scrollIntoView();
+    window.scrollBy(0, -80);
     document.querySelector("#id_label").focus();
   } else {
     newTermForm.classList.add("hidden");
