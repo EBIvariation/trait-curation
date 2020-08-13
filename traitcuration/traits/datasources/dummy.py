@@ -33,7 +33,7 @@ def import_dummy_data():
                          cross_refs='MONDO:0013685,HP:0000400', status=Status.AWAITING_CREATION)
     term7 = OntologyTerm(label='/ Familial cancer of breast, 2 /',
                          description='Description for familial cancer of breast, 2',
-                         cross_refs="Orphanet:0000405", status=Status.AWAITING_CREATION)
+                         cross_refs="Orphanet:0000405", status=Status.NEEDS_CREATION)
     term8 = OntologyTerm(label='/ Diastrophic dysplasia /',
                          description='Description for Diastrophic dysplasia',
                          cross_refs="", status=Status.AWAITING_CREATION)
