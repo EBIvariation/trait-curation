@@ -63,7 +63,7 @@ def get_suggestions_from_datasources(trait):
     formatted_trait_name = requests.utils.quote(trait.name)
     response = requests.get(
         f"{BASE_URL}/services/annotate?propertyValue={formatted_trait_name}"
-        "&filter=required:[cttv,sysmicro,atlas,ebisc,uniprot,gwas,cbi]")
+        "&filter=required:[cttv,sysmicro,atlas,ebisc,uniprot,gwas,cbi,clinvar-xrefs]")
     return response.json()
 
 
@@ -162,6 +162,10 @@ def find_automatic_mapping(trait, created_terms, high_confidence_term_iris):
             return
 
     for term_iri in high_confidence_term_iris:
+        print('HEYYYYYYYYYYYYYY1')
+        if 'medgen' in term_iri:
+            print('HEYYYYYYYYYYYYYY2')
+            continue
         ontology_id = get_ontology_id(term_iri)
         term_curie = make_ols_query(identifier_value=term_iri, ontology_id=ontology_id)['curie']
         oxo_results = make_oxo_query([term_curie])
