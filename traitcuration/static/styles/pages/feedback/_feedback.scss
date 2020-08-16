@@ -1,0 +1,29 @@
+@import "../../utilities/variables";
+
+.progress {
+  max-width: 31.25rem;
+  padding: 1.2rem;
+  color: white;
+  background: $color-secondary;
+
+  &--success {
+    background: $color-success !important;
+  }
+
+  &--danger {
+    background: $color-danger !important;
+  }
+
+  &__spinner {
+    margin-right: 1rem !important;
+  }
+
+  &__icon {
+    margin-right: 1rem !important;
+  }
+
+  &__link {
+    text-decoration: underline !important;
+    color: white !important;
+  }
+}

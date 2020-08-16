@@ -11,8 +11,8 @@ class NewTermForm(forms.Form):
 
 
 class GitHubSubmissionForm(forms.Form):
-    repo = forms.URLField(label="GitHub repository URL", initial="https://github.com/EBISPOT/efo/",
-                          widget=forms.TextInput(attrs={'class': 'uk-input field field__text-field'}))
+    repo = forms.CharField(label="GitHub Repository", initial="joj0s/django-notes-app",
+                           widget=forms.TextInput(attrs={'class': 'uk-input field field__text-field'}))
     title = forms.CharField(label="Issue Title", widget=forms.TextInput(
         attrs={'class': 'uk-input field field__text-field field__text-field--large'}))
     body = forms.CharField(label="Issue Body", widget=forms.Textarea(
