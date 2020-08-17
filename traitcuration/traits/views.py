@@ -17,7 +17,6 @@ from .forms import NewTermForm, GitHubSubmissionForm
 
 
 def browse(request):
-    request.session['github_access_token'] = None
     traits = Trait.objects.all()
     status_dict = get_status_dict(traits)
     context = {"traits": traits, "status_dict": status_dict}
