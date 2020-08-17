@@ -146,8 +146,8 @@ def find_automatic_mapping(trait, created_terms, high_confidence_term_iris):
     confidence, then attemps to find an exact text match.
     """
 
-    if trait.status != Status.UNMAPPED:
-        return
+    # if trait.status != Status.UNMAPPED:
+    #     return
 
     for term in created_terms:
         if term.iri in high_confidence_term_iris:
@@ -162,18 +162,21 @@ def find_automatic_mapping(trait, created_terms, high_confidence_term_iris):
             return
 
     for term_iri in high_confidence_term_iris:
-        print('HEYYYYYYYYYYYYYY1')
+        # Skip medgen terms since info about them can't be retrieved through OLS
         if 'medgen' in term_iri:
-            print('HEYYYYYYYYYYYYYY2')
             continue
         ontology_id = get_ontology_id(term_iri)
+
         term_curie = make_ols_query(identifier_value=term_iri, ontology_id=ontology_id)['curie']
         oxo_results = make_oxo_query([term_curie])
         for result in oxo_results['_embedded']['searchResults'][0]['mappingResponseList']:
+            ontology_id = result['targetPrefix'].lower()  # E.g. 'efo'
+            if ontology_id == "orphanet":
+                ontology_id = "ordo"
             result_iri = make_ols_query(identifier_value=result['curie'],
                                         ontology_id=ontology_id, identifier_type='obo_id')['iri']
             suggested_term = create_local_term(result_iri)
-            created_terms.add(suggested_term)
+            created_terms.append(suggested_term)
             create_mapping_suggestion(trait, suggested_term)
 
 
