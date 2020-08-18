@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from django.urls import reverse
 from django.db import transaction
 from django_celery_results.models import TaskResult
+
 from .utils import get_status_dict, get_user_info, parse_request_body, get_initial_issue_body
 from .models import Trait, Mapping, OntologyTerm, User, Status, Review, Comment
 from .datasources import dummy, zooma
