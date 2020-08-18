@@ -145,28 +145,31 @@ def find_automatic_mapping(trait, created_terms, high_confidence_term_iris):
     If a trait is unmapped, attempts to find an automatic mapping. First if it finds a ZOOMA suggestion with 'HIGH'
     confidence, then attemps to find an exact text match.
     """
+    if trait.status != Status.UNMAPPED:
+        return
 
-    # if trait.status != Status.UNMAPPED:
-    #     return
-
+    # Check if a created term suggestion has 'HIGH" confidence, and map it to the trait if it does
     for term in created_terms:
         if term.iri in high_confidence_term_iris:
             create_mapping(trait, term)
             logger.info(f"CREATED HIGH CONFIDENCE MAPPING {trait.current_mapping}")
             return
 
+    # Check if a created term suggestion is an exact text match with the trait, and map it if it does
     for term in created_terms:
         if trait.name.lower() == term.label.lower():
             create_mapping(trait, term)
             logger.info(f"CREATED EXACT TEXT MATCH MAPPING {trait.current_mapping}")
             return
 
+    # For high confidence term suggestions that weren't in EFO compatible ontologies
     for term_iri in high_confidence_term_iris:
         # Skip medgen terms since info about them can't be retrieved through OLS
         if 'medgen' in term_iri:
             continue
-        ontology_id = get_ontology_id(term_iri)
 
+        # Create term suggestion from OxO cross references
+        ontology_id = get_ontology_id(term_iri)
         term_curie = make_ols_query(identifier_value=term_iri, ontology_id=ontology_id)['curie']
         oxo_results = make_oxo_query([term_curie])
         for result in oxo_results['_embedded']['searchResults'][0]['mappingResponseList']:
