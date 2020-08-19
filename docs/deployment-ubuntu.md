@@ -167,7 +167,7 @@ Description=gunicorn daemon
 After=network.target
 
 [Service]
-User=jojos
+User=ubuntu
 Group=www-data
 WorkingDirectory=/home/ubuntu/trait-curation
 ExecStart=/home/ubuntu/trait-curation/traitcurationenv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/ubuntu/trait-curation/traitcuration.sock traitcuration.wsgi:application
