@@ -50,22 +50,20 @@ GRANT ALL PRIVILEGES ON DATABASE traitcuration TO ubuntu;
 
 ## 3. Clone the project's code and create a virtual environment
 
-1. Make sure there is an ssh key with access to the [GitHub repo](https://github.com/EBIvariation/trait-curation). You can create an SSH key for the host machine by following [these instructions](https://docs.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent). 
-
-2. Navigate to the host user's home directory and then clone the GitHub repository and move inside its directory:
+1. Navigate to the host user's home directory and then clone the GitHub repository and move inside its directory:
 ```
 cd ~
 git clone git@github.com:EBIvariation/trait-curation.git
 cd trait-curation
 ````
 
-3. Make sure pip is upgraded, and install the virtualenv package for creating virtual environments in Python:
+2. Make sure pip is upgraded, and install the virtualenv package for creating virtual environments in Python:
 ```
 sudo -H pip3 install --upgrade pip
 sudo -H pip3 install virtualenv
 ```
 
-4. Within the project directory, create a Python virtual environment and activate it:
+3. Within the project directory, create a Python virtual environment and activate it:
 ```
 virtualenv traitcurationenv
 source traitcurationenv/bin/activate
@@ -73,7 +71,7 @@ source traitcurationenv/bin/activate
 ```
 Your prompt should change to indicate that you are now operating within a Python virtual environment.
 
-5. Install the project's requirements using the requirements.txt file.
+4. Install the project's requirements using the requirements.txt file.
 ```
 pip3 install -r requirements.txt
 ```
