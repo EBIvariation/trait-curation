@@ -3,34 +3,171 @@
 {% load static %} 
 
 {% block content %}
+{% static "" as static_url %}
 <script src="{% static 'js/datasources.js' %}"></script>
 <div class="uk-container uk-container-xlarge">
+  <section>
+    <h4 class="uk-margin-medium-bottom">ONTOLOGY TERM SOURCES</h4>
+    {% for source in ontology_sources %}
+    <div class="source">
+      <div class="source__top_wrapper">
+        <img
+          data-src="{{static_url}}/img/{{source.id}}-logo.png"
+          height="140"
+          width="110"
+          alt="source.id"
+          class="source__image"
+          uk-img
+        />
+        <span class="source__title bold"> {{source.title}} </span>
+        <button class="source__button button button--primary uk-button">
+          <a href="{% url source.id %}">
+          UPDATE NOW
+          </a>
+        </button>
+      </div>
+      <hr />
+      <div class="source__bottom_wrapper">
+        <span class="source__scheduled">
+          <span class="bold">Next scheduled update: </span>
+          Aug. 7, 2020, 12:37 p.m.
+        </span>
+        <span class="source__latest">
+          <span class="bold">Latest update: </span>
+          <span class="date" date="{{source.latest_import_date.isoformat}}"></span>
+        </span>
+        <div class="source__progress_wrapper">
+          <div
+            id="{{source.id}}-progress-bar"
+            class="source__progress_bar"
+            style="background-color: #68a9ef; width: 0%;"
+          >
+            &nbsp;
+          </div>
+        </div>
+        <div id="{{source.id}}-progress-bar-message">
+          Waiting for progress to start...
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </section>
+
+  <section>
+    <h4 class="uk-margin-medium-bottom">TRAIT NAME SOURCES</h4>
+    {% for source in trait_sources %}
+    <div class="source">
+      <div class="source__top_wrapper">
+        <img
+          data-src="{{static_url}}/img/{{source.id}}-logo.png"
+          height="80"
+          width="50"
+          alt="source.id"
+          class="source__image"
+          uk-img
+        />
+        <span class="source__title bold"> {{source.title}} </span>
+        <button class="source__button button button--primary uk-button">
+          <a href="{% url source.id %}">
+          IMPORT NOW
+          </a>
+        </button>
+      </div>
+      <hr />
+      <div class="source__bottom_wrapper">
+        <span class="source__scheduled">
+          <span class="bold">Next scheduled import: </span>
+          Aug. 7, 2020, 12:37 p.m.
+        </span>
+        <span class="source__latest">
+          <span class="bold">Latest import: </span>
+          <span class="date" date="{{source.latest_import_date.isoformat}}"></span>
+        </span>
+        <div class="source__progress_wrapper">
+          <div
+            id="{{source.id}}-progress-bar"
+            class="source__progress_bar"
+            style="background-color: #68a9ef; width: 0%;"
+          >
+            &nbsp;
+          </div>
+        </div>
+        <div id="{{source.id}}-progress-bar-message">
+          Waiting for progress to start...
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </section>
+  
   <a href="{% url 'all_data' %}"
     ><button class="uk-button uk-button-primary">IMPORT ALL DATA</button>
   </a>
   <a href="{% url 'dummy_data' %}"
     ><button class="uk-button uk-button-primary">IMPORT DUMMY DATA</button>
   </a>
-  <a href="{% url 'clinvar_data' %}"
-    ><button class="uk-button uk-button-primary">CLINVAR DATA</button>
-  </a>
-  <a href="{% url 'zooma_suggestions' %}"
-    ><button class="uk-button uk-button-primary">ZOOMA SUGGESTIONS</button>
-  </a>
-  <a href="{% url 'ols' %}"
-    ><button class="uk-button uk-button-primary">OLS STATUS UPDATES</button>
-  </a>
-  <div class='progress-wrapper'>
-    <div id='progress-bar' class='progress-bar' style="background-color: #68a9ef; width: 0%;">&nbsp;</div>
+  
+  <div class="progress-wrapper">
+    <div
+      id="progress-bar"
+      class="progress-bar"
+      style="background-color: #68a9ef; width: 0%;"
+    >
+      &nbsp;
+    </div>
+    <div id="progress-bar-message">Waiting for progress to start...</div>
   </div>
-  <div id="progress-bar-message">Waiting for progress to start...</div>
   <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      if ('{{request.session.task_id}}' === 'None') return;
-      var progressUrl = "{% url 'celery_progress:task_status' request.session.task_id %}";
-      CeleryProgressBar.initProgressBar(progressUrl);
-    });
+    function progressError(progressBarElement, progressBarMessageElement, excMessage) {
+      progressBarElement.style.backgroundColor = "#B22929";
+      progressBarMessageElement.innerHTML = `Error: ${excMessage}`
+    }
+
+    const olsTaskId = "{{ols_task_id}}";
+    if (olsTaskId != "None") {
+      document.addEventListener("DOMContentLoaded", () => {
+        const progressUrl = "{% url 'celery_progress:task_status' ols_task_id %}";
+        CeleryProgressBar.initProgressBar(progressUrl, {
+          progressBarId: "ols-progress-bar",
+          progressBarMessageId: "ols-progress-bar-message",
+          onError: progressError,
+        });
+      });
+    }
+
+    function traitImportProgress (progressBarElement, progressBarMessageElement, progress){
+      progressBarElement.style.backgroundColor = '#68a9ef';
+      progressBarElement.style.width = progress.percent + "%";
+      progressBarMessageElement.innerHTML = progress.current + ' MB of ' + progress.total + ' MB downloaded...';
+    }
+
+
+    const zoomaTaskId = "{{zooma_task_id}}";
+    if (zoomaTaskId != "None") {
+      document.addEventListener("DOMContentLoaded", function () {
+        const progressUrl = "{% url 'celery_progress:task_status' zooma_task_id %}";
+        CeleryProgressBar.initProgressBar(progressUrl, {
+          progressBarId: "zooma-progress-bar",
+          progressBarMessageId: "zooma-progress-bar-message",
+          onError: "progressError"
+        });
+      });
+    }
+
+    const clinvarTaskId = "{{clinvar_task_id}}";
+    if (clinvarTaskId != "None") {
+      document.addEventListener("DOMContentLoaded", function () {
+        const progressUrl = "{% url 'celery_progress:task_status' clinvar_task_id %}";
+        CeleryProgressBar.initProgressBar(progressUrl, {
+          progressBarId: "clinvar-progress-bar",
+          progressBarMessageId: "clinvar-progress-bar-message",
+          onError: "progressError",
+          onProgress: traitImportProgress
+        });
+      });
+    }
+
   </script>
 </div>
 {% endblock %}

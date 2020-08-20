@@ -10,9 +10,10 @@ from django.db import transaction
 from django_celery_results.models import TaskResult
 
 from .utils import get_status_dict, get_user_info, parse_request_body, get_initial_issue_body
+from .utils import add_ontology_sources_to_context, add_trait_sources_to_context
 from .models import Trait, Mapping, OntologyTerm, User, Status, Review, Comment
 from .datasources import dummy, zooma
-from .tasks import get_zooma_suggestions, get_clinvar_data, get_clinvar_data_and_suggestions, get_ols_status
+from .tasks import import_zooma, import_clinvar, get_clinvar_data_and_suggestions, import_ols
 from .tasks import create_github_issue
 from .forms import NewTermForm, GitHubSubmissionForm
 
@@ -203,10 +204,19 @@ def feedback(request):
     return render(request, 'traits/feedback.html', context)
 
 
+@transaction.atomic
 def datasources(request):
-    # The task_id session variable is used to track task progress via the progress bar in the datasources page
-    request.session['task_id'] = request.session.get('task_id', 'None')
-    return render(request, 'traits/datasources.html')
+    context = dict()
+    add_ontology_sources_to_context(context)
+    add_trait_sources_to_context(context)
+
+    if request.session.get('current_task_id'):
+        task_name = request.session.get('current_task_name')
+        context[f"{task_name}_task_id"] = request.session.get('current_task_id')
+        del request.session['current_task_id']
+        del request.session['current_task_name']
+
+    return render(request, 'traits/datasources.html', context)
 
 
 def all_data(request):
@@ -216,13 +226,16 @@ def all_data(request):
 
 
 def clinvar_data(request):
-    get_clinvar_data.delay()
+    result = import_clinvar.delay()
+    request.session['current_task_id'] = result.task_id
+    request.session['current_task_name'] = 'clinvar'
     return redirect('datasources')
 
 
 def zooma_suggestions(request):
-    result = get_zooma_suggestions.delay()
-    request.session['task_id'] = result.task_id
+    result = import_zooma.delay()
+    request.session['current_task_id'] = result.task_id
+    request.session['current_task_name'] = 'zooma'
     return redirect('datasources')
 
 
@@ -232,5 +245,7 @@ def dummy_data(request):
 
 
 def ols_queries(request):
-    get_ols_status.delay()
+    result = import_ols.delay()
+    request.session['current_task_id'] = result.task_id
+    request.session['current_task_name'] = 'ols'
     return redirect('datasources')
