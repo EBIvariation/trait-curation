@@ -3,6 +3,7 @@ import json
 import gspread
 from github import Github
 from allauth.socialaccount.models import SocialAccount
+from django_celery_results.models import TaskResult
 
 from .models import Status, Trait, OntologyTerm
 
@@ -36,6 +37,55 @@ def parse_request_body(request):
     """
     body = request.POST.dict() if request.POST.dict() else json.loads(request.body.decode('utf-8'))
     return body
+
+
+def add_ontology_sources_to_context(context):
+    ontology_sources = list()
+
+    latest_ols_import = TaskResult.objects.filter(task_name="traitcuration.traits.tasks.import_ols").first()
+    if latest_ols_import:
+        latest_import_date = latest_ols_import.date_done
+        ols_task_id = latest_ols_import.task_id
+    else:
+        latest_import_date = "No imports"
+        ols_task_id = "None"
+    context['ols_task_id'] = ols_task_id
+    ols_dict = {'id': 'ols', 'title': 'Source of ontology term information',
+                'latest_import_date': latest_import_date}
+    ontology_sources.append(ols_dict)
+
+    latest_zooma_import = TaskResult.objects.filter(
+        task_name="traitcuration.traits.tasks.import_zooma").first()
+    if latest_zooma_import:
+        latest_import_date = latest_zooma_import.date_done
+        zooma_task_id = latest_zooma_import.task_id
+    else:
+        latest_import_date = "No imports"
+        zooma_task_id = "None"
+    context['zooma_task_id'] = zooma_task_id
+    zooma_dict = {'id': 'zooma', 'title': 'Source of mapping suggestions',
+                  'latest_import_date': latest_import_date}
+    ontology_sources.append(zooma_dict)
+
+    context['ontology_sources'] = ontology_sources
+
+
+def add_trait_sources_to_context(context):
+    trait_sources = list()
+
+    latest_clinvar_import = TaskResult.objects.filter(task_name="traitcuration.traits.tasks.import_clinvar").first()
+    if latest_clinvar_import:
+        latest_import_date = latest_clinvar_import.date_done
+        clinvar_task_id = latest_clinvar_import.task_id
+    else:
+        latest_import_date = "No imports"
+        clinvar_task_id = "None"
+    context['clinvar_task_id'] = clinvar_task_id
+    clinvar_dict = {'id': 'clinvar', 'title': 'ClinVar',
+                    'latest_import_date': latest_import_date}
+    trait_sources.append(clinvar_dict)
+
+    context['trait_sources'] = trait_sources
 
 
 def create_spreadsheet_and_issue(github_access_token, issue_info):

@@ -1,0 +1,33 @@
+@import "../../utilities/variables";
+
+.source {
+  margin-bottom: 6rem;
+
+  &__top_wrapper {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: auto auto 1fr;
+    justify-items: start;
+    align-items: center;
+  }
+
+  &__bottom_wrapper {
+    display: flex;
+  }
+
+  &__button {
+    justify-self: end;
+  }
+
+  &__scheduled {
+    margin-right: 2rem;
+  }
+
+  &__progress_wrapper {
+    display: flex;
+    width: 25vw !important;
+    margin: 0 1rem;
+    align-self: flex-start;
+    border: 1px solid lighten($color-gray,25%);
+  }
+}
