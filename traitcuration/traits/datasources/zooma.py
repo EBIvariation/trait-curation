@@ -7,8 +7,9 @@ import logging
 
 from django.db import transaction
 
-from ..models import Trait, MappingSuggestion, OntologyTerm, User, Status
+from ..models import Trait, MappingSuggestion, OntologyTerm, User, Status, Mapping
 from .ols import make_ols_query, get_ontology_id
+from .oxo import make_oxo_query
 
 logging.basicConfig()
 logger = logging.getLogger('ZOOMA')
@@ -29,26 +30,51 @@ def run_zooma_for_all_traits():
 
 def run_zooma_for_single_trait(trait):
     logger.info(f"Retrieving ZOOMA suggestions for trait: {trait.name}")
-    suggestion_list = get_zooma_suggestions_for_trait(trait)
-    # A set of suggested terms found in the query, used to exclude those terms from being deleted from the database
-    # when the delete_unused_mappings function is called.
-    suggested_terms = set()
-    for suggestion in suggestion_list:
+
+    datasource_suggestion_list = get_suggestions_from_datasources(trait)
+    ols_suggestion_list = get_suggestions_from_ols(trait)
+
+    high_confidence_term_iris = list()  # A list of terms with 'HIGH' mapping confidence
+    final_suggestion_iri_set = set()  # A set of the term iris which are kept from the ZOOMA queries
+
+    for suggestion in datasource_suggestion_list + ols_suggestion_list:
+        if len(suggestion["semanticTags"]) > 1:
+            logger.warn(f"Suggestion with combined terms found: Suggestions:{suggestion['semanticTags']} for {trait}")
+            continue
         suggested_term_iri = suggestion["semanticTags"][0]  # E.g. http://purl.obolibrary.org/obo/HP_0004839
-        suggested_term = create_local_term(suggested_term_iri)
+        if suggestion['confidence'] == 'HIGH':
+            high_confidence_term_iris.append(suggested_term_iri)
+        if get_ontology_id(suggested_term_iri) in ["efo", "ordo", "hp", "mondo"]:
+            final_suggestion_iri_set.add(suggested_term_iri)
+
+    created_terms = set()
+    for suggested_iri in final_suggestion_iri_set:
+        suggested_term = create_local_term(suggested_iri)
+        created_terms.add(suggested_term)
         create_mapping_suggestion(trait, suggested_term)
-        suggested_terms.add(suggested_term)
-    delete_unused_suggestions(trait, suggested_terms)
+    find_automatic_mapping(trait, created_terms, high_confidence_term_iris)
+    delete_unused_suggestions(trait, created_terms)
 
 
-def get_zooma_suggestions_for_trait(trait):
+def get_suggestions_from_datasources(trait):
+    """
+    Takes in a trait object as its argument and returns the zooma response of a suggestion list as a dictionary.
+    """
+    formatted_trait_name = requests.utils.quote(trait.name)
+    response = requests.get(
+        f"{BASE_URL}/services/annotate?propertyValue={formatted_trait_name}"
+        "&filter=required:[cttv,sysmicro,atlas,ebisc,uniprot,gwas,cbi,clinvar-xrefs]")
+    return response.json()
+
+
+def get_suggestions_from_ols(trait):
     """
     Takes in a trait object as its argument and returns the zooma response of a suggestion list as a dictionary.
     """
     formatted_trait_name = trait.name.replace(' ', '+')
     response = requests.get(
-        f"{BASE_URL}/services/annotate?propertyValue={formatted_trait_name} \
-        &filter=required:[none],ontologies:[efo,mondo,hp,ordo]")
+        f"{BASE_URL}/services/annotate?propertyValue={formatted_trait_name}"
+        "&filter=required:[none],ontologies:[efo,mondo,hp,ordo]")
     return response.json()
 
 
@@ -114,16 +140,69 @@ def create_mapping_suggestion(trait, term, user_email='eva-dev@ebi.ac.uk'):
     logger.info(f"Created mapping suggestion {suggestion}")
 
 
-@transaction.atomic
-def delete_unused_suggestions(trait, suggested_terms):
+def find_automatic_mapping(trait, created_terms, high_confidence_term_iris):
     """
-    Takes in a trait and a set of suggested_terms, found in the previously executed ZOOMA query. This function gets all
-    the mapping suggestions for that trait that are NOT found in the suggested_terms list or in any previous mappings
+    If a trait is unmapped, attempts to find an automatic mapping. First if it finds a ZOOMA suggestion with 'HIGH'
+    confidence, then attemps to find an exact text match.
+    """
+    if trait.status != Status.UNMAPPED:
+        return
+
+    # Check if a created term suggestion has 'HIGH" confidence, and map it to the trait if it does
+    for term in created_terms:
+        if term.iri in high_confidence_term_iris:
+            create_mapping(trait, term)
+            logger.info(f"CREATED HIGH CONFIDENCE MAPPING {trait.current_mapping}")
+            return
+
+    # Check if a created term suggestion is an exact text match with the trait, and map it if it does
+    for term in created_terms:
+        if trait.name.lower() == term.label.lower():
+            create_mapping(trait, term)
+            logger.info(f"CREATED EXACT TEXT MATCH MAPPING {trait.current_mapping}")
+            return
+
+    # For high confidence term suggestions that weren't in EFO compatible ontologies
+    for term_iri in high_confidence_term_iris:
+        # Skip medgen terms since info about them can't be retrieved through OLS
+        if 'medgen' in term_iri:
+            continue
+
+        # Create term suggestion from OxO cross references
+        ontology_id = get_ontology_id(term_iri)
+        term_curie = make_ols_query(identifier_value=term_iri, ontology_id=ontology_id)['curie']
+        oxo_results = make_oxo_query([term_curie])
+        for result in oxo_results['_embedded']['searchResults'][0]['mappingResponseList']:
+            ontology_id = result['targetPrefix'].lower()  # E.g. 'efo'
+            if ontology_id == "orphanet":
+                ontology_id = "ordo"
+            result_iri = make_ols_query(identifier_value=result['curie'],
+                                        ontology_id=ontology_id, identifier_type='obo_id')['iri']
+            suggested_term = create_local_term(result_iri)
+            created_terms.append(suggested_term)
+            create_mapping_suggestion(trait, suggested_term)
+
+
+@transaction.atomic
+def create_mapping(trait, term):
+    zooma_user = User.objects.filter(email='eva-dev@ebi.ac.uk').first()
+    if Mapping.objects.filter(trait_id=trait, term_id=term).exists():
+        return
+    mapping = Mapping(trait_id=trait, term_id=term, curator=zooma_user, is_reviewed=False)
+    mapping.save()
+    trait.current_mapping = mapping
+    trait.save()
+
+
+def delete_unused_suggestions(trait, created_terms):
+    """
+    Takes in a trait and a set of created_terms, found in the previously executed ZOOMA query. This function gets all
+    the mapping suggestions for that trait that are NOT found in the created_terms list or in any previous mappings
     for that trait, and deletes them
     """
     trait_mappings = trait.mapping_set.all()
     for mapping in trait_mappings:
-        suggested_terms.add(mapping.term_id)
-    deleted_suggestions = trait.mappingsuggestion_set.exclude(term_id__in=list(suggested_terms))
+        created_terms.add(mapping.term_id)
+    deleted_suggestions = trait.mappingsuggestion_set.exclude(term_id__in=list(created_terms))
     deleted_suggestions.delete()
-    logger.info(f"Deleted mapping suggestions {deleted_suggestions}")
+    logger.info(f"Deleted mapping suggestions {deleted_suggestions.all()}")

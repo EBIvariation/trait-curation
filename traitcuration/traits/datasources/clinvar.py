@@ -16,7 +16,7 @@ from ..models import Trait, Status
 # Constants to use. URL defines the clinvar data location and NUMBER_OF_RECORDS defines how many traits to parse
 # during development.
 URL = 'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz'
-NUMBER_OF_RECORDS = 200
+NUMBER_OF_RECORDS = 1000
 
 logging.basicConfig()
 logger = logging.getLogger('CLINVAR')
