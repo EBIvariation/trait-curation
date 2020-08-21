@@ -34,13 +34,16 @@
         </span>
         <span class="source__latest">
           <span class="bold">Latest update: </span>
+          {% if source.latest_import_date %}
           <span class="date" date="{{source.latest_import_date.isoformat}}"></span>
+          {% else %}
+          <span> No imports </span>
+          {% endif %}
         </span>
         <div class="source__progress_wrapper">
           <div
             id="{{source.id}}-progress-bar"
             class="source__progress_bar"
-            style="background-color: #68a9ef; width: 0%;"
           >
             &nbsp;
           </div>
@@ -81,13 +84,17 @@
         </span>
         <span class="source__latest">
           <span class="bold">Latest import: </span>
-          <span class="date" date="{{source.latest_import_date.isoformat}}"></span>
+          {% if source.latest_import_date %}
+          {{source.latest_import_date}}
+          <span class="date source__latest_date" date="{{source.latest_import_date.isoformat}}"></span>
+          {% else %}
+          <span class="source__latest_date"> No imports </span>
+          {% endif %}
         </span>
         <div class="source__progress_wrapper">
           <div
             id="{{source.id}}-progress-bar"
             class="source__progress_bar"
-            style="background-color: #68a9ef; width: 0%;"
           >
             &nbsp;
           </div>
@@ -119,55 +126,18 @@
   </div>
   <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
   <script>
-    function progressError(progressBarElement, progressBarMessageElement, excMessage) {
-      progressBarElement.style.backgroundColor = "#B22929";
-      progressBarMessageElement.innerHTML = `Error: ${excMessage}`
-    }
-
-    const olsTaskId = "{{ols_task_id}}";
-    if (olsTaskId != "None") {
-      document.addEventListener("DOMContentLoaded", () => {
-        const progressUrl = "{% url 'celery_progress:task_status' ols_task_id %}";
-        CeleryProgressBar.initProgressBar(progressUrl, {
-          progressBarId: "ols-progress-bar",
-          progressBarMessageId: "ols-progress-bar-message",
-          onError: progressError,
-        });
-      });
-    }
-
-    function traitImportProgress (progressBarElement, progressBarMessageElement, progress){
-      progressBarElement.style.backgroundColor = '#68a9ef';
-      progressBarElement.style.width = progress.percent + "%";
-      progressBarMessageElement.innerHTML = progress.current + ' MB of ' + progress.total + ' MB downloaded...';
-    }
-
-
-    const zoomaTaskId = "{{zooma_task_id}}";
-    if (zoomaTaskId != "None") {
-      document.addEventListener("DOMContentLoaded", function () {
-        const progressUrl = "{% url 'celery_progress:task_status' zooma_task_id %}";
-        CeleryProgressBar.initProgressBar(progressUrl, {
-          progressBarId: "zooma-progress-bar",
-          progressBarMessageId: "zooma-progress-bar-message",
-          onError: "progressError"
-        });
-      });
-    }
-
-    const clinvarTaskId = "{{clinvar_task_id}}";
-    if (clinvarTaskId != "None") {
-      document.addEventListener("DOMContentLoaded", function () {
-        const progressUrl = "{% url 'celery_progress:task_status' clinvar_task_id %}";
-        CeleryProgressBar.initProgressBar(progressUrl, {
-          progressBarId: "clinvar-progress-bar",
-          progressBarMessageId: "clinvar-progress-bar-message",
-          onError: "progressError",
-          onProgress: traitImportProgress
-        });
-      });
-    }
-
+    if ("{{ols_task_id}}" !== "None") 
+      setOlsProgressUrl("{% url 'celery_progress:task_status' ols_task_id %}");
+    else 
+      setOlsProgressUrl("None")
+    if ("{{zooma_task_id}}" !== "None") 
+      setZoomaProgressUrl("{% url 'celery_progress:task_status' zooma_task_id %}");
+    else 
+      setZoomaProgressUrl("None")
+    if ("{{clinvar_task_id}}" !== "None") 
+      setClinvarProgressUrl("{% url 'celery_progress:task_status' clinvar_task_id %}");
+    else 
+      setClinvarProgressUrl("None")
   </script>
 </div>
 {% endblock %}
