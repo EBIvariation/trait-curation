@@ -6,7 +6,7 @@ from celery import shared_task
 from celery_progress.backend import ProgressRecorder
 
 from .datasources import zooma, clinvar, ols
-from .models import Trait
+from .models import Trait, OntologyTerm, Status
 from .utils import create_spreadsheet_and_issue
 
 
@@ -62,9 +62,21 @@ def get_clinvar_data_and_suggestions():
     return 'Successful Import'
 
 
-@shared_task
-def import_ols():
-    ols.ols_update()
+@shared_task(bind=True)
+def import_ols(self):
+    try:
+        progress_recorder = ProgressRecorder(self)
+        terms_to_query = OntologyTerm.objects.filter(
+            status__in=[Status.CURRENT, Status.AWAITING_IMPORT, Status.NEEDS_IMPORT])
+        for index, term in enumerate(terms_to_query):
+            ols.ols_query_term(term)
+            progress_recorder.set_progress(index, len(terms_to_query))
+        return 'Successful Import'
+    except Exception as e:
+        track = traceback.format_exc()
+        logger.error(track)
+        progress_recorder.stop_task(100, 100, e)
+        return
     return 'Successful status update'
 
 
