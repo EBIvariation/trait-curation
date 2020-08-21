@@ -57,7 +57,6 @@ def get_ontology_id(term_iri):
     return ontology_id
 
 
-@transaction.atomic
 def ols_update():
     """
     Query OLS for all terms with 'current', 'awaiting_import' and 'needs_import' status and update their status
@@ -65,18 +64,23 @@ def ols_update():
     terms_to_query = OntologyTerm.objects.filter(
         status__in=[Status.CURRENT, Status.AWAITING_IMPORT, Status.NEEDS_IMPORT])
     for term in terms_to_query:
-        logger.info(f"Querying OLS for term {term}")
-        efo_response = make_ols_query(term.iri, 'efo')
-        term_ontology_id = get_ontology_id(term.iri)
-        parent_ontology_response = None
-        if term_ontology_id != 'efo':
-            parent_ontology_response = make_ols_query(term.iri, term_ontology_id)
-        term.status = get_term_status(efo_response, parent_ontology_response, term.status)
-        if term.status == Status.CURRENT:
-            term.label = efo_response['label']
-        elif term.status in [Status.NEEDS_IMPORT, Status.AWAITING_IMPORT]:
-            term.label = parent_ontology_response['label']
-        term.save()
+        ols_query_term(term)
+
+
+@transaction.atomic
+def ols_query_term(term):
+    logger.info(f"Querying OLS for term {term}")
+    efo_response = make_ols_query(term.iri, 'efo')
+    term_ontology_id = get_ontology_id(term.iri)
+    parent_ontology_response = None
+    if term_ontology_id != 'efo':
+        parent_ontology_response = make_ols_query(term.iri, term_ontology_id)
+    term.status = get_term_status(efo_response, parent_ontology_response, term.status)
+    if term.status == Status.CURRENT:
+        term.label = efo_response['label']
+    elif term.status in [Status.NEEDS_IMPORT, Status.AWAITING_IMPORT]:
+        term.label = parent_ontology_response['label']
+    term.save()
 
 
 def get_term_status(efo_response, parent_ontology_response=None, previous_status=None):
@@ -85,7 +89,7 @@ def get_term_status(efo_response, parent_ontology_response=None, previous_status
         return Status.DELETED
     if efo_response and efo_response.get('is_obsolete') is True or \
             parent_ontology_response and parent_ontology_response.get('is_obsolete') is True:
-        logger.info("FOUND OBOSLETE")
+        logger.info("FOUND OBSOLETE")
         return Status.OBSOLETE
     if efo_response is not None:
         return Status.CURRENT
