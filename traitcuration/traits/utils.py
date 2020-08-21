@@ -47,7 +47,7 @@ def add_ontology_sources_to_context(context):
         latest_import_date = latest_ols_import.date_done
         ols_task_id = latest_ols_import.task_id
     else:
-        latest_import_date = "No imports"
+        latest_import_date = None
         ols_task_id = "None"
     context['ols_task_id'] = ols_task_id
     ols_dict = {'id': 'ols', 'title': 'Source of ontology term information',
@@ -78,7 +78,7 @@ def add_trait_sources_to_context(context):
         latest_import_date = latest_clinvar_import.date_done
         clinvar_task_id = latest_clinvar_import.task_id
     else:
-        latest_import_date = "No imports"
+        latest_import_date = None
         clinvar_task_id = "None"
     context['clinvar_task_id'] = clinvar_task_id
     clinvar_dict = {'id': 'clinvar', 'title': 'ClinVar',
