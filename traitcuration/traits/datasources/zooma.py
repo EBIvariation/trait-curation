@@ -39,7 +39,7 @@ def run_zooma_for_single_trait(trait):
 
     for suggestion in datasource_suggestion_list + ols_suggestion_list:
         if len(suggestion["semanticTags"]) > 1:
-            logger.warn("Suggestion with combined terms found! Skipping suggestion...")
+            logger.warn(f"Suggestion with combined terms found: Suggestions:{suggestion['semanticTags']} for {trait}")
             continue
         suggested_term_iri = suggestion["semanticTags"][0]  # E.g. http://purl.obolibrary.org/obo/HP_0004839
         if suggestion['confidence'] == 'HIGH':
