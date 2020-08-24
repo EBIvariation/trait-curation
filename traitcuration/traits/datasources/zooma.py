@@ -106,10 +106,10 @@ def create_mapping_suggestion(trait, term, user_email='eva-dev@ebi.ac.uk'):
     if user_email == "eva-dev@ebi.ac.uk" and user is None:
         zooma = User(first_name="ZOOMA", email="eva-dev@ebi.ac.uk")
         zooma.save()
-    if MappingSuggestion.objects.filter(trait_id=trait, term_id=term).exists():
+    if MappingSuggestion.objects.filter(mapped_trait=trait, mapped_term=term).exists():
         logger.info(f"Mapping suggestion {trait} - {term} already exists in the database")
         return
-    suggestion = MappingSuggestion(trait_id=trait, term_id=term, made_by=user)
+    suggestion = MappingSuggestion(mapped_trait=trait, mapped_term=term, made_by=user)
     suggestion.save()
     logger.info(f"Created mapping suggestion {suggestion}")
 
@@ -123,7 +123,7 @@ def delete_unused_suggestions(trait, suggested_terms):
     """
     trait_mappings = trait.mapping_set.all()
     for mapping in trait_mappings:
-        suggested_terms.add(mapping.term_id)
-    deleted_suggestions = trait.mappingsuggestion_set.exclude(term_id__in=list(suggested_terms))
+        suggested_terms.add(mapping.mapped_term)
+    deleted_suggestions = trait.mappingsuggestion_set.exclude(mapped_term__in=list(suggested_terms))
     deleted_suggestions.delete()
     logger.info(f"Deleted mapping suggestions {deleted_suggestions}")
