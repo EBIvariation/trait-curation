@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'compressor',
     'django_celery_results',
-    'django_celery_beat',
     'celery_progress',
     'allauth',
     'allauth.account',
@@ -196,13 +195,6 @@ CELERY_IMPORTS = (
     'traitcuration.traits.tasks',
     'traitcuration.traits.datasources',
 )
-CELERY_BEAT_SCHEDULE = {
-    'run_zooma_imports': {
-        'task': 'traitcuration.traits.tasks.import_zooma',
-        # This can either be crontab syntax, or number of seconds to use as interval
-        'schedule': 5000
-    },
-}
 
 
 # Activate Django-Heroku, only on Heroku environments.
