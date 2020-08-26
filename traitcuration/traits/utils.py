@@ -60,7 +60,7 @@ def add_ontology_sources_to_context(context):
         latest_import_date = latest_zooma_import.date_done
         zooma_task_id = latest_zooma_import.task_id
     else:
-        latest_import_date = "No imports"
+        latest_import_date = None
         zooma_task_id = "None"
     context['zooma_task_id'] = zooma_task_id
     zooma_dict = {'id': 'zooma', 'title': 'Source of mapping suggestions',
