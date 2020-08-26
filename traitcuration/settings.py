@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'computedfields',
-    'django_admin_conf_vars'
+    'django_admin_conf_vars',
+    'django_celery_beat',
 ]
 
 
