@@ -7,6 +7,8 @@ from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.urls import reverse
 from django.db import transaction
+from django.utils import timezone
+
 from django_celery_results.models import TaskResult
 
 from .utils import get_status_dict, get_user_info, parse_request_body, get_initial_issue_body
@@ -213,6 +215,9 @@ def datasources(request):
     if request.session.get('current_task_id'):
         task_name = request.session.get('current_task_name')
         context[f"{task_name}_task_id"] = request.session.get('current_task_id')
+        for source in context['ontology_sources'] + context['trait_sources']:
+            if source['id'] == request.session.get('current_task_name'):
+                source['latest_import_date'] = timezone.now()
         del request.session['current_task_id']
         del request.session['current_task_name']
 
