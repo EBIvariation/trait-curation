@@ -79,18 +79,18 @@
       <hr />
       <div class="source__bottom_wrapper">
         <span class="source__scheduled">
-          <span class="bold">Next scheduled import: </span>
+          <span class="bold">Next scheduled update: </span>
           Aug. 7, 2020, 12:37 p.m.
         </span>
         <span class="source__latest">
-          <span class="bold">Latest import: </span>
-          {% if source.latest_import_date %} {{source.latest_import_date}}
+          <span class="bold">Latest update: </span>
+          {% if source.latest_import_date %}
           <span
-            class="date source__latest_date"
+            class="date"
             date="{{source.latest_import_date.isoformat}}"
           ></span>
           {% else %}
-          <span class="source__latest_date"> No imports </span>
+          <span> No imports </span>
           {% endif %}
         </span>
         <div class="source__progress_wrapper">
