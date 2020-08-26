@@ -67,10 +67,13 @@ sudo -H pip3 install virtualenv
 ```
 virtualenv traitcurationenv
 source traitcurationenv/bin/activate
-
 ```
 Your prompt should change to indicate that you are now operating within a Python virtual environment.
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> Fix leftorver conflicts in deployment instructions
 4. Install the project's requirements using the requirements.txt file.
 ```
 pip3 install -r requirements.txt
@@ -174,7 +177,6 @@ ExecStart=/home/ubuntu/trait-curation/traitcurationenv/bin/gunicorn --access-log
 
 [Install]
 WantedBy=multi-user.target
-
 ```
 The `[Unit]` section isused to specify metadata and dependencies. We’ll put a description of our service here and tell the init system to only start this after the networking target has been reached.
 
