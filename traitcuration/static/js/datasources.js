@@ -15,7 +15,6 @@ function setZoomaProgressUrl(progressUrl) {
 
 function setClinvarProgressUrl(progressUrl) {
   clinvarProgressUrl = progressUrl
-  console.log(clinvarProgressUrl != "None");
 }
 
 // The following code is used to initialize the progress bars in the 'Sources' page
@@ -43,7 +42,6 @@ if (zoomaProgressUrl != "None") {
 }
 
 if (clinvarProgressUrl !== "None") {
-  console.log('hi')
   document.addEventListener("DOMContentLoaded", function () {
     CeleryProgressBar.initProgressBar(clinvarProgressUrl, {
       progressBarId: "clinvar-progress-bar",
