@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
 from computedfields.models import ComputedFieldsModel, computed
+from django_admin_conf_vars.global_vars import config
+
 
 from .managers import CustomUserManager
 
@@ -89,7 +91,7 @@ class Mapping(ComputedFieldsModel):
         ['review_set', ['mapping_id']],
     ])
     def is_reviewed(self):
-        return self.review_set.count() >= 2
+        return self.review_set.count() >= int(config.REVIEW_MIN_NUMBER)
 
     def __str__(self):
         return f"{self.trait_id} - {self.term_id}"

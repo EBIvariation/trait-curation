@@ -10,13 +10,15 @@ import logging
 import requests
 
 from django.db import transaction
+from django_admin_conf_vars.global_vars import config
+
 
 from ..models import Trait, Status
 
 # Constants to use. URL defines the clinvar data location and NUMBER_OF_RECORDS defines how many traits to parse
 # during development.
-URL = 'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz'
-NUMBER_OF_RECORDS = 1000
+URL = config.CLINVAR_BASE_URL
+NUMBER_OF_RECORDS = int(config.CLINVAR_RECORDS_TO_PARSE)
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)

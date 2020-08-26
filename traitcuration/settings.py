@@ -47,13 +47,13 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'compressor',
     'django_celery_results',
-    'django_celery_beat',
     'celery_progress',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'computedfields'
+    'computedfields',
+    'django_admin_conf_vars'
 ]
 
 
@@ -187,7 +187,6 @@ COMPRESS_PRECOMPILERS = (
 
 
 # Celery config
-
 CELERY_BROKER_URL = os.environ.get('REDIS_URL')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
@@ -196,13 +195,9 @@ CELERY_IMPORTS = (
     'traitcuration.traits.tasks',
     'traitcuration.traits.datasources',
 )
-CELERY_BEAT_SCHEDULE = {
-    'run_zooma_imports': {
-        'task': 'traitcuration.traits.tasks.import_zooma',
-        # This can either be crontab syntax, or number of seconds to use as interval
-        'schedule': 5000
-    },
-}
+
+# django_admin_conf_vars package configuration
+VARS_MODULE_PATH = 'traitcuration.config'
 
 
 # Activate Django-Heroku, only on Heroku environments.
