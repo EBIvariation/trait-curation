@@ -39,7 +39,7 @@ def parse_request_body(request):
 
 
 def create_spreadsheet_and_issue(github_access_token, issue_info):
-    gc = gspread.oauth()
+    gc = gspread.service_account()
 
     github = Github(github_access_token)
 
