@@ -1,7 +1,7 @@
 from celery import shared_task
 from celery_progress.backend import ProgressRecorder
 
-from .datasources import zooma, clinvar
+from .datasources import zooma, clinvar, ols
 from .models import Trait
 
 
@@ -26,3 +26,9 @@ def get_clinvar_data_and_suggestions():
     clinvar.run_clinvar()
     zooma.run_zooma_for_all_traits()
     return 'Successful Import'
+
+
+@shared_task
+def get_ols_status():
+    ols.ols_update()
+    return 'Successful status update'

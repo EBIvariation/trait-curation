@@ -8,11 +8,12 @@ import logging
 from django.db import transaction
 
 from ..models import Trait, MappingSuggestion, OntologyTerm, User, Status, Mapping
-from .ols import make_ols_query, get_ontology_id
+from .ols import make_ols_query, get_ontology_id, get_term_status
 from .oxo import make_oxo_query
 
+
 logging.basicConfig()
-logger = logging.getLogger('ZOOMA')
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 BASE_URL = "http://www.ebi.ac.uk/spot/zooma/v2/api"
@@ -88,39 +89,32 @@ def create_local_term(suggested_term_iri):
     if OntologyTerm.objects.filter(iri=suggested_term_iri).exists():
         logger.info(f"Term {suggested_term_iri} already exists in the database")
         return OntologyTerm.objects.filter(iri=suggested_term_iri).first()
-    # Search for the term in EFO and return its information. If it is not in EFO, search for it in original ontology.
-    term_info = make_ols_query(suggested_term_iri, 'efo')
-    term_ontology_id = 'efo'
-    # None here means that the term wasn't found in the EFO ontology.
-    if term_info is None:
+
+    # Search for the term in EFO and return its information.
+    efo_response = make_ols_query(suggested_term_iri, 'efo')
+    term_ontology_id = get_ontology_id(suggested_term_iri)
+
+    # If it is a non EFO term, also query its parent ontology, and calulate its status.
+    if term_ontology_id != 'efo':
         term_ontology_id = get_ontology_id(suggested_term_iri)
-        term_info = make_ols_query(suggested_term_iri, term_ontology_id)
-        # If the term is not found in the original ontology either, create a 'deleted' term.
-        if term_info is None:
-            term_ontology_id = None
-            term_info = {'curie': None, 'label': 'Not Found', 'is_obsolete': False}
-            print(term_info)
-    logger.info(f"Term {suggested_term_iri} found in {term_ontology_id} ontology")
-    term_status = get_term_status(term_info['is_obsolete'], term_ontology_id)
+        parent_ontology_response = make_ols_query(suggested_term_iri, term_ontology_id)
+        term_status = get_term_status(efo_response, parent_ontology_response)
+    else:
+        term_status = get_term_status(efo_response)
+
+    # Finally create a dict holding the term info that was found in the queries
+    if term_status == Status.DELETED:
+        term_info = {'curie': 'Not Found', 'iri': suggested_term_iri, 'label': 'Not Found'}
+    elif term_status == Status.CURRENT:
+        term_info = {'curie': efo_response['curie'], 'iri': suggested_term_iri, 'label': efo_response['label']}
+    else:
+        term_info = {'curie': parent_ontology_response['curie'],
+                     'iri': suggested_term_iri, 'label': parent_ontology_response['label']}
+
     # Create an ontology term in the database
     term = OntologyTerm(curie=term_info['curie'], iri=suggested_term_iri, label=term_info['label'], status=term_status)
     term.save()
     return term
-
-
-def get_term_status(is_obsolete, ontology_id=None):
-    """
-    Takes the ontology_id of a term and a whether it is obsolete or not, and returns its calculated status.
-    'Obsolete' if the is_obsolete flag is true, 'Deleted' if no info was found in any ontology, 'Current' if its
-    ontology is EFO, and 'Needs Import' if info about the term was found in another ontology.
-    """
-    if ontology_id is None:
-        return Status.DELETED
-    if is_obsolete:
-        return Status.OBSOLETE
-    if ontology_id == 'efo':
-        return Status.CURRENT
-    return Status.NEEDS_IMPORT
 
 
 @transaction.atomic
