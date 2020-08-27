@@ -70,10 +70,6 @@ source traitcurationenv/bin/activate
 ```
 Your prompt should change to indicate that you are now operating within a Python virtual environment.
 
-<<<<<<< HEAD
-=======
-
->>>>>>> Fix leftorver conflicts in deployment instructions
 4. Install the project's requirements using the requirements.txt file.
 ```
 pip3 install -r requirements.txt
