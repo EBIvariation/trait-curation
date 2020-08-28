@@ -39,22 +39,16 @@ def parse_request_body(request):
 
 
 def create_spreadsheet_and_issue(github_access_token, issue_info):
-<<<<<<< HEAD
     gc = gspread.service_account()
-=======
-    gc = gspread.oauth()
->>>>>>> 11a4e261362920808253375c6c733c46678652e7
-
     github = Github(github_access_token)
 
-    # Create the spreadsheet
+    # Create the spreadsheet and the individual worksheets. Also delete the default one
     sheet = gc.create(issue_info['title'])
     needs_import_worksheet = sheet.add_worksheet(title="Terms to import", rows="100", cols="20")
+    needs_creation_worksheet = sheet.add_worksheet(title="Terms to create", rows="100", cols="20")
     sheet.del_worksheet(sheet.sheet1)
-    needs_import_worksheet.update('A1', 'IRI of selected mapping')
-    needs_import_worksheet.update('B1', 'Label of selected mapping')
-    needs_import_worksheet.update('C1', 'ClinVar label')
-    needs_import_worksheet.update('D1', 'ClinVar Freq')
+
+    # Add background color to the cell headers
     needs_import_worksheet.format("A1:D1", {
         "backgroundColor": {
             "red": 0.82,
@@ -65,19 +59,46 @@ def create_spreadsheet_and_issue(github_access_token, issue_info):
             "bold": True
         }
     })
+    needs_import_worksheet.format("A1:D1", {
+        "backgroundColor": {
+            "red": 0.82,
+            "green": 0.88,
+            "blue": 0.89
+        },
+        "textFormat": {
+            "bold": True
+        }
+    })
+
     needs_import_traits = Trait.objects.filter(status=Status.NEEDS_IMPORT)
+
+    # A list of dictionaries of cell ranges and cell values, to insert to the spreadsheet
+    batch_update_list = list()
+    batch_update_list.append({
+        'range': 'A1:D1',
+        'values': [['IRI of selected mapping', 'Label of selected mapping', 'ClinVar label', 'ClinVar Freq']]
+    })
+
+    # A dictionary containing the cell range to update, and the value list to insert
+    row_update_dict = dict()
     for index, trait in enumerate(needs_import_traits):
         row_index = 2 + index
-        needs_import_worksheet.update_cell(row_index, 1, trait.current_mapping.term_id.iri)
-        needs_import_worksheet.update_cell(row_index, 2, trait.current_mapping.term_id.label)
-        needs_import_worksheet.update_cell(row_index, 3, trait.name)
-        needs_import_worksheet.update_cell(row_index, 4, trait.number_of_source_records)
-    needs_creation_worksheet = sheet.add_worksheet(title="Terms to create", rows="100", cols="20")
-    needs_creation_worksheet.update('A1', 'Suggested term label')
-    needs_creation_worksheet.update('B1', 'Suggested term description')
-    needs_creation_worksheet.update('C1', 'Suggested term x-refs')
-    needs_creation_worksheet.update('D1', 'ClinVar label')
-    needs_creation_worksheet.update('E1', 'ClinVar freq')
+        row_update_dict['range'] = f"A{row_index}:D{row_index}"  # Cell range: E.g. A3:D3
+        term_iri = trait.current_mapping.term_id.iri
+        term_label = trait.current_mapping.term_id.label
+        trait_name = trait.name
+        source_records = trait.number_of_source_records
+        row_update_dict['values'] = [[term_iri, term_label, trait_name, source_records]]
+        batch_update_list.append(row_update_dict)
+
+    needs_import_worksheet.batch_update(batch_update_list)
+
+    batch_update_list.append({
+        'range': 'A1:E1',
+        'values': [['Suggested term label', 'Suggested term description',
+                    'Suggested term x-refs', 'ClinVar label', 'ClinVar freq']]
+    })
+
     needs_creation_worksheet.format("A1:E1", {
         "backgroundColor": {
             "red": 0.82,
@@ -88,22 +109,30 @@ def create_spreadsheet_and_issue(github_access_token, issue_info):
             "bold": True
         }
     })
+
     needs_creation_traits = Trait.objects.filter(status=Status.NEEDS_CREATION)
     for index, trait in enumerate(needs_creation_traits):
         row_index = 2 + index
-        needs_creation_worksheet.update_cell(row_index, 1, trait.current_mapping.term_id.label)
-        needs_creation_worksheet.update_cell(row_index, 2, trait.current_mapping.term_id.description)
-        needs_creation_worksheet.update_cell(row_index, 3, trait.current_mapping.term_id.cross_refs)
-        needs_creation_worksheet.update_cell(row_index, 4, trait.name)
-        needs_creation_worksheet.update_cell(row_index, 5, trait.number_of_source_records)
+        row_update_dict['range'] = f"A{row_index}:E{row_index}"  # Cell range: E.g. A3:E3
+        term_label = trait.current_mapping.term_id.label
+        term_description = trait.current_mapping.term_id.description
+        term_cross_refs = trait.current_mapping.term_id.cross_refs
+        trait_name = trait.name
+        source_records = trait.number_of_source_records
+        row_update_dict['values'] = [[term_label, term_description, term_cross_refs, trait_name, source_records]]
+        batch_update_list.append(row_update_dict)
+
+    needs_creation_worksheet.batch_update(batch_update_list)
 
     gc.insert_permission(sheet.id, None, perm_type='anyone', role='writer')
-    repo = github.get_repo(issue_info['repo'])
+
     # Create the GitHub issue
+    repo = github.get_repo(issue_info['repo'])
     issue_body = issue_info['body'].replace("{speadsheet_url}", sheet.url)
     repo = github.get_repo(issue_info['repo'])
     issue = repo.create_issue(title=issue_info['title'], body=issue_body)
 
+    # After successful feedback to maintainers, change term status to awaiting import/creation
     needs_import_terms = OntologyTerm.objects.filter(status=Status.NEEDS_IMPORT)
     for term in needs_import_terms:
         term.status = Status.AWAITING_IMPORT
