@@ -19,14 +19,14 @@ class Status(models.TextChoices):
 
     @classmethod
     def trait_choices(cls):
-        return tuple((i.name, i.value) for i in cls)
+        return tuple((i.name.lower(), i.value) for i in cls)
 
     @classmethod
     def term_choices(cls):
         choices = list()
         for i in cls:
             if i.name != 'UNMAPPED' and i.name != 'AWAITING_REVIEW':
-                choices.append((i.name, i.value))
+                choices.append((i.name.lower(), i.value))
         return tuple(choices)
 
 
@@ -86,7 +86,7 @@ class Mapping(ComputedFieldsModel):
     timestamp_mapped = models.DateTimeField(auto_now=True)
 
     @computed(models.BooleanField(), depends=[
-        ['review_set', []],
+        ['review_set', ['mapping_id']],
     ])
     def is_reviewed(self):
         return self.review_set.count() >= 2
