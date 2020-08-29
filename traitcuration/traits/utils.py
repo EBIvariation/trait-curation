@@ -38,7 +38,7 @@ def parse_request_body(request):
     return body
 
 
-def create_spreadsheet_and_issue(github_access_token, issue_info):
+def create_spreadsheet_and_issue(github_access_token, issue_info, user_email):
     gc = gspread.service_account()
     github = Github(github_access_token)
 
@@ -125,6 +125,7 @@ def create_spreadsheet_and_issue(github_access_token, issue_info):
     needs_creation_worksheet.batch_update(batch_update_list)
 
     gc.insert_permission(sheet.id, None, perm_type='anyone', role='writer')
+    gc.insert_permission(sheet.id, value=user_email, perm_type='user', role='owner')
 
     # Create the GitHub issue
     repo = github.get_repo(issue_info['repo'])

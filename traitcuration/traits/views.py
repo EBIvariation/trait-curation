@@ -18,6 +18,8 @@ from .forms import NewTermForm, GitHubSubmissionForm
 
 
 def browse(request):
+    print(request.user)
+    print(request.user.email)
     traits = Trait.objects.all()
     status_dict = get_status_dict(traits)
     context = {"traits": traits, "status_dict": status_dict}
@@ -173,7 +175,10 @@ def post_issue(request):
 
     del request.session['github_request']
 
-    task_id = create_github_issue.delay(access_token, issue_info)
+    if not request.user.email:
+        return redirect('feedback')
+
+    task_id = create_github_issue.delay(access_token, issue_info, request.user.email)
     request.session['feedback_task_id'] = str(task_id)
     return redirect('feedback')
 

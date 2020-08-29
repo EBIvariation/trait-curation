@@ -36,6 +36,6 @@ def get_ols_status():
 
 
 @shared_task
-def create_github_issue(github_access_token, issue_info):
-    issue_url = create_spreadsheet_and_issue(github_access_token, issue_info)
+def create_github_issue(github_access_token, issue_info, user_email):
+    issue_url = create_spreadsheet_and_issue(github_access_token, issue_info, user_email)
     return issue_url
