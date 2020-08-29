@@ -18,8 +18,6 @@ from .forms import NewTermForm, GitHubSubmissionForm
 
 
 def browse(request):
-    print(request.user)
-    print(request.user.email)
     traits = Trait.objects.all()
     status_dict = get_status_dict(traits)
     context = {"traits": traits, "status_dict": status_dict}
