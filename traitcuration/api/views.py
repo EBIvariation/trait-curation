@@ -10,8 +10,8 @@ class TraitList(generics.ListAPIView):
 
     def get_queryset(self):
         """
-        Optionally restricts the returned purchases to a given user,
-        by filtering against a `username` query parameter in the URL.
+        Optionally restricts the returned traits to a given status and/or name,
+        by filtering against query parameters in the URL.
         """
         queryset = Trait.objects.all().order_by('-number_of_source_records')
         status = self.request.query_params.get('status', None)
