@@ -12,6 +12,14 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import django_heroku
 import os
+import yaml
+
+try:
+    file = open('config.yaml', 'r')
+    config = yaml.load(file, Loader=yaml.FullLoader)
+except FileNotFoundError as e:
+    print('Config file not found! Make sure you have config.yaml in the project directory')
+    raise e
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -21,13 +29,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'cox$_8ag9@-n3pfuvnvjk==j0()u5apcf!_jx4f&xyp5x%#-+o'
+SECRET_KEY = config['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config['ALLOWED_HOSTS']
 
 
 # Application definition
@@ -85,12 +93,7 @@ WSGI_APPLICATION = 'traitcuration.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
+DATABASES = {'default': config['DATABASES']['POSTGRES']}
 
 # Auth
 AUTH_USER_MODEL = 'traits.User'
@@ -190,6 +193,12 @@ CELERY_IMPORTS = (
     'traitcuration.traits.tasks',
     'traitcuration.traits.datasources',
 )
+
+
+if os.environ.get('DJANGO_ENV') == 'LOCAL_DEV':
+    from .settings_localdev import *
+elif os.environ.get('DJANGO_ENV') == 'DEV':
+    from .settings_dev import *
 
 
 # Activate Django-Heroku, only on Heroku environments.
