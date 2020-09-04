@@ -18,7 +18,7 @@
     >
   </section>
 
-  {% if not user.is_anonymous and traits_for_import_count > 0 %}
+  {% if not user.is_anonymous and traits_for_import_count|add:traits_for_creation_count > 0 %}
   <section class="section">
     <h5>CREATE GITHUB SUBMISSION</h5>
     <div class="progress hidden">
