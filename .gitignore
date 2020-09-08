@@ -70,4 +70,5 @@ db.sqlite3
 .vscode/
 traitcuration/static/CACHE
 dump.rdb
+config.yaml
 celerybeat.pid
