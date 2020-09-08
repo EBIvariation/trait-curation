@@ -33,7 +33,7 @@ def import_dummy_data():
                          cross_refs='MONDO:0013685,HP:0000400', status=Status.AWAITING_CREATION)
     term7 = OntologyTerm(label='/ Familial cancer of breast, 2 /',
                          description='Description for familial cancer of breast, 2',
-                         cross_refs="Orphanet:0000405", status=Status.AWAITING_CREATION)
+                         cross_refs="Orphanet:0000405", status=Status.NEEDS_CREATION)
     term8 = OntologyTerm(label='/ Diastrophic dysplasia /',
                          description='Description for Diastrophic dysplasia',
                          cross_refs="", status=Status.AWAITING_CREATION)
@@ -54,7 +54,7 @@ def import_dummy_data():
     trait6 = Trait(name='/ Hypogonadism, diabetes mellitus, alopecia, mental retardation and \
           electrocardiographic abnormalities /', status=Status.UNMAPPED, number_of_source_records=12)
     trait7 = Trait(name='/ Pancreatic cancer 4 /', status=Status.UNMAPPED, number_of_source_records=1)
-    trait8 = Trait(name='/ Familial cancer of breast /', status=Status.AWAITING_CREATION, number_of_source_records=4)
+    trait8 = Trait(name='/ Familial cancer of breast /', status=Status.NEEDS_CREATION, number_of_source_records=4)
     trait9 = Trait(name='/ Diastrophic dysplasia /', status=Status.UNMAPPED, number_of_source_records=7)
     trait10 = Trait(name='/ Spastic paraplegia /', status=Status.UNMAPPED, number_of_source_records=7)
     for trait in (trait1, trait2, trait3, trait4, trait5, trait6, trait7, trait8, trait9, trait10):
