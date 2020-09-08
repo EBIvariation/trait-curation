@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'computedfields'
+    'computedfields',
+    'rest_framework',
 ]
 
 
@@ -192,6 +193,11 @@ CELERY_IMPORTS = (
     'traitcuration.traits.datasources',
 )
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
 
 # Activate Django-Heroku, only on Heroku environments.
 if '/app' in os.environ['HOME']:

@@ -61,7 +61,7 @@ def comment(request, pk):
     user_info = get_user_info(request)
     trait = get_object_or_404(Trait, pk=pk)
     user = get_object_or_404(User, email=user_info['email'])
-    comment = Comment(trait_id=trait, author=user, body=comment_body)
+    comment = Comment(mapped_trait=trait, author=user, body=comment_body)
     comment.save()
     return redirect(reverse('trait_detail', args=[pk]))
 
@@ -74,19 +74,19 @@ def update_mapping(request, pk):
         return HttpResponse('Unauthorized', status=401)
     # Parse request body parameters, expected a trait id
     request_body = parse_request_body(request)
-    term_id = request_body['term']
-    term = get_object_or_404(OntologyTerm, pk=term_id)
+    mapped_term = request_body['term']
+    term = get_object_or_404(OntologyTerm, pk=mapped_term)
     trait = get_object_or_404(Trait, pk=pk)
     user_info = get_user_info(request)
     user = get_object_or_404(User, email=user_info['email'])
     # If a mapping instance with the given trait and term already exists, then map the trait to that, and reset reviews
-    if Mapping.objects.filter(trait_id=trait, term_id=term).exists():
-        mapping = Mapping.objects.filter(trait_id=trait, term_id=term).first()
+    if Mapping.objects.filter(mapped_trait=trait, mapped_term=term).exists():
+        mapping = Mapping.objects.filter(mapped_trait=trait, mapped_term=term).first()
         mapping.curator = user
         mapping.is_reviewed = False
         mapping.review_set.all().delete()
     else:
-        mapping = Mapping(trait_id=trait, term_id=term, curator=user, is_reviewed=False)
+        mapping = Mapping(mapped_trait=trait, mapped_term=term, curator=user, is_reviewed=False)
     mapping.save()
     trait.current_mapping = mapping
     trait.status = Status.AWAITING_REVIEW
@@ -117,7 +117,7 @@ def add_mapping(request, pk):
                             cross_refs=term_cross_refs, status=Status.NEEDS_CREATION)
         term.save()
         zooma.create_mapping_suggestion(trait, term, user_email=user_info["email"])
-    mapping = Mapping(trait_id=trait, term_id=term, curator=user, is_reviewed=False)
+    mapping = Mapping(mapped_trait=trait, mapped_term=term, curator=user, is_reviewed=False)
     mapping.save()
     trait.current_mapping = mapping
     trait.save()
