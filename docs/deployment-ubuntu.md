@@ -6,7 +6,7 @@ Throughout these instructions, the user will be referenced as *ubuntu* and the p
 
 ## 1. Install prerequisites
 
-1. ```sudo apt update``` To make sure the system is up to date.
+1. ```sudo apt update``` and ```sudo apt upgrade``` to make sure the system is up to date.
 
 2. ```sudo apt install python3-pip python3-dev libpq-dev postgresql postgresql-contrib nginx git``` This will install pip, the Python development files needed to build Gunicorn later, the Postgres database system and the libraries needed to interact with it the Nginx web server, plus git to clone the original repo.
 
@@ -26,7 +26,7 @@ CREATE DATABASE traitcuration;
 CREATE USER ubuntu WITH PASSWORD 'password';
 ```
 
- **Important: PostgreSQL uses an authentication scheme called “peer authentication” for local connections. Basically, this means that if the user’s operating system username matches a valid Postgres username, that user can login with no further authentication. So make sure that the PSQL username matches the host OS username**:
+ **Important: PostgreSQL uses an authentication scheme called “peer authentication” for local connections. Basically, this means that if the user’s operating system username matches a valid Postgres username, that user can login with no further authentication. So make sure that the PSQL username matches the host OS username**.
 
 4. Next, modify a few of the connection parameters for the user we just created. We are setting the default encoding to UTF-8, which Django expects. We are also setting the default transaction isolation scheme to “read committed”, which blocks reads from uncommitted transactions. Lastly, we are setting the timezone to UTC.
 
@@ -59,7 +59,7 @@ cd trait-curation
 
 2. Make sure pip is upgraded, and install the virtualenv package for creating virtual environments in Python:
 ```
-sudo -H pip3 install --upgrade pip
+sudo -H pip3 install --upgrade pip setuptools
 sudo -H pip3 install virtualenv
 ```
 
