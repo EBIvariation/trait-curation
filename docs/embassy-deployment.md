@@ -16,9 +16,9 @@
     * Create the necessary number of floating IPs (one for each instance you would like to make publicly accessibly). Use the external network which you identified on the previous step.
 1. **Security group.**
     * Go to Compute → Access & Security → Security Groups.
-    * Click on “Create Security Group”. Name = “SSH-and-ping”, description = “Allows inbound SSH and ICMP access”.
+    * Click on “Create Security Group”. Name = “Web app”, description = “Allows inbound SSH and ICMP access. Opens ports 80, 443, and 8000.”.
     * Click on “Manage rules” for that security group.
-    * Add the rules for “SSH” and “ALL ICMP”.
+    * Add the rules for: “SSH”, “ALL ICMP”, “HTTP”, “HTTPS”, and “Custom TCP Rule” with Port=8000.
 
 ## Create and set up the instances
 1. Go to Compute → Instances and click on “Launch Instance”. Set the parameters:

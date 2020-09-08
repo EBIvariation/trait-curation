@@ -176,7 +176,10 @@ def post_issue(request):
 
     del request.session['github_request']
 
-    task_id = create_github_issue.delay(access_token, issue_info)
+    if not request.user.email:
+        return redirect('feedback')
+
+    task_id = create_github_issue.delay(access_token, issue_info, request.user.email)
     request.session['feedback_task_id'] = str(task_id)
     return redirect('feedback')
 
