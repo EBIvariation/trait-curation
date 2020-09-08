@@ -1,4 +1,5 @@
 import json
+import requests
 from datetime import datetime
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -6,12 +7,17 @@ from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.urls import reverse
 from django.db import transaction
+from django.utils import timezone
 
-from .utils import get_status_dict, get_user_info, parse_request_body
+from django_celery_results.models import TaskResult
+
+from .utils import get_status_dict, get_user_info, parse_request_body, get_initial_issue_body
+from .utils import add_ontology_sources_to_context, add_trait_sources_to_context
 from .models import Trait, Mapping, OntologyTerm, User, Status, Review, Comment
 from .datasources import dummy, zooma
-from .tasks import get_zooma_suggestions, get_clinvar_data, get_clinvar_data_and_suggestions, get_ols_status
-from .forms import NewTermForm
+from .tasks import import_zooma, import_clinvar, get_clinvar_data_and_suggestions, import_ols
+from .tasks import create_github_issue
+from .forms import NewTermForm, GitHubSubmissionForm
 
 
 def browse(request):
@@ -55,7 +61,7 @@ def comment(request, pk):
     user_info = get_user_info(request)
     trait = get_object_or_404(Trait, pk=pk)
     user = get_object_or_404(User, email=user_info['email'])
-    comment = Comment(trait_id=trait, author=user, body=comment_body)
+    comment = Comment(mapped_trait=trait, author=user, body=comment_body)
     comment.save()
     return redirect(reverse('trait_detail', args=[pk]))
 
@@ -68,19 +74,19 @@ def update_mapping(request, pk):
         return HttpResponse('Unauthorized', status=401)
     # Parse request body parameters, expected a trait id
     request_body = parse_request_body(request)
-    term_id = request_body['term']
-    term = get_object_or_404(OntologyTerm, pk=term_id)
+    mapped_term = request_body['term']
+    term = get_object_or_404(OntologyTerm, pk=mapped_term)
     trait = get_object_or_404(Trait, pk=pk)
     user_info = get_user_info(request)
     user = get_object_or_404(User, email=user_info['email'])
     # If a mapping instance with the given trait and term already exists, then map the trait to that, and reset reviews
-    if Mapping.objects.filter(trait_id=trait, term_id=term).exists():
-        mapping = Mapping.objects.filter(trait_id=trait, term_id=term).first()
+    if Mapping.objects.filter(mapped_trait=trait, mapped_term=term).exists():
+        mapping = Mapping.objects.filter(mapped_trait=trait, mapped_term=term).first()
         mapping.curator = user
         mapping.is_reviewed = False
         mapping.review_set.all().delete()
     else:
-        mapping = Mapping(trait_id=trait, term_id=term, curator=user, is_reviewed=False)
+        mapping = Mapping(mapped_trait=trait, mapped_term=term, curator=user, is_reviewed=False)
     mapping.save()
     trait.current_mapping = mapping
     trait.status = Status.AWAITING_REVIEW
@@ -111,7 +117,7 @@ def add_mapping(request, pk):
                             cross_refs=term_cross_refs, status=Status.NEEDS_CREATION)
         term.save()
         zooma.create_mapping_suggestion(trait, term, user_email=user_info["email"])
-    mapping = Mapping(trait_id=trait, term_id=term, curator=user, is_reviewed=False)
+    mapping = Mapping(mapped_trait=trait, mapped_term=term, curator=user, is_reviewed=False)
     mapping.save()
     trait.current_mapping = mapping
     trait.save()
@@ -137,10 +143,88 @@ def review(request, pk):
     return redirect(reverse('trait_detail', args=[pk]))
 
 
+def github_callback(request):
+    payload = {}
+    payload['client_id'] = '328c5e48d8b20f2849bd'
+    payload['client_secret'] = '594e44da561dbd9169d57796de9c1cfa6a462f71'
+    payload['code'] = request.GET['code']
+    headers = {}
+    headers['Accept'] = 'application/json'
+    result = requests.post('https://github.com/login/oauth/access_token', data=payload, headers=headers)
+    request.session['github_access_token'] = result.json()['access_token']
+    return redirect('post_issue')
+
+
+def post_issue(request):
+    # If the user was redirected from GitHub OAuth, parse the request stored in the session. Else, parse the form data.
+    if request.session.get('github_request'):
+        request_body = request.session.get('github_request')
+    else:
+        request_body = parse_request_body(request)
+        request.session['github_request'] = request_body
+
+    if request.session.get('github_access_token') is None:
+        client_id = '328c5e48d8b20f2849bd'
+        return redirect(f"https://github.com/login/oauth/authorize?scope=user,repo&client_id={client_id}")
+
+    access_token = request.session.get('github_access_token')
+
+    issue_info = {}
+    issue_info['repo'] = request_body['repo']
+    issue_info['title'] = request_body['title']
+    issue_info['body'] = request_body['body']
+
+    del request.session['github_request']
+
+    if not request.user.email:
+        return redirect('feedback')
+
+    task_id = create_github_issue.delay(access_token, issue_info, request.user.email)
+    request.session['feedback_task_id'] = str(task_id)
+    return redirect('feedback')
+
+
+def feedback(request):
+    current_feedback_task = None
+    if request.session.get('feedback_task_id'):
+        current_feedback_task = request.session['feedback_task_id']
+        try:
+            task_result = TaskResult.objects.get(task_id=current_feedback_task)
+            if task_result.status in ['SUCCESS', 'FAILURE']:
+                del request.session['feedback_task_id']
+                current_feedback_task = None
+        except Exception:
+            pass
+    traits_for_feedback = Trait.objects.filter(status__in=[Status.NEEDS_IMPORT, Status.NEEDS_CREATION])
+    traits_for_import_count = traits_for_feedback.filter(status=Status.NEEDS_IMPORT).count()
+    traits_for_creation_count = traits_for_feedback.filter(status=Status.NEEDS_CREATION).count()
+    github_form = GitHubSubmissionForm()
+    now = datetime.now()
+    github_form.fields['title'].initial = f"EVA-EFO import {now.month}/{now.year}"
+    github_form.fields['body'].initial = get_initial_issue_body(traits_for_import_count, traits_for_creation_count)
+    context = {"traits_for_feedback": traits_for_feedback, "traits_for_import_count": traits_for_import_count,
+               "traits_for_creation_count": traits_for_creation_count, "github_form": github_form}
+    if current_feedback_task:
+        context['current_feedback_task'] = current_feedback_task
+    return render(request, 'traits/feedback.html', context)
+
+
+@transaction.atomic
 def datasources(request):
-    # The task_id session variable is used to track task progress via the progress bar in the datasources page
-    request.session['task_id'] = request.session.get('task_id', 'None')
-    return render(request, 'traits/datasources.html')
+    context = dict()
+    add_ontology_sources_to_context(context)
+    add_trait_sources_to_context(context)
+
+    if request.session.get('current_task_id'):
+        task_name = request.session.get('current_task_name')
+        context[f"{task_name}_task_id"] = request.session.get('current_task_id')
+        for source in context['ontology_sources'] + context['trait_sources']:
+            if source['id'] == request.session.get('current_task_name'):
+                source['latest_import_date'] = timezone.now()
+        del request.session['current_task_id']
+        del request.session['current_task_name']
+
+    return render(request, 'traits/datasources.html', context)
 
 
 def all_data(request):
@@ -150,13 +234,16 @@ def all_data(request):
 
 
 def clinvar_data(request):
-    get_clinvar_data.delay()
+    result = import_clinvar.delay()
+    request.session['current_task_id'] = result.task_id
+    request.session['current_task_name'] = 'clinvar'
     return redirect('datasources')
 
 
 def zooma_suggestions(request):
-    result = get_zooma_suggestions.delay()
-    request.session['task_id'] = result.task_id
+    result = import_zooma.delay()
+    request.session['current_task_id'] = result.task_id
+    request.session['current_task_name'] = 'zooma'
     return redirect('datasources')
 
 
@@ -166,5 +253,7 @@ def dummy_data(request):
 
 
 def ols_queries(request):
-    get_ols_status.delay()
+    result = import_ols.delay()
+    request.session['current_task_id'] = result.task_id
+    request.session['current_task_name'] = 'ols'
     return redirect('datasources')

@@ -71,3 +71,4 @@ db.sqlite3
 traitcuration/static/CACHE
 dump.rdb
 config.yaml
+celerybeat.pid

@@ -39,12 +39,12 @@ class Trait(ComputedFieldsModel):
 
     @computed(models.CharField(max_length=30, choices=Status.trait_choices()), depends=[
         ['current_mapping', ['is_reviewed']],
-        ['current_mapping.term_id', ['status']]
+        ['current_mapping.mapped_term', ['status']]
     ])
     def status(self):
         if not self.current_mapping:
             return Status.UNMAPPED
-        return self.current_mapping.term_id.status if self.current_mapping.is_reviewed else Status.AWAITING_REVIEW
+        return self.current_mapping.mapped_term.status if self.current_mapping.is_reviewed else Status.AWAITING_REVIEW
 
     def __str__(self):
         return self.name
@@ -80,8 +80,8 @@ class OntologyTerm(models.Model):
 
 
 class Mapping(ComputedFieldsModel):
-    trait_id = models.ForeignKey(Trait, on_delete=models.PROTECT)
-    term_id = models.ForeignKey(OntologyTerm, on_delete=models.PROTECT)
+    mapped_trait = models.ForeignKey(Trait, on_delete=models.PROTECT)
+    mapped_term = models.ForeignKey(OntologyTerm, on_delete=models.PROTECT)
     curator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     timestamp_mapped = models.DateTimeField(auto_now=True)
 
@@ -92,23 +92,23 @@ class Mapping(ComputedFieldsModel):
         return self.review_set.count() >= 2
 
     def __str__(self):
-        return f"{self.trait_id} - {self.term_id}"
+        return f"{self.mapped_trait} - {self.mapped_term}"
 
     class Meta:
-        unique_together = ('trait_id', 'term_id',)
+        unique_together = ('mapped_trait', 'mapped_term',)
 
 
 class MappingSuggestion(models.Model):
-    trait_id = models.ForeignKey(Trait, on_delete=models.PROTECT)
-    term_id = models.ForeignKey(OntologyTerm, on_delete=models.PROTECT)
+    mapped_trait = models.ForeignKey(Trait, on_delete=models.PROTECT)
+    mapped_term = models.ForeignKey(OntologyTerm, on_delete=models.PROTECT)
     made_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Trait: {self.trait_id} | Term: {self.term_id}"
+        return f"Trait: {self.mapped_trait} | Term: {self.mapped_term}"
 
     class Meta:
-        unique_together = ('trait_id', 'term_id',)
+        unique_together = ('mapped_trait', 'mapped_term',)
 
 
 class Review(models.Model):
@@ -121,7 +121,7 @@ class Review(models.Model):
 
 
 class Comment(models.Model):
-    trait_id = models.ForeignKey(Trait, on_delete=models.PROTECT)
+    mapped_trait = models.ForeignKey(Trait, on_delete=models.PROTECT)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     date = models.DateTimeField(auto_now=True)
     body = models.TextField()

@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'computedfields'
+    'computedfields',
+    'rest_framework',
 ]
 
 
@@ -185,6 +186,7 @@ COMPRESS_PRECOMPILERS = (
 
 
 # Celery config
+
 CELERY_BROKER_URL = os.environ.get('REDIS_URL')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
@@ -194,12 +196,14 @@ CELERY_IMPORTS = (
     'traitcuration.traits.datasources',
 )
 
-
 if os.environ.get('DJANGO_ENV') == 'LOCAL_DEV':
     from .settings_localdev import *
 elif os.environ.get('DJANGO_ENV') == 'DEV':
     from .settings_dev import *
 
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
 
 # Activate Django-Heroku, only on Heroku environments.
 if '/app' in os.environ['HOME']:

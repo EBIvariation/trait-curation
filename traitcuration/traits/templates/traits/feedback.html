@@ -1,0 +1,117 @@
+{% extends "traits/base.html" %}
+{% block title %} Feedback {% endblock %}
+{% load trait_filters %}
+{% load static %}
+{% load socialaccount %}
+{% load account %}
+
+{% block content %}
+<main class="uk-container uk-container-xlarge">
+  <section>
+    <span>There are currently</span>
+    <span class="bold">
+      {{traits_for_import_count}} traits that need import</span
+    >
+    <span>and</span>
+    <span class="bold">
+      {{traits_for_creation_count}} traits that need creation.</span
+    >
+  </section>
+
+  {% if not user.is_anonymous and traits_for_import_count|add:traits_for_creation_count > 0 %}
+  <section class="section">
+    <h5>CREATE GITHUB SUBMISSION</h5>
+    <div class="progress hidden">
+      <div class="progress__spinner" uk-spinner></div>
+      <span class="progress__icon" uk-icon="check"></span>
+      <span class="progress__message"></span>
+    </div>
+    <form action="{% url 'post_issue' %}" id="form" method="post">
+      {% csrf_token %}
+      <div class="fields">
+        <div class="field__container">
+          <label class="bold field__label" for="github_form.repo.id_for_label">
+            GitHub Repository</label
+          >
+          {{github_form.repo}}
+          <span id="{{github_form.repo.auto_id}}-error" class="field__error"></span>
+        </div>
+        <div class="field__container">
+          <label class="bold field__label" for="github_form.title.id_for_label">
+            Issue Title</label
+          >
+          {{github_form.title}}
+          <span id="{{github_form.title.auto_id}}-error" class="field__error"></span>
+        </div>
+        <div class="field__container">
+          <label class="bold field__label" for="github_form.body.id_for_label">
+            Issue Body</label
+          >
+          {{github_form.body}}
+          <span id="{{github_form.body.auto_id}}-error" class="field__error"></span>
+        </div>
+        <span>
+          Note: The spreadsheet containing the terms will be automatically
+          created and the link will be placed inside the {spreadsheet_url} tag.
+        </span>
+      </div>
+    </form>
+    <button
+      onclick="validateAndSubmit()"
+      class="button button--primary uk-button new_term__button"
+    >
+    <span uk-icon="github" class="uk-margin-small-right"></span>
+    <span> SUBMIT ISSUE </span>
+  </button>
+  {% endif %}
+  </section>
+
+  <section class="section">
+    <h5>TERMS FOR SUBMISSION</h5>
+    <table class="uk-table uk-table-small uk-table-divider uk-table-justify">
+      <thead>
+        <tr>
+          <th class="uk-width-large">TRAIT NAME</th>
+          <th class="uk-width-1-6">SOURCE RECORDS</th>
+          <th class="uk-width-1-6">MAPPED TERM</th>
+          <th class="uk-width-large">MAPPED TERM LABEL</th>
+          <th class="uk-width-1-6">TRAIT STATUS</th>
+        </tr>
+      </thead>
+      <tbody class="list">
+        {% for trait in traits_for_feedback %}
+        <tr status="{{trait.status}}">
+          <td class="name">
+            <a href="{% url 'trait_detail' trait.id %}">{{trait.name}}</a>
+          </td>
+          <td>{% firstof trait.number_of_source_records '0' %}</td>
+          <td class="curie">
+            {% if trait.current_mapping.term_id.iri %}
+            <a target="_blank" href="{{ trait.current_mapping.term_id.iri }}">
+              {{trait.current_mapping.term_id.curie}}
+            </a>
+            {% else %} None {% endif %}
+          </td>
+          <td class="label">
+            {% firstof trait.current_mapping.term_id.label 'None' %}
+          </td>
+          <td>
+            <span class="uk-label label--warning">
+              {{trait.status | status_readable_name}}</span
+            >
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</main>
+
+<script src="{% static 'js/github-issue.js' %}"></script>
+<script>
+  const task_id = "{{current_feedback_task}}";
+
+  if (task_id) pollFeedbackTask(task_id);
+  else document.querySelector(".progress").classList.add("hidden");
+</script>
+{% endblock %}
