@@ -3,6 +3,7 @@ from celery_progress.backend import ProgressRecorder
 
 from .datasources import zooma, clinvar, ols
 from .models import Trait
+from .utils import create_spreadsheet_and_issue
 
 
 @shared_task(bind=True)
@@ -32,3 +33,9 @@ def get_clinvar_data_and_suggestions():
 def get_ols_status():
     ols.ols_update()
     return 'Successful status update'
+
+
+@shared_task
+def create_github_issue(github_access_token, issue_info, user_email):
+    issue_url = create_spreadsheet_and_issue(github_access_token, issue_info, user_email)
+    return issue_url
