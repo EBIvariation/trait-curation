@@ -61,8 +61,12 @@ def parse_trait_names_and_source_records():
         for row in itertools.islice(reader, NUMBER_OF_RECORDS):
             # For every row, get its allele_id and all its rcv_accessions and phenotypes
             row_alleleid = (row['#AlleleID'])
-            row_rcv_list = row['RCVaccession'].split(';')
-            row_phenotype_list = row['PhenotypeList'].split(';')
+            row_rcv_list = row['RCVaccession'].split('|')
+            row_phenotype_list = row['PhenotypeList'].split('|')
+            if '-' in row_phenotype_list:
+                row_phenotype_list.remove('-')
+            if len(row_phenotype_list) > 5:
+                continue
             # Get every possible pair tuple of allele_id rcv_accessions and phenotypes for the current row
             tuple_set = {(row_alleleid, rcv, phenotype) for rcv, phenotype in zip(row_rcv_list, row_phenotype_list)}
             # Insert the tuple in the dictionary
