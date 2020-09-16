@@ -180,9 +180,9 @@ def find_automatic_mapping(trait, created_terms, high_confidence_term_iris):
 @transaction.atomic
 def create_mapping(trait, term):
     zooma_user = User.objects.filter(email='eva-dev@ebi.ac.uk').first()
-    if Mapping.objects.filter(trait_id=trait, term_id=term).exists():
+    if Mapping.objects.filter(mapped_trait=trait, mapped_term=term).exists():
         return
-    mapping = Mapping(trait_id=trait, term_id=term, curator=zooma_user, is_reviewed=False)
+    mapping = Mapping(mapped_trait=trait, mapped_term=term, curator=zooma_user, is_reviewed=False)
     mapping.save()
     trait.current_mapping = mapping
     trait.save()
@@ -197,7 +197,7 @@ def delete_unused_suggestions(trait, created_terms):
     trait_mappings = trait.mapping_set.all()
     for mapping in trait_mappings:
         created_terms.add(mapping.mapped_term)
-    deleted_suggestions = trait.mappingsuggestion_set.exclude(mapped_term__in=list(suggested_terms))
+    deleted_suggestions = trait.mappingsuggestion_set.exclude(mapped_term__in=list(created_terms))
 
     deleted_suggestions.delete()
     logger.info(f"Deleted mapping suggestions {deleted_suggestions.all()}")
