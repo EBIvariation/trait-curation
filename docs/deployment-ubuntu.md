@@ -48,12 +48,84 @@ GRANT ALL PRIVILEGES ON DATABASE traitcuration TO ubuntu;
 \q
 ```
 
-## 3. Clone the project's code and create a virtual environment
+## 3. Install Redis for background task scheduling
+The suggested way of installing Redis is compiling it from sources as Redis has no dependencies other than a working GCC compiler and libc. Installing it using the Ubuntu package manager is somewhat discouraged as usually the available version is not the latest.
+
+1. Move to the home folder, download and compile Redis:
+```
+cd ~
+wget http://download.redis.io/redis-stable.tar.gz
+tar xvzf redis-stable.tar.gz
+cd redis-stable
+make
+```
+
+2. Copy both the Redis server and the command line interface into the proper places:
+```
+sudo make install
+```
+
+3. Check the installation by manually starting the redis-server:
+```
+redis-server
+```
+
+You should also check whether you can ping it by opening another terminal and running:
+```
+redis-cli ping
+```
+You should receive a "PONG" response.
+
+4. Create a directory in which to store your Redis config files and your data:
+```
+sudo mkdir /etc/redis
+sudo mkdir /var/redis
+```
+
+5. Copy the init script that you'll find in the Redis distribution under the utils directory into /etc/init.d and call it with the name of the port where you are running this instance of Redis:
+```
+sudo cp utils/redis_init_script /etc/init.d/redis_6379
+```
+
+6. Copy the template configuration file you'll find in the root directory of the Redis distribution into /etc/redis/ using the port number as name:
+```
+sudo cp redis.conf /etc/redis/6379.conf
+```
+
+7. Edit the configuration file, making sure to perform the following changes:
+
+- Set daemonize to yes (by default it is set to no).
+- Set the logfile to /var/log/redis_6379.log
+- Set the dir to /var/redis/6379
+
+8. Create a directory inside /var/redis that will work as data and working directory for this Redis instance:
+```
+sudo mkdir /var/redis/6379
+```
+
+9. Finally add the new Redis init script to all the default runlevels using the following command:
+```
+sudo update-rc.d redis_6379 defaults
+```
+
+10. You are done! Now you can try running your instance with:
+```
+sudo /etc/init.d/redis_6379 start
+```
+Make sure that everything is working as expected:
+
+- Try pinging your instance with redis-cli.
+- Do a test save with `redis-cli save` and check that the dump file is correctly stored into /var/redis/6379/ (you should find a file called dump.rdb).
+- Check that your Redis instance is correctly logging in the log file.
+- Make sure that after a reboot everything is still working.
+
+
+## 4. Clone the project's code and create a virtual environment
 
 1. Navigate to the host user's home directory and then clone the GitHub repository and move inside its directory:
 ```
 cd ~
-git clone git@github.com:EBIvariation/trait-curation.git
+git clone https://github.com/EBIvariation/trait-curation.git
 cd trait-curation
 ````
 
@@ -75,7 +147,7 @@ Your prompt should change to indicate that you are now operating within a Python
 pip3 install -r requirements.txt
 ```
 
-## 4. Configure the project's settings
+## 5. Configure the project's settings
 1.  Open the settings file in your text editor:
 
 ```
@@ -91,22 +163,7 @@ ALLOWED_HOSTS = [ 'example.com', '203.0.113.5']
 #ALLOWED_HOSTS = ['your_server_domain_or_IP', 'second_domain_or_IP', . . .]
 ```
 
-3. Next, find the section that configures database access. It will start with DATABASES. The configuration in the file is for a SQLite database. We already created a PostgreSQL database for our project, so we need to adjust the settings. You can leave the PORT setting as an empty string:
-
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'traitcuration',
-        'USER': 'ubuntu',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
-}
-```
-
-4. Make sure the static files settings, located at the bottom of the files, are correctly configured as follows: 
+3. Next, make sure the static files settings, located at the bottom of the files, are correctly configured as follows: 
 ```python
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
@@ -132,6 +189,13 @@ COMPRESS_PRECOMPILERS = (
 The `STATICFILES_DIRS` options lets Django know where to look for static files indide the project, the `STATIC_URL` option indicates the url that the server serves static files from, and the `STATIC_ROOT` option is where the directory within the server where static files are all collected to and served from.
 
 Basically, Django collects all files from directories specified in `STATICFILES_DIRS`, moves them to `STATIC_ROOT`, and NginX will serve them from that directory, with clients requesting static files from the `STATIC_URL` endpoint.
+
+4. We then need to add the `config.yaml` file to the project's root directory. Go ahead and create that file, and copy the settings located in the private GitHub repository that contains the sample config file.
+```
+nano /home/ubuntu/trait-curation/config.yaml
+```
+
+5. Make sure that the credentials you used when creating the PostgreSQL database match the ones in the config file, and that the API keys and secrets are correct.
 
 6. Now, we can migrate the initial database schema to our PostgreSQL database using the management script. Then we collect our static files.
 ```
@@ -176,7 +240,7 @@ WantedBy=multi-user.target
 ```
 The `[Unit]` section isused to specify metadata and dependencies. We’ll put a description of our service here and tell the init system to only start this after the networking target has been reached.
 
-I the `[Service]` section we’ll specify the user and group that we want to process to run under. We will give our regular user account ownership of the process since it owns all of the relevant files. We’ll give group ownership to the www-data group so that Nginx can communicate easily with Gunicorn.
+In the `[Service]` section we’ll specify the user and group that we want to process to run under. We will give our regular user account ownership of the process since it owns all of the relevant files. We’ll give group ownership to the www-data group so that Nginx can communicate easily with Gunicorn.
 
 We’ll then map out the working directory and specify the command to use to start the service. In this case, we’ll have to specify the full path to the Gunicorn executable, which is installed within our virtual environment. We will bind it to a Unix socket within the project directory since Nginx is installed on the same computer. This is safer and faster than using a network port. We can also specify any optional Gunicorn tweaks here. In our case, we have specified 3 workers.
 
@@ -240,9 +304,11 @@ sudo ln -s /etc/nginx/sites-available/traitcuration /etc/nginx/sites-enabled
 sudo nginx -t
 ```
 
-5. If no errors are reported, go ahead and restart Nginx by typing:
+5. If no errors are reported, go ahead and rerun `collectstatic` and then restart Nginx and Gunicorn by typing:
 ```
-sudo systemctl restart nginx
+rm -rf ~/trait-curation/static/
+~/trait-curation/manage.py collectstatic
+sudo systemctl restart nginx gunicorn
 ```
 
 6. Finally, we need to open up our firewall to normal traffic on port 80. Since we no longer need access to the development server, we can remove the rule to open port 8000 as well:
@@ -255,76 +321,6 @@ Note:  After configuring Nginx, the next step before going into production shoul
 
 If you have a domain name, the easiest way get an SSL certificate to secure your traffic is using Let’s Encrypt. Follow [this guide](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04) to set up Let’s Encrypt with Nginx on Ubuntu 16.04.
 
-## 7. Install Redis for background task scheduling
-The suggested way of installing Redis is compiling it from sources as Redis has no dependencies other than a working GCC compiler and libc. Installing it using the Ubuntu package manager is somewhat discouraged as usually the available version is not the latest.
-
-1. Move to the home folder, download and compile Redis:
-```
-cd ~
-wget http://download.redis.io/redis-stable.tar.gz
-tar xvzf redis-stable.tar.gz
-cd redis-stable
-make
-```
-
-2. Copy both the Redis server and the command line interface into the proper places:
-```
-make install
-```
-
-3. Check the installation by manually starting the redis-server:
-```
-redis-server
-```
-
-You should also check whether you can ping it by opening another terminal and running:
-```
-redis-cli ping
-```
-You should receive a "PONG" response.
-
-4. Create a directory in which to store your Redis config files and your data:
-```
-sudo mkdir /etc/redis
-sudo mkdir /var/redis
-```
-
-5. Copy the init script that you'll find in the Redis distribution under the utils directory into /etc/init.d and call it with the name of the port where you are running this instance of Redis:
-```
-sudo cp utils/redis_init_script /etc/init.d/redis_6379
-```
-
-6. Copy the template configuration file you'll find in the root directory of the Redis distribution into /etc/redis/ using the port number as name:
-```
-sudo cp redis.conf /etc/redis/6379.conf
-```
-
-7. Edit the configuration file, making sure to perform the following changes:
-
-- Set daemonize to yes (by default it is set to no).
-- Set the logfile to /var/log/redis_6379.log
-- Set the dir to /var/redis/6379
-
-8. Create a directory inside /var/redis that will work as data and working directory for this Redis instance:
-```
-sudo mkdir /var/redis/6379
-```
-
-9. Finally add the new Redis init script to all the default runlevels using the following command:
-```
-sudo update-rc.d redis_6379 defaults
-```
-
-10. You are done! Now you can try running your instance with:
-```
-sudo /etc/init.d/redis_6379 start
-```
-Make sure that everything is working as expected:
-
-- Try pinging your instance with redis-cli.
-- Do a test save with `redis-cli save` and check that the dump file is correctly stored into /var/redis/6379/ (you should find a file called dump.rdb).
-- Check that your Redis instance is correctly logging in the log file.
-- Make sure that after a reboot everything is still working.
 
 ## 8. Daemonize Celery for background task execution
 
@@ -346,13 +342,13 @@ CELERYD_NODES="worker1"
 #CELERYD_NODES=10
 
 # Absolute or relative path to the 'celery' command:
-CELERY_BIN="/home/trait-curation/traitcurationenv/bin/celery"
+CELERY_BIN="/home/ubuntu/trait-curation/traitcurationenv/bin/celery"
 
 # App instance to use
 CELERY_APP="traitcuration"
 
 # Where to chdir at start.
-CELERYD_CHDIR="/opt/django_projects/your_proj/"
+CELERYD_CHDIR="/home/ubuntu/trait-curation/"
 
 # Extra command-line arguments to the worker
 CELERYD_OPTS="--time-limit=7200 --concurrency=8"
@@ -382,9 +378,11 @@ chmod +x celeryd
 sudo mv celeryd /etc/init.d/
 ```
 
-3. Create the logs directory:
+3. Create the logs directory, and change the owner for sufficient permissions:
 ```
 sudo mkdir /var/log/celery
+chown -R ubuntu:ubuntu /var/log/celery/
+chown -R ubuntu:ubuntu /var/run/celery/
 ```
 
 4. Verbose the init-scripts. 
@@ -403,4 +401,15 @@ The output should return:
 ```
 sudo update-rc.d celeryd defaults
 sudo service celeryd start
+```
+
+## 9. Create Google API credentials file
+
+In order for the app to create spreadsheets via the `gspread` library, there needs to exist a `service_account.json` file. If you haven't enabled a service account for the app, follow these instructions to do so https://gspread.readthedocs.io/en/latest/oauth2.html#enable-api-access-for-a-project.
+
+Once available, download the `.json` file with the service account credentials, create the file by typing the commands below, and then paste the content.
+
+```
+mkdir ~/.config/gspread
+nano ~/.config/gspread/service_account.json
 ```
