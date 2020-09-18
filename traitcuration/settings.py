@@ -167,10 +167,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 COMPRESS_ENABLED = True
 
-STATICFILES_DIRS = []
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'traitcuration/static/'), ]
 
-STATIC_URL = os.path.join(BASE_DIR, 'traitcuration/static/')
-STATIC_ROOT = os.path.join(BASE_DIR, 'traitcuration/static')
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 COMPRESS_ROOT = os.path.join(BASE_DIR, 'traitcuration/static/')
 
 STATICFILES_FINDERS = (
@@ -183,7 +183,6 @@ COMPRESS_PRECOMPILERS = (
     ('text/x-sass', 'django_libsass.SassCompiler'),
     ('text/x-scss', 'django_libsass.SassCompiler'),
 )
-
 
 # Celery config
 CELERY_BROKER_URL = config['DATABASES']['REDIS']['URL']
