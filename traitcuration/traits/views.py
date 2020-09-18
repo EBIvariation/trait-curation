@@ -1,5 +1,6 @@
 import json
 import requests
+import yaml
 from datetime import datetime
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -18,6 +19,14 @@ from .datasources import dummy, zooma
 from .tasks import import_zooma, import_clinvar, get_clinvar_data_and_suggestions, import_ols
 from .tasks import create_github_issue
 from .forms import NewTermForm, GitHubSubmissionForm
+
+
+try:
+    file = open('config.yaml', 'r')
+    config = yaml.load(file, Loader=yaml.FullLoader)
+except FileNotFoundError as e:
+    print('Config file not found! Make sure you have config.yaml in the project directory')
+    raise e
 
 
 def browse(request):
@@ -145,8 +154,8 @@ def review(request, pk):
 
 def github_callback(request):
     payload = {}
-    payload['client_id'] = '328c5e48d8b20f2849bd'
-    payload['client_secret'] = '594e44da561dbd9169d57796de9c1cfa6a462f71'
+    payload['client_id'] = config['GITHUB_API']['CLIENT_ID']
+    payload['client_secret'] = config['GITHUB_API']['CLIENT_SECRET']
     payload['code'] = request.GET['code']
     headers = {}
     headers['Accept'] = 'application/json'
@@ -164,7 +173,7 @@ def post_issue(request):
         request.session['github_request'] = request_body
 
     if request.session.get('github_access_token') is None:
-        client_id = '328c5e48d8b20f2849bd'
+        client_id = config['GITHUB_API']['CLIENT_ID']
         return redirect(f"https://github.com/login/oauth/authorize?scope=user,repo&client_id={client_id}")
 
     access_token = request.session.get('github_access_token')
