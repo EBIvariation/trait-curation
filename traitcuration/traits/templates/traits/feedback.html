@@ -86,14 +86,14 @@
           </td>
           <td>{% firstof trait.number_of_source_records '0' %}</td>
           <td class="curie">
-            {% if trait.current_mapping.term_id.iri %}
-            <a target="_blank" href="{{ trait.current_mapping.term_id.iri }}">
-              {{trait.current_mapping.term_id.curie}}
+            {% if trait.current_mapping.mapped_term.iri %}
+            <a target="_blank" href="{{ trait.current_mapping.mapped_term.iri }}">
+              {{trait.current_mapping.mapped_term.curie}}
             </a>
             {% else %} None {% endif %}
           </td>
           <td class="label">
-            {% firstof trait.current_mapping.term_id.label 'None' %}
+            {% firstof trait.current_mapping.mapped_term.label 'None' %}
           </td>
           <td>
             <span class="uk-label label--warning">

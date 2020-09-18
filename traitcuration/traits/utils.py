@@ -88,8 +88,8 @@ def add_trait_sources_to_context(context):
     context['trait_sources'] = trait_sources
 
 
-def create_spreadsheet_and_issue(github_access_token, issue_info):
-    gc = gspread.oauth()
+def create_spreadsheet_and_issue(github_access_token, issue_info, user_email):
+    gc = gspread.service_account()
 
     github = Github(github_access_token)
 
@@ -135,8 +135,8 @@ def create_spreadsheet_and_issue(github_access_token, issue_info):
     for index, trait in enumerate(needs_import_traits):
         row_index = 2 + index
         row_update_dict['range'] = f"A{row_index}:D{row_index}"  # Cell range: E.g. A3:D3
-        term_iri = trait.current_mapping.term_id.iri
-        term_label = trait.current_mapping.term_id.label
+        term_iri = trait.current_mapping.mapped_term.iri
+        term_label = trait.current_mapping.mapped_term.label
         trait_name = trait.name
         source_records = trait.number_of_source_records
         row_update_dict['values'] = [[term_iri, term_label, trait_name, source_records]]
@@ -165,9 +165,9 @@ def create_spreadsheet_and_issue(github_access_token, issue_info):
     for index, trait in enumerate(needs_creation_traits):
         row_index = 2 + index
         row_update_dict['range'] = f"A{row_index}:E{row_index}"  # Cell range: E.g. A3:E3
-        term_label = trait.current_mapping.term_id.label
-        term_description = trait.current_mapping.term_id.description
-        term_cross_refs = trait.current_mapping.term_id.cross_refs
+        term_label = trait.current_mapping.mapped_term.label
+        term_description = trait.current_mapping.mapped_term.description
+        term_cross_refs = trait.current_mapping.mapped_term.cross_refs
         trait_name = trait.name
         source_records = trait.number_of_source_records
         row_update_dict['values'] = [[term_label, term_description, term_cross_refs, trait_name, source_records]]
