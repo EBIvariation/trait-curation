@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'computedfields',
     'rest_framework',
+    'django_admin_conf_vars'
 ]
 
 
@@ -193,6 +194,11 @@ CELERY_IMPORTS = (
     'traitcuration.traits.tasks',
     'traitcuration.traits.datasources',
 )
+
+
+# django_admin_conf_vars config
+VARS_MODULE_PATH = 'traitcuration.config_vars'
+
 
 # Local environment config
 if os.environ.get('DJANGO_ENV') == 'LOCAL_DEV':

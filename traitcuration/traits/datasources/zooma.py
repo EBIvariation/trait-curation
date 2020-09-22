@@ -6,6 +6,7 @@ import requests
 import logging
 
 from django.db import transaction
+from django_admin_conf_vars.global_vars import config
 
 from ..models import Trait, MappingSuggestion, OntologyTerm, User, Status, Mapping
 from .ols import make_ols_query, get_ontology_id, get_term_status
@@ -16,7 +17,7 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-BASE_URL = "http://www.ebi.ac.uk/spot/zooma/v2/api"
+BASE_URL = config.ZOOMA_BASE_URL
 
 
 def run_zooma_for_all_traits():
