@@ -403,7 +403,63 @@ sudo update-rc.d celeryd defaults
 sudo service celeryd start
 ```
 
-## 9. Create Google API credentials file
+## 9. Daemonize Celery Beat for background task scheduling
+
+1. First, create the configuration file for the `celerybeat` daemon:
+
+```
+sudo nano /etc/default/celerybeat
+```
+
+2. Add the following configuration:
+```python
+# Absolute or relative path to the 'celery' command:
+CELERY_BIN="/home/ubuntu/trait-curation/traitcurationenv/bin/celery"
+
+# App instance to use
+CELERY_APP="traitcuration"
+
+# Where to chdir at start.
+CELERYBEAT_CHDIR="/home/ubuntu/trait-curation/"
+
+# Extra arguments to celerybeat
+CELERYBEAT_OPTS="--scheduler django_celery_beat.schedulers:DatabaseScheduler"
+
+CELERYBEAT_LOG_FILE="/var/log/celerybeat/beat.log"
+
+CELERYBEAT_USER="ubuntu"
+```
+
+3. Download the generic init script for `celerybeat` daemon, and place it in the `init.d` directory:
+
+```
+cd ~
+wget https://raw.githubusercontent.com/celery/celery/3.1/extra/generic-init.d/celerybeat
+sudo chmod +x celerybeat
+sudo mv celerybeat /etc/init.d/celerybeat
+```
+
+4. Create the logs file and directory, and add the appropriate permissions
+```
+mkdir /var/log/celerybeat
+chown -R ubuntu:ubuntu /var/log/celerybeat
+touch /var/log/celerybeat/beat.log
+```
+
+5. Verbose the init-scripts
+```
+sudo sh -x /etc/init.d/celerybeat start
+sudo sh -x /etc/init.d/celerybeat status
+```
+
+6. Provided you get a successful exit status, enable the daemon
+```
+sudo update-rc.d celerybeat defaults
+sudo service celerybeat start
+```
+
+
+## 10. Create Google API credentials file
 
 In order for the app to create spreadsheets via the `gspread` library, there needs to exist a `service_account.json` file. If you haven't enabled a service account for the app, follow these instructions to do so https://gspread.readthedocs.io/en/latest/oauth2.html#enable-api-access-for-a-project.
 
