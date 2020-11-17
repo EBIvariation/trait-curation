@@ -406,8 +406,7 @@ sudo service celeryd start
 ## 9. Daemonize Celery Beat for background task scheduling
 
 1. First, create the configuration file for the `celerybeat` daemon:
-
-```
+```bash
 sudo nano /etc/default/celerybeat
 ```
 
@@ -431,8 +430,7 @@ CELERYBEAT_USER="ubuntu"
 ```
 
 3. Download the generic init script for `celerybeat` daemon, and place it in the `init.d` directory:
-
-```
+```bash
 cd ~
 wget https://raw.githubusercontent.com/celery/celery/3.1/extra/generic-init.d/celerybeat
 sudo chmod +x celerybeat
@@ -440,20 +438,20 @@ sudo mv celerybeat /etc/init.d/celerybeat
 ```
 
 4. Create the logs file and directory, and add the appropriate permissions
-```
+```bash
 mkdir /var/log/celerybeat
 chown -R ubuntu:ubuntu /var/log/celerybeat
 touch /var/log/celerybeat/beat.log
 ```
 
 5. Verbose the init-scripts
-```
+```bash
 sudo sh -x /etc/init.d/celerybeat start
 sudo sh -x /etc/init.d/celerybeat status
 ```
 
 6. Provided you get a successful exit status, enable the daemon
-```
+```bash
 sudo update-rc.d celerybeat defaults
 sudo service celerybeat start
 ```
