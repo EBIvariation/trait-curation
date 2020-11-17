@@ -7,6 +7,7 @@ import logging
 from retry import retry
 
 from django.db import transaction
+from django_admin_conf_vars.global_vars import config
 
 from ..models import Status, OntologyTerm
 
@@ -15,7 +16,7 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-BASE_URL = "https://www.ebi.ac.uk/ols/api/"
+BASE_URL = config.OLS_BASE_URL
 
 
 @retry(tries=3, delay=5, backoff=1.2, jitter=(1, 3), logger=logger)

@@ -14,6 +14,8 @@ import django_heroku
 import os
 import yaml
 
+from celery.schedules import crontab
+
 try:
     file = open('config.yaml', 'r')
     config = yaml.load(file, Loader=yaml.FullLoader)
@@ -58,6 +60,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'computedfields',
     'rest_framework',
+    'django_admin_conf_vars',
+    'django_celery_beat',
 ]
 
 
@@ -184,6 +188,7 @@ COMPRESS_PRECOMPILERS = (
     ('text/x-scss', 'django_libsass.SassCompiler'),
 )
 
+
 # Celery config
 CELERY_BROKER_URL = config['DATABASES']['REDIS']['URL']
 CELERY_ACCEPT_CONTENT = ['json']
@@ -193,6 +198,26 @@ CELERY_IMPORTS = (
     'traitcuration.traits.tasks',
     'traitcuration.traits.datasources',
 )
+
+CELERY_BEAT_SCHEDULE = {
+    'import-clinvar-every-thursday': {
+        'task': 'traitcuration.traits.tasks.import_clinvar',
+        'schedule': crontab(hour='9', minute='25', day_of_week='thu'),
+    },
+    'import-zooma-every-thursday': {
+        'task': 'traitcuration.traits.tasks.import_zooma',
+        'schedule': crontab(hour='9', minute='33', day_of_week='thu'),
+    },
+    'update-ols-every-month': {
+        'task': 'traitcuration.traits.tasks.import_ols',
+        'schedule': crontab(0, 0, day_of_month='2')
+    }
+}
+
+
+# django_admin_conf_vars config
+VARS_MODULE_PATH = 'traitcuration.config_vars'
+
 
 # Local environment config
 if os.environ.get('DJANGO_ENV') == 'LOCAL_DEV':
