@@ -41,7 +41,7 @@ mccabe==0.6.1
 oauthlib==3.1.0
 protobuf==3.12.4
 psycopg2==2.8.5
-py==1.9.0
+py==1.10.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycodestyle==2.6.0
